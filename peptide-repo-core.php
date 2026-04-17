@@ -8,7 +8,7 @@
  * Author URI:  https://peptiderepo.com
  * License:     GPL-2.0-or-later
  * Text Domain: peptide-repo-core
- * Requires PHP: 8.0
+ * Requires PHP: 8.1
  *
  * @see ARCHITECTURE.md — Full data flow and file tree.
  * @see CONVENTIONS.md  — Naming patterns and extension guides.

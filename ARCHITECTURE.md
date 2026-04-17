@@ -48,10 +48,12 @@ peptide-repo-core/
 ├── ARCHITECTURE.md                    # This file
 ├── CONVENTIONS.md                     # Naming patterns, extension guides
 ├── CHANGELOG.md                       # Semantic versioning changelog
+├── composer.json                      # Dev dependencies (PHPCS, WPCS) and lint scripts
+├── phpcs.xml.dist                     # PHPCS ruleset configuration
 │
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                     # PHP lint (8.0-8.2), PHPCS, 300-line check
+│       └── ci.yml                     # PHP lint (8.1-8.3), PHPCS WordPress, 300-line check
 │
 ├── assets/
 │   └── css/
