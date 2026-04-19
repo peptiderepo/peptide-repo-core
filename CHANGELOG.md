@@ -3,6 +3,15 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] — 2026-04-19
+
+### Fixed
+- **Fatal error on activation: `NAMESPACE` is a PHP reserved keyword.** Renamed
+  to `REST_NAMESPACE` in the REST controller.
+- **Fatal error: autoloader cannot resolve `PR_Core` class.** Class name equals
+  the autoloader prefix exactly, producing wrong filename. Added explicit
+  require_once in bootstrap (same pattern as PRAutoBlogger).
+
 ## [0.1.0] — 2026-04-17
 
 ### Added

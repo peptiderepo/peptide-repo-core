@@ -23,7 +23,7 @@ declare(strict_types=1);
 class PR_Core_Rest_Controller {
 
 	/** @var string REST namespace. */
-	private const NAMESPACE = 'pr-core/v1';
+	private const REST_NAMESPACE = 'pr-core/v1';
 
 	/**
 	 * Register the rest_api_init hook.
@@ -43,7 +43,7 @@ class PR_Core_Rest_Controller {
 	 */
 	public function register_routes(): void {
 		// GET /peptides
-		register_rest_route( self::NAMESPACE, '/peptides', [
+		register_rest_route( self::REST_NAMESPACE, '/peptides', [
 			'methods'             => 'GET',
 			'callback'            => [ $this, 'list_peptides' ],
 			'permission_callback' => '__return_true',
@@ -57,14 +57,14 @@ class PR_Core_Rest_Controller {
 		] );
 
 		// GET /peptides/{id}
-		register_rest_route( self::NAMESPACE, '/peptides/(?P<id>\d+)', [
+		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)', [
 			'methods'             => 'GET',
 			'callback'            => [ $this, 'get_peptide' ],
 			'permission_callback' => '__return_true',
 		] );
 
 		// GET /peptides/{id}/dosing
-		register_rest_route( self::NAMESPACE, '/peptides/(?P<id>\d+)/dosing', [
+		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)/dosing', [
 			'methods'             => 'GET',
 			'callback'            => [ $this, 'list_dosing' ],
 			'permission_callback' => '__return_true',
@@ -75,21 +75,21 @@ class PR_Core_Rest_Controller {
 		] );
 
 		// POST /peptides/{id}/dosing (auth required)
-		register_rest_route( self::NAMESPACE, '/peptides/(?P<id>\d+)/dosing', [
+		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)/dosing', [
 			'methods'             => 'POST',
 			'callback'            => [ $this, 'create_dosing' ],
 			'permission_callback' => [ $this, 'check_write_permission' ],
 		] );
 
 		// GET /peptides/{id}/legal
-		register_rest_route( self::NAMESPACE, '/peptides/(?P<id>\d+)/legal', [
+		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)/legal', [
 			'methods'             => 'GET',
 			'callback'            => [ $this, 'list_legal' ],
 			'permission_callback' => '__return_true',
 		] );
 
 		// POST /peptides/{id}/legal (auth required)
-		register_rest_route( self::NAMESPACE, '/peptides/(?P<id>\d+)/legal', [
+		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)/legal', [
 			'methods'             => 'POST',
 			'callback'            => [ $this, 'create_legal' ],
 			'permission_callback' => [ $this, 'check_write_permission' ],
