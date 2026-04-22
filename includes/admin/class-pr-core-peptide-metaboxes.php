@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Meta boxes for the peptide edit screen: scientific identifiers, dosing, and legal.
  *
- * What: Renders and saves three meta boxes on the pr_peptide edit screen.
+ * What: Renders and saves three meta boxes on the peptide edit screen.
  * Who calls it: PR_Core_Admin via add_meta_boxes and save_post hooks.
  * Dependencies: PR_Core_Dosing_Repository, PR_Core_Legal_Repository.
  *

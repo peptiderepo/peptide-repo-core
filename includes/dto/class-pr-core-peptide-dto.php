@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Typed data-transfer object for a peptide record.
  *
- * What: Immutable value object wrapping a pr_peptide post + its meta fields.
+ * What: Immutable value object wrapping a peptide post + its meta fields.
  * Who calls it: PR_Core_Peptide_Repository returns these; consumers read them.
  * Dependencies: None.
  *

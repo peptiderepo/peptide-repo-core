@@ -61,3 +61,14 @@ Values: `prescription`, `ruo`, `otc`, `restricted`, `banned`, `unclear`. Validat
 ## Supersede Pattern (Soft Delete)
 
 Dosing rows and legal cells use a `superseded_by_id` column instead of hard deletes. When a correction is needed, the old row gets `superseded_by_id` set to the new row's ID. Queries for "active" data filter on `superseded_by_id IS NULL`. This preserves full audit history.
+
+## CPT Ownership
+
+- **One plugin owns each CPT.** PR Core owns the `peptide` CPT and the `peptide_category` taxonomy (as of v0.2.0). No other plugin in this ecosystem registers these post types or taxonomies directly.
+- **All registrations must guard with existence checks.** CPT registrations call `if ( post_type_exists( $slug ) ) return;` before `register_post_type()`, and taxonomy registrations call `if ( taxonomy_exists( $slug ) ) return;` before `register_taxonomy()`. This makes deploy order between plugins irrelevant — whichever runs first wins, the other no-ops — and prevents rewrite-slug collisions when two plugins temporarily overlap during a transition.
+- **Consumers read, do not register.** Plugins that need to query or display `peptide` posts (PSA, PR Theme, PRAutoBlogger, Peptide News, Tier 1 tools) call `get_posts( [ 'post_type' => 'peptide' ] )` / `WP_Query` without registering the CPT themselves. If a consumer plugin needs its own custom post type for a different domain (e.g., `reconstitution_protocol`), it registers its own slug and does not touch `peptide`.
+- **Meta keys are plugin-namespaced, not CPT-namespaced.** PR Core writes `_pr_core_*` or bare keys registered via `register_post_meta()`. PSA writes `psa_*`. The two namespaces coexist on the same `peptide` post because they don't collide.
+
+## `_pr_core_authored` Flag
+
+Any `peptide` post created via PR Core's own UI (not authored via PSA's meta boxes) must be tagged with post-meta key `_pr_core_authored` = `1`. This is the flag `uninstall.php` uses to scope teardown to plugin-owned posts only. Posts originating from PSA (the 89 canonical peptide monographs on production) do not carry this flag and are never deleted on PR Core uninstall.

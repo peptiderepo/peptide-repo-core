@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Custom admin list-table columns for the pr_peptide CPT.
+ * Custom admin list-table columns for the peptide CPT.
  *
  * What: Adds evidence strength, editorial status, and dosing count columns.
  * Who calls it: PR_Core_Admin via manage_posts_columns and custom_column hooks.

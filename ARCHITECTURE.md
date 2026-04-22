@@ -1,6 +1,8 @@
 # Peptide Repo Core — Architecture
 
-Peptide Repo Core is a WordPress plugin that provides the canonical peptide data layer for the peptiderepo.com ecosystem. It defines the `pr_peptide` custom post type, custom tables for dosing rows and legal status cells, typed repository classes, an AI candidate queue for semi-automated data extraction, a shared disclaimer component, and JSON-LD structured data output. Every consumer plugin (PR Theme, PRAutoBlogger, Peptide News, Peptide Search AI, and all Tier 1 tools) reads peptide data through this plugin's versioned PHP API, never directly.
+Peptide Repo Core is a WordPress plugin that provides the canonical peptide data layer for the peptiderepo.com ecosystem. It owns the `peptide` custom post type (consolidated in v0.2.0; previously registered by Peptide Search AI pre-schema-sprint — PSA v4.5.0 drops its registration in favor of this one), the `peptide_category` taxonomy, custom tables for dosing rows and legal status cells, typed repository classes, an AI candidate queue for semi-automated data extraction, a shared disclaimer component, and JSON-LD structured data output. Every consumer plugin (PR Theme, PRAutoBlogger, Peptide News, Peptide Search AI, and all Tier 1 tools) reads peptide data through this plugin's versioned PHP API, never directly.
+
+**Ownership model (v0.2.0+).** PR Core is the sole registrant of the `peptide` CPT and `peptide_category` taxonomy. Registration is guarded by `post_type_exists()` / `taxonomy_exists()` so a second registration from any other plugin (historically PSA, which now defers) no-ops cleanly and deploy order between plugins does not matter. See CONVENTIONS.md for the CPT ownership rule.
 
 ---
 
@@ -25,7 +27,7 @@ Peptide Repo Core is a WordPress plugin that provides the canonical peptide data
                                     │
                                     ▼
                          ┌───────────────────────┐
-                         │  Peptide Repository   │  pr_peptide CPT + meta
+                         │  Peptide Repository   │  peptide CPT + meta
                          └──────────┬────────────┘
                                     │
                     ┌───────────────┼───────────────┐
@@ -44,7 +46,7 @@ Peptide Repo Core is a WordPress plugin that provides the canonical peptide data
 ```
 peptide-repo-core/
 ├── peptide-repo-core.php              # Plugin bootstrap — constants, autoloader, activation hooks
-├── uninstall.php                      # Full teardown: tables, posts, terms, options, capabilities
+├── uninstall.php                      # Selective teardown: plugin-owned posts + tables + options + caps
 ├── ARCHITECTURE.md                    # This file
 ├── CONVENTIONS.md                     # Naming patterns, extension guides
 ├── CHANGELOG.md                       # Semantic versioning changelog
@@ -53,7 +55,7 @@ peptide-repo-core/
 │
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                     # PHP lint (8.1-8.3), PHPCS WordPress, 300-line check
+│       └── ci.yml                     # PHP lint (8.1-8.3), PHPCS WordPress, 300-line check, unit tests
 │
 ├── assets/
 │   └── css/
@@ -61,13 +63,13 @@ peptide-repo-core/
 │
 ├── includes/
 │   ├── class-pr-core.php              # Main orchestrator — boots subsystems, registers public filters
-│   ├── class-pr-core-activator.php    # Activation: migrations, capabilities, rewrite flush
+│   ├── class-pr-core-activator.php    # Activation + version-change flush handler
 │   ├── class-pr-core-deactivator.php  # Deactivation: rewrite flush only (data preserved)
 │   ├── class-pr-core-autoloader.php   # SPL autoloader for PR_Core_ prefixed classes
 │   ├── class-pr-core-seed-data.php    # Dev fixture: 3 peptides, 10 dosing rows, 5 legal cells
 │   │
 │   ├── cpt/
-│   │   └── class-pr-core-peptide-cpt.php  # CPT registration, taxonomies, meta fields, sanitizers
+│   │   └── class-pr-core-peptide-cpt.php  # CPT + peptide_category registration (guarded), meta fields, sanitizers
 │   │
 │   ├── migrations/
 │   │   ├── class-pr-core-migration-runner.php           # Sequential migration engine
@@ -82,7 +84,7 @@ peptide-repo-core/
 │   │   └── class-pr-core-candidate-dto.php   # Typed candidate queue value object
 │   │
 │   ├── repositories/
-│   │   ├── class-pr-core-peptide-repository.php          # CRUD for pr_peptide CPT
+│   │   ├── class-pr-core-peptide-repository.php          # CRUD for peptide CPT
 │   │   ├── class-pr-core-dosing-repository.php           # CRUD for pr_dosing_rows
 │   │   ├── class-pr-core-legal-repository.php            # CRUD for pr_legal_cells
 │   │   └── class-pr-core-candidate-queue-repository.php  # CRUD + approve/reject for queue
@@ -101,8 +103,9 @@ peptide-repo-core/
 │       └── class-pr-core-rest-controller.php  # REST endpoints for peptides, dosing, legal
 │
 └── tests/
-    ├── unit/                          # PHPUnit tests (mocked WP)
-    └── integration/                   # WordPress integration tests
+    ├── bootstrap.php                  # Lightweight WP function mocks for no-PHPUnit unit runs
+    └── unit/
+        └── test-peptide-cpt.php       # CPT + taxonomy guard + args payload assertions
 ```
 
 ---
@@ -180,3 +183,16 @@ Single editorial review point. All consumer plugins render the same versioned di
 
 ### #6: JSON-LD from day one
 Drug schema on single pages increases LLM citation rate. Filter hook allows consumer plugins to extend the schema object.
+
+### #7: PR Core owns the `peptide` CPT and `peptide_category` taxonomy (v0.2.0)
+Prior to v0.2.0, PR Core registered `pr_peptide` while Peptide Search AI registered `peptide` — both claimed the public rewrite slug `peptides`, and WP's rewrite resolver picked PR Core's empty CPT, 404'ing all 89 production peptide detail pages. v0.2.0 consolidates both registrations onto a single `peptide` CPT, owned by PR Core. PSA v4.5.0 drops its CPT/taxonomy registration; its meta boxes (`psa_peptide_data`, `psa_extended_data`), directory shortcode, KB article renderer, and search widget continue operating on the shared `peptide` CPT regardless of who registers it. Registration on both sides is guarded with `post_type_exists()` / `taxonomy_exists()` so deploy order is forgiving.
+
+## §2.9 Uninstall specification
+
+PR Core `uninstall.php` removes plugin-owned data only:
+
+1. **Drops custom tables** — `pr_dosing_rows`, `pr_legal_cells`, `pr_ai_candidate_queue`.
+2. **Deletes `peptide` posts only if they carry the `_pr_core_authored` meta flag.** The 89 canonical peptide posts predate PR Core and were authored via PSA; they are never blanket-deleted on PR Core uninstall.
+3. **Does not delete `peptide_category` terms.** Shared-ownership taxonomy; term metadata the site relies on outlasts this plugin.
+4. **Deletes `pr_core_*` options.**
+5. **Removes `manage_peptide_content` capability from all roles.**

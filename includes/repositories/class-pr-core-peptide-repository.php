@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Repository for peptide CPT records.
  *
- * What: CRUD operations over pr_peptide posts, returning typed DTOs.
+ * What: CRUD operations over peptide posts, returning typed DTOs.
  * Who calls it: PR_Core (public API), REST controller, admin UI, consumer plugins.
  * Dependencies: WordPress WP_Query, PR_Core_Peptide_DTO.
  *

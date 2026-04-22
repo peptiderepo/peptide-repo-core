@@ -3,6 +3,32 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] — 2026-04-22
+
+### Changed (BREAKING)
+- CPT renamed from `pr_peptide` to `peptide`. Consolidates with PSA's existing `peptide` CPT which owns the 89 canonical peptide posts on production.
+- Taxonomy renamed from `pr_peptide_category` to `peptide_category`. Same reason.
+- CPT args harmonized as superset of PSA + prior PR Core registration (supports now includes thumbnail + revisions + custom-fields).
+- Defensive registration: guards with `post_type_exists()` / `taxonomy_exists()` so PSA's parallel registration no-ops cleanly during the PSA v4.5.0 transition.
+
+### Added
+- `PR_Core_Activator::maybe_flush_on_version_change()` — one-shot rewrite flush on in-place version bumps (hooked at `init` priority 999). Eliminates the need for a manual `wp rewrite flush` after updates that change CPT/taxonomy slugs.
+- `_pr_core_authored` post-meta flag contract — peptide posts created via PR Core UI carry this flag; `uninstall.php` uses it to scope teardown to plugin-owned posts only.
+- Lightweight unit-test harness (`tests/bootstrap.php` + `tests/unit/test-peptide-cpt.php`) that exercises CPT/taxonomy guards and args payload shape without a PHPUnit + wp-env dependency. Wired into the existing PHP-lint CI job.
+
+### Removed
+- `pr_peptide_family` taxonomy — never populated, never surfaced in UI.
+- All `pr_peptide*` CPT-slug-derived references (constants, docblock mentions, uninstall string literals).
+- Blanket `DELETE FROM posts WHERE post_type = 'pr_peptide'` on uninstall. Replaced with a join-on-`_pr_core_authored` selective delete so PSA-authored peptide posts are never destroyed by PR Core teardown.
+- Taxonomy-term cleanup on uninstall. `peptide_category` is shared ownership post-v0.2.0; term data the site still needs is preserved.
+
+### Fixed
+- Production peptide detail pages (all 89) were 404'ing due to a rewrite slug collision between PSA's `peptide` CPT and PR Core's `pr_peptide` CPT both claiming `/peptides/%postname%/`. PR Core v0.1.1's empty `pr_peptide` CPT was winning the rewrite resolution. This release consolidates both to a single `peptide` CPT owned by PR Core.
+
+### Notes
+- Scope of the `pr_peptide*` scrub is intentionally narrow: CPT-slug-derived identifiers only. Class names (`PR_Core_Peptide_CPT`), file names (`class-pr-core-peptide-cpt.php`), plugin constants (`PR_CORE_VERSION`), option keys (`pr_core_*`), and the REST namespace (`pr-core/v1`) are the plugin's own namespace, not the CPT slug, and are preserved verbatim.
+- PR Core-defined meta keys (`display_name`, `aliases`, `evidence_strength`, `editorial_review_status`, …) are gated by `manage_peptide_content`. The activator grants this capability to `administrator` and `editor` roles on activation. Prod sites where the activation hook never fired (v0.1.1 was deployed manually) will receive the grant on next `wp plugin activate peptide-repo-core`. Follow-up thread to decide whether a dedicated `peptide_editor` role is more appropriate than extending core `editor`.
+
 ## [0.1.1] — 2026-04-19
 
 ### Fixed
