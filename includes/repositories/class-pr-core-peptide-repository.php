@@ -92,14 +92,10 @@ class PR_Core_Peptide_Repository {
 			] ];
 		}
 
-		if ( ! empty( $filters['family'] ) ) {
-			$args['tax_query']   = $args['tax_query'] ?? [];
-			$args['tax_query'][] = [
-				'taxonomy' => PR_Core_Peptide_CPT::TAX_FAMILY,
-				'field'    => 'slug',
-				'terms'    => sanitize_text_field( $filters['family'] ),
-			];
-		}
+		// v0.2.0: `family` filter silently ignored — `pr_peptide_family` taxonomy
+		// was removed with the CPT consolidation. Callers passing `family` get
+		// all-category results rather than a fatal. Remove this key from the
+		// REST schema in a future minor bump.
 
 		if ( ! empty( $filters['evidence_strength'] ) ) {
 			$args['meta_query'] = [ [
@@ -135,7 +131,10 @@ class PR_Core_Peptide_Repository {
 		$aliases     = json_decode( $aliases_raw ?: '[]', true ) ?: [];
 
 		$categories = wp_get_post_terms( $post->ID, PR_Core_Peptide_CPT::TAX_CATEGORY, [ 'fields' => 'names' ] );
-		$families   = wp_get_post_terms( $post->ID, PR_Core_Peptide_CPT::TAX_FAMILY, [ 'fields' => 'names' ] );
+		// v0.2.0: `pr_peptide_family` taxonomy removed. DTO `families` field
+		// preserved as empty array to keep the REST response shape stable for
+		// clients; will be dropped in a future minor bump with a release note.
+		$families   = [];
 
 		return new PR_Core_Peptide_DTO( [
 			'id'                       => $post->ID,
@@ -156,7 +155,7 @@ class PR_Core_Peptide_Repository {
 			'last_editorial_review_at' => get_post_meta( $post->ID, 'last_editorial_review_at', true ) ?: '',
 			'medical_editor_id'        => (int) get_post_meta( $post->ID, 'medical_editor_id', true ),
 			'categories'               => is_array( $categories ) ? $categories : [],
-			'families'                 => is_array( $families ) ? $families : [],
+			'families'                 => $families,
 		] );
 	}
 }

@@ -3,6 +3,15 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] — 2026-04-22
+
+### Fixed
+- **P1 hotfix: fatal `Undefined constant PR_Core_Peptide_CPT::TAX_FAMILY` on every peptide page.** The v0.2.0 release removed `TAX_FAMILY` from `PR_Core_Peptide_CPT` but left two stale references in `PR_Core_Peptide_Repository` (the `family` filter branch in `find_all()` and the families lookup in `post_to_dto()`). JSON-LD emission on single-peptide templates called `find_by_id()`, which called `post_to_dto()`, which hit the undefined constant and killed page rendering mid-`wp_head()`. QA gate on `874f93b` missed this because the unit tests cover the CPT class in isolation, not the repository's consumption of its constants. Post-mortem + QA checklist update to follow.
+
+### Changed
+- `PR_Core_Peptide_Repository::find_all()` — `family` filter is now silently ignored rather than throwing. Next minor bump will remove it from the REST schema.
+- `PR_Core_Peptide_DTO::$families` is preserved but always populated as `[]`. Keeps REST response shape stable for existing clients; will be dropped with a release note.
+
 ## [0.2.0] — 2026-04-22
 
 ### Changed (BREAKING)
