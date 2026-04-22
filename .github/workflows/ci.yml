@@ -29,6 +29,13 @@ jobs:
       - name: Syntax check all PHP files
         run: find . -name "*.php" -not -path "./vendor/*" | xargs -n 1 php -l
 
+      - name: Unit tests (lightweight, no PHPUnit)
+        run: |
+          for test in tests/unit/test-*.php; do
+            echo "=== Running $test ==="
+            php "$test"
+          done
+
   # ── WordPress Coding Standards (PHP CodeSniffer) ──────────────────
   lint-phpcs:
     name: WordPress Coding Standards

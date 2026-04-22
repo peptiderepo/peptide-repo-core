@@ -2,25 +2,29 @@
 declare(strict_types=1);
 
 /**
- * Registers the pr_peptide custom post type and associated taxonomies.
+ * Registers the peptide custom post type and associated taxonomy.
  *
  * What: Defines the peptide CPT with REST support, archive, and monograph meta fields.
  * Who calls it: PR_Core::init() on plugins_loaded.
  * Dependencies: None.
  *
+ * Ownership: As of v0.2.0, PR Core is the canonical owner of the `peptide` CPT
+ * and `peptide_category` taxonomy (previously registered by Peptide Search AI
+ * pre-schema-sprint; PSA v4.5.0 drops its registrations in favor of this one).
+ * Registration is guarded by `post_type_exists()` / `taxonomy_exists()` so
+ * deploy order between the two plugins does not matter — whichever runs first
+ * wins, the other no-ops.
+ *
  * @see ARCHITECTURE.md — CPT specification and post-meta field definitions.
- * @see cpt/class-pr-core-peptide-taxonomies.php — Not used; taxonomies registered here for simplicity.
+ * @see CONVENTIONS.md — CPT ownership rule (no plugin registers a CPT another plugin owns).
  */
 class PR_Core_Peptide_CPT {
 
-	/** @var string Post type slug. */
-	public const POST_TYPE = 'pr_peptide';
+	/** @var string Post type slug (owned by PR Core since v0.2.0; PSA previously registered this). */
+	public const POST_TYPE = 'peptide';
 
 	/** @var string Taxonomy: category (e.g., GLP-1 agonist). */
-	public const TAX_CATEGORY = 'pr_peptide_category';
-
-	/** @var string Taxonomy: family grouping. */
-	public const TAX_FAMILY = 'pr_peptide_family';
+	public const TAX_CATEGORY = 'peptide_category';
 
 	/** @var string Capability required for editing peptide data. */
 	public const CAPABILITY = 'manage_peptide_content';
@@ -129,13 +133,22 @@ class PR_Core_Peptide_CPT {
 	}
 
 	/**
-	 * Register the pr_peptide custom post type.
+	 * Register the `peptide` custom post type.
+	 *
+	 * Guarded with `post_type_exists()`: if another plugin (historically PSA)
+	 * has already registered the `peptide` post type, this call no-ops. This
+	 * makes deploy order between PR Core and PSA irrelevant during the
+	 * PSA v4.5.0 consolidation transition.
 	 *
 	 * Side effects: registers CPT with WordPress.
 	 *
 	 * @return void
 	 */
 	public static function register_peptide_post_type(): void {
+		if ( post_type_exists( self::POST_TYPE ) ) {
+			return;
+		}
+
 		$labels = [
 			'name'               => __( 'Peptides', 'peptide-repo-core' ),
 			'singular_name'      => __( 'Peptide', 'peptide-repo-core' ),
@@ -150,60 +163,77 @@ class PR_Core_Peptide_CPT {
 			'menu_name'          => __( 'Peptides', 'peptide-repo-core' ),
 		];
 
+		/*
+		 * Args are a harmonized superset of PR Core's prior `pr_peptide` args
+		 * and PSA's `peptide` args, so the 89 existing posts (authored under
+		 * PSA's registration) keep every capability they relied on:
+		 *   - supports: union of both — thumbnail comes from PSA, revisions +
+		 *     custom-fields come from PR Core.
+		 *   - capability_type + map_meta_cap: preserve PSA's per-role perms.
+		 *   - rewrite slug `peptides`: unchanged from both plugins, so
+		 *     /peptides/%postname%/ URLs keep working and theme templates
+		 *     single-peptide.php / archive-peptide.php continue to match.
+		 */
 		$args = [
 			'labels'             => $labels,
 			'public'             => true,
-			'has_archive'        => true,
-			'rewrite'            => [ 'slug' => 'peptides', 'with_front' => false ],
+			'publicly_queryable' => true,
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'show_in_nav_menus'  => true,
 			'show_in_rest'       => true,
 			'rest_base'          => 'peptides',
 			'rest_namespace'     => 'pr-core/v1',
-			'supports'           => [ 'title', 'editor', 'excerpt', 'revisions', 'custom-fields' ],
+			'menu_position'      => 25,
 			'menu_icon'          => 'dashicons-database',
 			'capability_type'    => 'post',
 			'map_meta_cap'       => true,
-			'show_in_menu'       => true,
-			'menu_position'      => 25,
+			'hierarchical'       => false,
+			'has_archive'        => true,
+			'rewrite'            => [ 'slug' => 'peptides', 'with_front' => false ],
+			'supports'           => [ 'title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'custom-fields' ],
 		];
 
 		register_post_type( self::POST_TYPE, $args );
 	}
 
 	/**
-	 * Register the pr_peptide_category and pr_peptide_family taxonomies.
+	 * Register the `peptide_category` taxonomy.
 	 *
-	 * Side effects: registers taxonomies with WordPress.
+	 * Guarded with `taxonomy_exists()` for the same reason CPT registration
+	 * is guarded. The 8 existing terms + term_relationships stay intact —
+	 * they key on taxonomy name `peptide_category` in wp_term_taxonomy,
+	 * which is exactly what we register here.
+	 *
+	 * v0.2.0: `pr_peptide_family` taxonomy removed — never populated, never
+	 * surfaced in UI.
+	 *
+	 * Side effects: registers taxonomy with WordPress.
 	 *
 	 * @return void
 	 */
 	public static function register_taxonomies(): void {
+		if ( taxonomy_exists( self::TAX_CATEGORY ) ) {
+			return;
+		}
+
 		register_taxonomy( self::TAX_CATEGORY, self::POST_TYPE, [
-			'labels'            => [
+			'labels'             => [
 				'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
 				'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
 			],
-			'hierarchical'      => true,
-			'show_in_rest'      => true,
-			'show_admin_column' => true,
-			'rewrite'           => [ 'slug' => 'peptide-category' ],
-		] );
-
-		register_taxonomy( self::TAX_FAMILY, self::POST_TYPE, [
-			'labels'            => [
-				'name'          => __( 'Peptide Families', 'peptide-repo-core' ),
-				'singular_name' => __( 'Peptide Family', 'peptide-repo-core' ),
-			],
-			'hierarchical'      => false,
-			'show_in_rest'      => true,
-			'show_admin_column' => true,
-			'rewrite'           => [ 'slug' => 'peptide-family' ],
+			'public'             => true,
+			'publicly_queryable' => true,
+			'show_in_rest'       => true,
+			'show_ui'            => true,
+			'show_admin_column'  => true,
+			'hierarchical'       => true,
+			'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
 		] );
 	}
 
 	/**
-	 * Register post-meta fields with the REST API.
-	 *
-	 * Side effects: registers meta with WordPress.
+	 * Register post-meta fields. Auth gated on manage_peptide_content.
 	 *
 	 * @return void
 	 */

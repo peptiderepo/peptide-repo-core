@@ -1,11 +1,13 @@
 <?php
 /**
- * Peptide Repo Core — Full data teardown on uninstall.
+ * Peptide Repo Core — Selective data teardown on uninstall.
  *
- * Removes ALL plugin data: custom tables, CPT posts + meta, taxonomy terms,
- * options, and capabilities. No orphaned data left behind.
+ * Removes plugin-owned data only: custom tables, PR Core-authored peptide
+ * posts, pr_core_ options, and the manage_peptide_content capability.
+ * Shared data (the 89 canonical peptide posts authored by PSA, and the
+ * peptide_category taxonomy terms) is preserved.
  *
- * @see ARCHITECTURE.md — Section 2.9 Uninstall specification.
+ * @see ARCHITECTURE.md — §2.9 Uninstall specification.
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
@@ -27,33 +29,45 @@ foreach ( $tables as $table ) {
 	$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 }
 
-/* ── 2. Delete all pr_peptide posts (cascade deletes meta) ────────────── */
+/* ── 2. Delete only peptide posts authored through PR Core's UI ───────── */
 
+/*
+ * As of v0.2.0, PR Core shares the `peptide` CPT with Peptide Search AI.
+ * PSA authored the 89 canonical peptide posts on peptiderepo.com; those
+ * predate PR Core and do NOT carry the `_pr_core_authored` flag. A blanket
+ * DELETE here would destroy site-owned content, not plugin-owned content.
+ *
+ * This loop only deletes posts that PR Core itself created (flagged with
+ * post-meta `_pr_core_authored = '1'`). If no post carries the flag, the
+ * loop no-ops and shared content is preserved.
+ */
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 $post_ids = $wpdb->get_col(
-	"SELECT ID FROM {$wpdb->posts} WHERE post_type = 'pr_peptide'"
+	$wpdb->prepare(
+		"SELECT p.ID FROM {$wpdb->posts} p
+		 INNER JOIN {$wpdb->postmeta} pm
+		   ON p.ID = pm.post_id AND pm.meta_key = %s AND pm.meta_value = %s
+		 WHERE p.post_type = %s",
+		'_pr_core_authored',
+		'1',
+		'peptide'
+	)
 );
 
 foreach ( $post_ids as $post_id ) {
 	wp_delete_post( (int) $post_id, true );
 }
 
-/* ── 3. Delete taxonomy terms ─────────────────────────────────────────── */
+/* ── 3. Preserve taxonomy terms (shared ownership post-v0.2.0) ────────── */
 
-$taxonomies = [ 'pr_peptide_category', 'pr_peptide_family' ];
-
-foreach ( $taxonomies as $taxonomy ) {
-	$terms = get_terms( [
-		'taxonomy'   => $taxonomy,
-		'hide_empty' => false,
-		'fields'     => 'ids',
-	] );
-
-	if ( is_array( $terms ) ) {
-		foreach ( $terms as $term_id ) {
-			wp_delete_term( (int) $term_id, $taxonomy );
-		}
-	}
-}
+/*
+ * `peptide_category` is shared between PR Core and PSA. Term metadata
+ * (descriptions, parent relationships, counts) is data the site owns —
+ * removing it on PR Core uninstall would strip categorization from the
+ * peptide posts that remain. So we intentionally do NOT enumerate or
+ * delete terms here. `pr_peptide_family` is gone in v0.2.0 so no cleanup
+ * is needed for it either.
+ */
 
 /* ── 4. Delete all pr_core_ prefixed options ──────────────────────────── */
 
@@ -62,7 +76,7 @@ $wpdb->query(
 	"DELETE FROM {$wpdb->options} WHERE option_name LIKE 'pr\_core\_%'"
 );
 
-/* ── 5. Remove manage_peptide_content capability from all roles ────────── */
+/* ── 5. Remove manage_peptide_content capability from all roles ───────── */
 
 $editable_roles = wp_roles()->roles;
 

@@ -30,6 +30,12 @@ class PR_Core {
 		$cpt = new PR_Core_Peptide_CPT();
 		$cpt->register_hooks();
 
+		// One-shot rewrite flush on in-place version bumps. Runs at the very
+		// end of init (priority 999) so all CPTs/taxonomies — ours and
+		// anyone else's — are registered first. Handles updates deployed
+		// without a deactivate/reactivate cycle (e.g., SCP/rsync pushes).
+		add_action( 'init', [ PR_Core_Activator::class, 'maybe_flush_on_version_change' ], 999 );
+
 		// Admin UI (fires on admin_init, admin_menu).
 		if ( is_admin() ) {
 			$admin = new PR_Core_Admin();
