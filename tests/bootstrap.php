@@ -22,6 +22,24 @@ if ( ! defined( 'PR_CORE_VERSION' ) ) {
 	define( 'PR_CORE_VERSION', '0.2.0' );
 }
 
+if ( ! defined( 'PR_CORE_PLUGIN_DIR' ) ) {
+	define( 'PR_CORE_PLUGIN_DIR', realpath( __DIR__ . '/..' ) . '/' );
+}
+
+if ( ! defined( 'PR_CORE_PLUGIN_URL' ) ) {
+	define( 'PR_CORE_PLUGIN_URL', 'http://example.test/wp-content/plugins/peptide-repo-core/' );
+}
+
+if ( ! defined( 'PR_CORE_PLUGIN_FILE' ) ) {
+	define( 'PR_CORE_PLUGIN_FILE', PR_CORE_PLUGIN_DIR . 'peptide-repo-core.php' );
+}
+
+if ( ! function_exists( 'trailingslashit' ) ) {
+	function trailingslashit( string $path ): string {
+		return rtrim( $path, '/\\' ) . '/';
+	}
+}
+
 /**
  * Global harness state. Tests reset this between cases.
  *
