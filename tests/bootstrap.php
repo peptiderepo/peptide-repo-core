@@ -103,9 +103,6 @@ function absint( $value ): int {
 	return abs( (int) $value );
 }
 
-function floatval( $value ): float {
-	return (float) $value;
-}
 
 /* ── Test assertion helpers ─────────────────────────────────────────── */
 
