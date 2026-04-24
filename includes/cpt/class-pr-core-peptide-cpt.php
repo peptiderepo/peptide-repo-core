@@ -296,4 +296,6 @@ class PR_Core_Peptide_CPT {
 	 */
 	public static function sanitize_review_status( $value ): string {
 		$value = sanitize_text_field( (string) $value );
+		return in_array( $value, self::REVIEW_STATUSES, true ) ? $value : 'draft';
+	}
 }
