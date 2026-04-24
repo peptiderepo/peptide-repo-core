@@ -3,6 +3,31 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] — 2026-04-24
+
+### Added
+- **Related Articles feature** — New `peptide_topic` taxonomy links blog posts to peptides by slug. Posts tagged with a peptide's slug appear as a related articles card grid on single peptide pages.
+- `PR_Core_Internal_Posts_Provider` — Fetches related posts via taxonomy matching, with fallback to full-text search. Results cached 1 hour per peptide.
+- `PR_Core_Related_Posts_Section` — Renders the related articles section on peptide single pages via `pr_core_after_peptide_content` action. Respects admin settings for feature toggle and display limit.
+- `PR_Core_Settings` — Admin settings page under Peptides menu. Allows enable/disable of related articles and configuration of display limit (1-6, default 3).
+- Template part `template-parts/related-posts/card.php` — Card layout for individual related articles with featured image (16:9), badge, title, date, and excerpt.
+- CSS file `assets/css/related-posts.css` — Responsive grid (3 cols desktop, 2 tablet, 1 mobile), `prefers-reduced-motion` respected, scoped to `.pr-related-posts`.
+- Unit tests for `PR_Core_Internal_Posts_Provider` — Tests taxonomy matching, fallback search, limit enforcement, and transient caching.
+- `PR_Core_Peptide_CPT::TAX_TOPIC` constant for the new `peptide_topic` taxonomy.
+
+### Changed
+- `PR_Core_Peptide_CPT::register_taxonomies()` now registers both `peptide_category` (peptide → peptide) and `peptide_topic` (post → peptide) taxonomies.
+- `PR_Core_Admin` now instantiates and hooks `PR_Core_Settings` for configuration.
+- `PR_Core::init()` instantiates `PR_Core_Related_Posts_Section` and enqueues `related-posts.css` on single peptide pages.
+- `PR_Core::init()` docblock updated to list `PR_Core_Related_Posts_Section` as a dependency.
+- Version bumped to `0.3.0`.
+
+### Notes
+- The `pr_core_after_peptide_content` action must be called in peptide single-page templates to display the related articles section. This hook fires after the main peptide content.
+- Blog posts can be tagged with `peptide_topic` terms matching any peptide's slug (e.g., 'bpc-157', 'tb-500') to appear as related articles on that peptide's page.
+- Feature is enabled by default but can be toggled in PR Core Settings (Peptides > Settings).
+- Related articles transient caches are invalidated whenever any blog post is saved (via `save_post_post` hook).
+
 ## [0.2.1] — 2026-04-22
 
 ### Fixed
