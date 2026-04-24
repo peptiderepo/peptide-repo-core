@@ -5,8 +5,7 @@ declare(strict_types=1);
  * Registers the peptide custom post type and associated taxonomies.
  *
  * What: Defines the peptide CPT with REST support, archive, and monograph meta fields.
- *       Also registers the peptide_category taxonomy (for peptide categorization) and
- *       peptide_topic taxonomy (for linking blog posts to peptides).
+ *       Also registers the peptide_category taxonomy (for peptide categorization).
  * Who calls it: PR_Core::init() on plugins_loaded.
  * Dependencies: None.
  *
@@ -17,9 +16,9 @@ declare(strict_types=1);
  * deploy order between the two plugins does not matter — whichever runs first
  * wins, the other no-ops.
  *
- * As of v0.3.0, `peptide_topic` taxonomy is registered for linking blog posts
- * to peptides via a shared topic slug (e.g., 'bpc-157'). This enables the
- * Related Articles feature.
+ * As of v0.3.0, `peptide_topic` taxonomy is registered in a separate class
+ * (PR_Core_Topic_Taxonomy) for linking blog posts to peptides via a shared
+ * topic slug (e.g., 'bpc-157'). This enables the Related Articles feature.
  *
  * @see ARCHITECTURE.md — CPT specification and post-meta field definitions.
  * @see CONVENTIONS.md — CPT ownership rule (no plugin registers a CPT another plugin owns).
@@ -31,9 +30,6 @@ class PR_Core_Peptide_CPT {
 
 	/** @var string Taxonomy: category (e.g., GLP-1 agonist). */
 	public const TAX_CATEGORY = 'peptide_category';
-
-	/** @var string Taxonomy: topic (links blog posts to peptides by slug). */
-	public const TAX_TOPIC = 'peptide_topic';
 
 	/** @var string Capability required for editing peptide data. */
 	public const CAPABILITY = 'manage_peptide_content';
@@ -207,7 +203,7 @@ class PR_Core_Peptide_CPT {
 	}
 
 	/**
-	 * Register the `peptide_category` and `peptide_topic` taxonomies.
+	 * Register the `peptide_category` taxonomy.
 	 *
 	 * Guarded with `taxonomy_exists()` for the same reason CPT registration
 	 * is guarded. The 8 existing category terms + term_relationships stay intact —
@@ -217,11 +213,9 @@ class PR_Core_Peptide_CPT {
 	 * v0.2.0: `pr_peptide_family` taxonomy removed — never populated, never
 	 * surfaced in UI.
 	 *
-	 * v0.3.0: `peptide_topic` taxonomy added. Non-hierarchical, linked to posts,
-	 * uses peptide slugs as terms (e.g., 'bpc-157', 'tb-500'). Enables the Related
-	 * Articles feature for blog posts tagged with a peptide topic.
+	 * v0.3.0: `peptide_topic` taxonomy moved to PR_Core_Topic_Taxonomy class.
 	 *
-	 * Side effects: registers taxonomies with WordPress.
+	 * Side effects: registers taxonomy with WordPress.
 	 *
 	 * @return void
 	 */
@@ -240,23 +234,6 @@ class PR_Core_Peptide_CPT {
 				'show_admin_column'  => true,
 				'hierarchical'       => true,
 				'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
-			] );
-		}
-
-		// Register peptide_topic taxonomy (for blog post tagging).
-		if ( ! taxonomy_exists( self::TAX_TOPIC ) ) {
-			register_taxonomy( self::TAX_TOPIC, 'post', [
-				'labels'             => [
-					'name'          => __( 'Peptide Topics', 'peptide-repo-core' ),
-					'singular_name' => __( 'Peptide Topic', 'peptide-repo-core' ),
-				],
-				'public'             => true,
-				'publicly_queryable' => true,
-				'show_in_rest'       => true,
-				'show_ui'            => true,
-				'show_admin_column'  => true,
-				'hierarchical'       => false,
-				'rewrite'            => [ 'slug' => 'peptide-topic', 'with_front' => false ],
 			] );
 		}
 	}
