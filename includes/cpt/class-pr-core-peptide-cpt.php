@@ -16,10 +16,6 @@ declare(strict_types=1);
  * deploy order between the two plugins does not matter — whichever runs first
  * wins, the other no-ops.
  *
- * As of v0.3.0, `peptide_topic` taxonomy is registered in a separate class
- * (PR_Core_Topic_Taxonomy) for linking blog posts to peptides via a shared
- * topic slug (e.g., 'bpc-157'). This enables the Related Articles feature.
- *
  * @see ARCHITECTURE.md — CPT specification and post-meta field definitions.
  * @see CONVENTIONS.md — CPT ownership rule (no plugin registers a CPT another plugin owns).
  */
