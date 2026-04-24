@@ -3,6 +3,12 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.3.1] — 2026-04-24
+
+### Fixed
+- Add missing `PR_Core_Related_Posts_Provider` interface file (`class-pr-core-related-posts-provider.php`).
+  Omitted from v0.3.0 deploy caused a fatal on every page load. Site was down until this fix.
+
 ## [0.3.0] — 2026-04-24
 
 ### Added
