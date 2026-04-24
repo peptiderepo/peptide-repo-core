@@ -7,11 +7,11 @@ declare(strict_types=1);
  * What: Registers all hooks, runs migrations, boots subsystems.
  * Who calls it: peptide-repo-core.php on plugins_loaded.
  * Dependencies: PR_Core_Migration_Runner, PR_Core_Peptide_CPT, PR_Core_Admin,
- *               PR_Core_Disclaimer, PR_Core_Jsonld, PR_Core_Rest_Controller,
- *               PR_Core_Related_Posts_Section.
+ *              PR_Core_Disclaimer, PR_Core_Jsonld, PR_Core_Rest_Controller,
+ *              PR_Core_Related_Posts_Section.
  *
  * @see peptide-repo-core.php — Bootstrap that instantiates this class.
- * @see ARCHITECTURE.md       — Full data flow diagram.
+ * @see ARCHITECTURE.md    — Full data flow diagram.
  */
 class PR_Core {
 
@@ -129,7 +129,7 @@ class PR_Core {
 	/**
 	 * Return disclaimer text for a given surface identifier.
 	 *
-	 * @param string $text    Existing text (empty string default).
+	 * @param string $text     Existing text (empty string default).
 	 * @param string $surface Surface identifier (dosing, legal, reconstitution, ai-answer).
 	 * @return string Disclaimer HTML.
 	 */
@@ -140,18 +140,18 @@ class PR_Core {
 	/**
 	 * Map evidence_strength enum value to human-readable label.
 	 *
-	 * @param string $label    Existing label (empty string default).
+	 * @param string $label     Existing label (empty string default).
 	 * @param string $strength Enum value.
 	 * @return string Localized label.
 	 */
 	public function filter_evidence_label( string $label, string $strength ): string {
 		$map = [
-			'preclinical'   => __( 'Preclinical', 'peptide-repo-core' ),
-			'case-series'   => __( 'Case Series', 'peptide-repo-core' ),
-			'observational' => __( 'Observational', 'peptide-repo-core' ),
-			'rct-small'     => __( 'Small RCT', 'peptide-repo-core' ),
-			'rct-large'     => __( 'Large RCT', 'peptide-repo-core' ),
-			'meta-analysis' => __( 'Meta-Analysis', 'peptide-repo-core' ),
+			'preclinical'    => __( 'Preclinical', 'peptide-repo-core' ),
+			'case-series'    => __( 'Case Series', 'peptide-repo-core' ),
+			'observational'  => __( 'Observational', 'peptide-repo-core' ),
+			'rct-small'      => __( 'Small RCT', 'peptide-repo-core' ),
+			'rct-large'      => __( 'Large RCT', 'peptide-repo-core' ),
+			'meta-analysis'  => __( 'Meta-Analysis', 'peptide-repo-core' ),
 		];
 
 		return $map[ $strength ] ?? $strength;
