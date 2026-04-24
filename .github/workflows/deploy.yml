@@ -7,67 +7,84 @@ on:
 permissions:
   contents: read
 
-# Cancel previous deploys if a new push arrives while one is running.
 concurrency:
   group: deploy-peptide-repo-core
   cancel-in-progress: true
 
 jobs:
-  # ── Run CI first ─────────────────────────────────────────────────
   ci:
     name: Pre-deploy CI
     uses: ./.github/workflows/ci.yml
 
-  # ── Deploy via rsync over SSH ────────────────────────────────────
-  deploy:
+  deploy-staging:
+    name: Deploy to Staging
     needs: ci
-    name: Deploy to Production
     runs-on: ubuntu-latest
-
+    environment: staging
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-
-      - name: Deploy via rsync
+      - name: Deploy via rsync → staging
         run: |
           rsync -avz --delete \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'tests' \
-            --exclude 'phpunit.xml.dist' \
-            --exclude 'composer.json' \
-            --exclude 'composer.lock' \
-            --exclude 'vendor' \
-            --exclude 'phpcs.xml.dist' \
-            --exclude 'ARCHITECTURE.md' \
-            --exclude 'CONVENTIONS.md' \
-            --exclude 'CHANGELOG.md' \
+            --exclude '.git' --exclude '.github' \
+            --exclude 'tests' --exclude 'phpunit.xml.dist' \
+            --exclude 'composer.json' --exclude 'composer.lock' \
+            --exclude 'vendor' --exclude 'phpcs.xml.dist' \
+            --exclude 'ARCHITECTURE.md' --exclude 'CONVENTIONS.md' --exclude 'CHANGELOG.md' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }}" \
+            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/domains/peptiderepo.com/public_html/staging/wp-content/plugins/peptide-repo-core/
+      - name: Staging health check
+        run: |
+          sleep 5
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://staging.peptiderepo.com/ || echo "000")
+          echo "Staging responded: HTTP $STATUS"
+      - name: Cleanup
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [ci, deploy-staging]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+      - name: Deploy via rsync → production
+        run: |
+          rsync -avz --delete \
+            --exclude '.git' --exclude '.github' \
+            --exclude 'tests' --exclude 'phpunit.xml.dist' \
+            --exclude 'composer.json' --exclude 'composer.lock' \
+            --exclude 'vendor' --exclude 'phpcs.xml.dist' \
+            --exclude 'ARCHITECTURE.md' --exclude 'CONVENTIONS.md' --exclude 'CHANGELOG.md' \
             -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }}" \
             ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/domains/peptiderepo.com/public_html/wp-content/plugins/peptide-repo-core/
-
       - name: Purge LiteSpeed Cache
         run: |
           ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
             "cd ~/domains/peptiderepo.com/public_html && find wp-content/litespeed/ -type f -delete 2>/dev/null; touch .lscache_purge 2>/dev/null || true"
-
-      - name: Health check
+      - name: Production health check
         run: |
           sleep 5
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://peptiderepo.com)
           if [ "$STATUS" != "200" ] && [ "$STATUS" != "403" ]; then
-            echo "ERROR: Site returned unexpected HTTP $STATUS after deploy"
+            echo "ERROR: Site returned HTTP $STATUS"
             exit 1
           fi
-          echo "Site is responsive (HTTP $STATUS)"
-
+          echo "Production healthy (HTTP $STATUS)"
       - name: Cleanup
         if: always()
         run: rm -f ~/.ssh/deploy_key
