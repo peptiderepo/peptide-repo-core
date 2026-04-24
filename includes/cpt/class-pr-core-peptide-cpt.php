@@ -2,9 +2,10 @@
 declare(strict_types=1);
 
 /**
- * Registers the peptide custom post type and associated taxonomy.
+ * Registers the peptide custom post type and associated taxonomies.
  *
  * What: Defines the peptide CPT with REST support, archive, and monograph meta fields.
+ *       Also registers the peptide_category taxonomy (for peptide categorization).
  * Who calls it: PR_Core::init() on plugins_loaded.
  * Dependencies: None.
  *
@@ -183,10 +184,8 @@ class PR_Core_Peptide_CPT {
 			'show_in_nav_menus'  => true,
 			'show_in_rest'       => true,
 			'rest_base'          => 'peptides',
-			// Note: 'rest_namespace' is deliberately omitted. Custom namespaces prevent
-			// Gutenberg's block editor from loading posts for editing (it fetches the
-			// hardcoded wp/v2 REST route). WordPress defaults to wp/v2 — appropriate for
-			// this CPT — and keeps the REST endpoint at /wp-json/wp/v2/peptides/.
+			// 'rest_namespace' omitted — custom namespaces break Gutenberg (it
+			// fetches wp/v2 hardcoded). WordPress defaults to wp/v2. (#4)
 			'menu_position'      => 25,
 			'menu_icon'          => 'dashicons-database',
 			'capability_type'    => 'post',
@@ -204,35 +203,36 @@ class PR_Core_Peptide_CPT {
 	 * Register the `peptide_category` taxonomy.
 	 *
 	 * Guarded with `taxonomy_exists()` for the same reason CPT registration
-	 * is guarded. The 8 existing terms + term_relationships stay intact —
+	 * is guarded. The 8 existing category terms + term_relationships stay intact —
 	 * they key on taxonomy name `peptide_category` in wp_term_taxonomy,
 	 * which is exactly what we register here.
 	 *
 	 * v0.2.0: `pr_peptide_family` taxonomy removed — never populated, never
 	 * surfaced in UI.
 	 *
+	 * v0.3.0: `peptide_topic` taxonomy moved to PR_Core_Topic_Taxonomy class.
+	 *
 	 * Side effects: registers taxonomy with WordPress.
 	 *
 	 * @return void
 	 */
 	public static function register_taxonomies(): void {
-		if ( taxonomy_exists( self::TAX_CATEGORY ) ) {
-			return;
+		// Register peptide_category taxonomy.
+		if ( ! taxonomy_exists( self::TAX_CATEGORY ) ) {
+			register_taxonomy( self::TAX_CATEGORY, self::POST_TYPE, [
+				'labels'             => [
+					'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
+					'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
+				],
+				'public'             => true,
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
+				'show_ui'            => true,
+				'show_admin_column'  => true,
+				'hierarchical'       => true,
+				'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
+			] );
 		}
-
-		register_taxonomy( self::TAX_CATEGORY, self::POST_TYPE, [
-			'labels'             => [
-				'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
-				'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
-			],
-			'public'             => true,
-			'publicly_queryable' => true,
-			'show_in_rest'       => true,
-			'show_ui'            => true,
-			'show_admin_column'  => true,
-			'hierarchical'       => true,
-			'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
-		] );
 	}
 
 	/**
@@ -288,4 +288,11 @@ class PR_Core_Peptide_CPT {
 	/**
 	 * Sanitize editorial_review_status to allowed enum values.
 	 *
-	
+	 * @param mixed $value Raw input.
+	 * @return string Valid enum value.
+	 */
+	public static function sanitize_review_status( $value ): string {
+		$value = sanitize_text_field( (string) $value );
+		return in_array( $value, self::REVIEW_STATUSES, true ) ? $value : 'draft';
+	}
+}
