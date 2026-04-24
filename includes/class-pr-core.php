@@ -7,7 +7,8 @@ declare(strict_types=1);
  * What: Registers all hooks, runs migrations, boots subsystems.
  * Who calls it: peptide-repo-core.php on plugins_loaded.
  * Dependencies: PR_Core_Migration_Runner, PR_Core_Peptide_CPT, PR_Core_Admin,
- *               PR_Core_Disclaimer, PR_Core_Jsonld, PR_Core_Rest_Controller.
+ *               PR_Core_Disclaimer, PR_Core_Jsonld, PR_Core_Rest_Controller,
+ *               PR_Core_Related_Posts_Section.
  *
  * @see peptide-repo-core.php — Bootstrap that instantiates this class.
  * @see ARCHITECTURE.md       — Full data flow diagram.
@@ -49,12 +50,39 @@ class PR_Core {
 		$jsonld = new PR_Core_Jsonld();
 		$jsonld->register_hooks();
 
+		// Related Articles section (frontend).
+		$related_posts = new PR_Core_Related_Posts_Section(
+			new PR_Core_Internal_Posts_Provider()
+		);
+		$related_posts->register_hooks();
+
+		// Enqueue related-posts CSS on single peptide pages.
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_styles' ] );
+
 		// REST API.
 		$rest = new PR_Core_Rest_Controller();
 		$rest->register_hooks();
 
 		// Expose public API filters.
 		$this->register_public_filters();
+	}
+
+	/**
+	 * Enqueue frontend CSS on single peptide pages.
+	 *
+	 * @return void
+	 */
+	public function enqueue_frontend_styles(): void {
+		if ( ! is_singular( PR_Core_Peptide_CPT::POST_TYPE ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'pr-core-related-posts',
+			PR_CORE_PLUGIN_URL . 'assets/css/related-posts.css',
+			[],
+			PR_CORE_VERSION
+		);
 	}
 
 	/**
