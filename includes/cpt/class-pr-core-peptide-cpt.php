@@ -183,7 +183,10 @@ class PR_Core_Peptide_CPT {
 			'show_in_nav_menus'  => true,
 			'show_in_rest'       => true,
 			'rest_base'          => 'peptides',
-			'rest_namespace'     => 'pr-core/v1',
+			// Note: 'rest_namespace' is deliberately omitted. Custom namespaces prevent
+			// Gutenberg's block editor from loading posts for editing (it fetches the
+			// hardcoded wp/v2 REST route). WordPress defaults to wp/v2 — appropriate for
+			// this CPT — and keeps the REST endpoint at /wp-json/wp/v2/peptides/.
 			'menu_position'      => 25,
 			'menu_icon'          => 'dashicons-database',
 			'capability_type'    => 'post',
@@ -285,11 +288,4 @@ class PR_Core_Peptide_CPT {
 	/**
 	 * Sanitize editorial_review_status to allowed enum values.
 	 *
-	 * @param mixed $value Raw input.
-	 * @return string Valid enum value.
-	 */
-	public static function sanitize_review_status( $value ): string {
-		$value = sanitize_text_field( (string) $value );
-		return in_array( $value, self::REVIEW_STATUSES, true ) ? $value : 'draft';
-	}
-}
+	
