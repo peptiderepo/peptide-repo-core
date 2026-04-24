@@ -3,6 +3,11 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.2.2] — 2026-04-25
+
+### Fixed
+- Remove `rest_namespace` from peptide CPT registration. Custom namespace prevented Gutenberg block editor from loading peptide posts for editing (404 on wp/v2 REST route). All 89 peptide entries are now editable in the block editor.
+
 ## [0.2.1] — 2026-04-22
 
 ### Fixed
@@ -65,7 +70,4 @@ Format: [Semantic Versioning](https://semver.org/).
 - JSON-LD emission: schema.org `Drug` type on single peptide pages with `pr_core_jsonld_peptide` filter.
 - Public API filters: `pr_core_get_indexable_corpus`, `pr_core_disclaimer_for_surface`, `pr_core_evidence_strength_label`.
 - Public API actions: `pr_core_before/after_peptide_publish`, `pr_core_before/after_dosing_row_publish`, `pr_core_before/after_legal_cell_publish`, `pr_core_candidate_approved/rejected`.
-- `manage_peptide_content` capability granted to administrators and editors on activation.
-- Full teardown in `uninstall.php` (tables, posts, terms, options, capabilities).
-- Seed data fixture: 3 peptides (BPC-157, Semaglutide, TB-500), 10 dosing rows, 5 legal cells.
-- CI workflow: PHP lint (8.0/8.1/8.2), PHPCS (WordPress standard), 300-line file check.
+- `manage_peptide_content` capability granted to administrators and editors on activ
