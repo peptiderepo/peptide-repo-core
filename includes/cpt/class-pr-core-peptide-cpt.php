@@ -2,9 +2,10 @@
 declare(strict_types=1);
 
 /**
- * Registers the peptide custom post type and associated taxonomy.
+ * Registers the peptide custom post type and associated taxonomies.
  *
  * What: Defines the peptide CPT with REST support, archive, and monograph meta fields.
+ *       Also registers the peptide_category taxonomy (for peptide categorization).
  * Who calls it: PR_Core::init() on plugins_loaded.
  * Dependencies: None.
  *
@@ -201,35 +202,36 @@ class PR_Core_Peptide_CPT {
 	 * Register the `peptide_category` taxonomy.
 	 *
 	 * Guarded with `taxonomy_exists()` for the same reason CPT registration
-	 * is guarded. The 8 existing terms + term_relationships stay intact —
+	 * is guarded. The 8 existing category terms + term_relationships stay intact —
 	 * they key on taxonomy name `peptide_category` in wp_term_taxonomy,
 	 * which is exactly what we register here.
 	 *
 	 * v0.2.0: `pr_peptide_family` taxonomy removed — never populated, never
 	 * surfaced in UI.
 	 *
+	 * v0.3.0: `peptide_topic` taxonomy moved to PR_Core_Topic_Taxonomy class.
+	 *
 	 * Side effects: registers taxonomy with WordPress.
 	 *
 	 * @return void
 	 */
 	public static function register_taxonomies(): void {
-		if ( taxonomy_exists( self::TAX_CATEGORY ) ) {
-			return;
+		// Register peptide_category taxonomy.
+		if ( ! taxonomy_exists( self::TAX_CATEGORY ) ) {
+			register_taxonomy( self::TAX_CATEGORY, self::POST_TYPE, [
+				'labels'             => [
+					'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
+					'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
+				],
+				'public'             => true,
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
+				'show_ui'            => true,
+				'show_admin_column'  => true,
+				'hierarchical'       => true,
+				'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
+			] );
 		}
-
-		register_taxonomy( self::TAX_CATEGORY, self::POST_TYPE, [
-			'labels'             => [
-				'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
-				'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
-			],
-			'public'             => true,
-			'publicly_queryable' => true,
-			'show_in_rest'       => true,
-			'show_ui'            => true,
-			'show_admin_column'  => true,
-			'hierarchical'       => true,
-			'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
-		] );
 	}
 
 	/**
