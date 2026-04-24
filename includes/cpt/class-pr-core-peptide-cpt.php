@@ -184,7 +184,8 @@ class PR_Core_Peptide_CPT {
 			'show_in_nav_menus'  => true,
 			'show_in_rest'       => true,
 			'rest_base'          => 'peptides',
-			'rest_namespace'     => 'pr-core/v1',
+			// 'rest_namespace' omitted — custom namespaces break Gutenberg
+			// (it fetches wp/v2 hardcoded). WordPress defaults to wp/v2. (#5)
 			'menu_position'      => 25,
 			'menu_icon'          => 'dashicons-database',
 			'capability_type'    => 'post',

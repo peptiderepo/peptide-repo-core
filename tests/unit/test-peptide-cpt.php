@@ -10,7 +10,7 @@
  *   - TAX_FAMILY constant is removed.
  *   - register_peptide_post_type() guard: no-op when post_type_exists returns true.
  *   - register_peptide_post_type() payload: args match the harmonized contract
- *     (thumbnail in supports, rewrite slug peptides, pr-core/v1 REST namespace).
+ *     (thumbnail in supports, rewrite slug peptides, rest_namespace absent — Gutenberg requires wp/v2).
  *   - register_taxonomies() guard: no-op when taxonomy_exists returns true.
  *   - register_taxonomies() only registers peptide_category; pr_peptide_family is gone.
  *
@@ -65,7 +65,7 @@ pr_assert_equals( true, $args['public'] ?? null, 'public = true' );
 pr_assert_equals( true, $args['publicly_queryable'] ?? null, 'publicly_queryable = true' );
 pr_assert_equals( true, $args['show_in_rest'] ?? null, 'show_in_rest = true' );
 pr_assert_equals( 'peptides', $args['rest_base'] ?? null, 'rest_base = "peptides"' );
-pr_assert_equals( 'pr-core/v1', $args['rest_namespace'] ?? null, 'rest_namespace = "pr-core/v1"' );
+pr_assert( ! array_key_exists( 'rest_namespace', $args ), 'rest_namespace absent — defaults to wp/v2 (Gutenberg requirement)' );
 pr_assert_equals( 'post', $args['capability_type'] ?? null, 'capability_type = "post"' );
 pr_assert_equals( true, $args['map_meta_cap'] ?? null, 'map_meta_cap = true' );
 pr_assert_equals( false, $args['hierarchical'] ?? null, 'hierarchical = false' );
