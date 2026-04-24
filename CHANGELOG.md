@@ -3,6 +3,11 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.3.2] — 2026-04-25
+
+### Fixed
+- Remove `rest_namespace` from peptide CPT registration. Custom namespace prevented Gutenberg block editor from loading peptide posts for editing (404 on wp/v2 REST route). All 89 peptide entries are now editable in the block editor. (#5)
+
 ## [0.3.1] — 2026-04-24
 
 ### Fixed
