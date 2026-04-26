@@ -48,9 +48,17 @@ jobs:
         if: always()
         run: rm -f ~/.ssh/deploy_key
 
+  smoke:
+    name: Smoke tests (staging)
+    needs: deploy-staging
+    uses: peptiderepo/peptide-e2e/.github/workflows/smoke.yml@main
+    secrets:
+      STAGING_WP_ADMIN_USER: ${{ secrets.STAGING_WP_ADMIN_USER }}
+      STAGING_WP_ADMIN_PASSWORD: ${{ secrets.STAGING_WP_ADMIN_PASSWORD }}
+
   deploy-production:
     name: Deploy to Production
-    needs: [ci, deploy-staging]
+    needs: [ci, deploy-staging, smoke]
     runs-on: ubuntu-latest
     environment: production
     steps:
