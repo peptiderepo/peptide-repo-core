@@ -45,20 +45,8 @@ class PR_Core_Verification_Scanner {
 				continue;
 			}
 
-			// Compute days since verification.
-			$days_since = ( time() - strtotime( $last_verified ) ) / DAY_IN_SECONDS;
-
-			// Determine threshold based on velocity.
-			$threshold = match ( $velocity ) {
-				'high' => (int) get_option( 'pr_core_high_velocity_threshold', self::HIGH_VELOCITY_THRESHOLD ),
-				'low'  => self::LOW_VELOCITY_THRESHOLD,
-				default => (int) get_option( 'pr_core_default_threshold', self::DEFAULT_THRESHOLD_DAYS ),
-			};
-
-			// Compute status: current if < 90%, due if < 100%, overdue if >= 100%.
-			$status = $days_since < ( $threshold * 0.9 )
-				? 'current'
-				: ( $days_since < $threshold ? 'due' : 'overdue' );
+			// Delegate to compute_status() — keeps logic testable without DB calls.
+			$status = self::compute_status( $last_verified, $velocity );
 
 			update_post_meta( $dto->id, '_pr_verification_status', $status );
 
@@ -76,6 +64,33 @@ class PR_Core_Verification_Scanner {
 		if ( ! empty( $due_peptides ) || ! empty( $overdue_peptides ) ) {
 			self::send_digest_email( $due_peptides, $overdue_peptides );
 		}
+	}
+
+
+	/**
+	 * Compute verification status for a single peptide.
+	 *
+	 * Extracted for direct unit-testability without database or WP-cron dependencies.
+	 *
+	 * @param string $last_verified YYYY-MM-DD date of last source verification. Empty = overdue.
+	 * @param string $velocity      Velocity tier: high | medium | low.
+	 * @return string Status: current | due | overdue.
+	 */
+	public static function compute_status( string $last_verified, string $velocity ): string {
+		if ( empty( $last_verified ) ) {
+			return 'overdue';
+		}
+
+		$days_since = ( time() - strtotime( $last_verified ) ) / DAY_IN_SECONDS;
+		$threshold  = match ( $velocity ) {
+			'high' => (int) get_option( 'pr_core_high_velocity_threshold', self::HIGH_VELOCITY_THRESHOLD ),
+			'low'  => self::LOW_VELOCITY_THRESHOLD,
+			default => (int) get_option( 'pr_core_default_threshold', self::DEFAULT_THRESHOLD_DAYS ),
+		};
+
+		return $days_since < ( $threshold * 0.9 )
+			? 'current'
+			: ( $days_since < $threshold ? 'due' : 'overdue' );
 	}
 
 	/**

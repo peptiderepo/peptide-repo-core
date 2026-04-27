@@ -1,134 +1,128 @@
 <?php
+/**
+ * Unit tests for PR_Core_Verification_Scanner::compute_status().
+ *
+ * Run: php tests/unit/test-verification-scanner.php
+ * Exit code 0 = all pass, 1 = any failure.
+ *
+ * What's covered:
+ *   - Empty last_verified → overdue.
+ *   - Days < 90% of threshold → current.
+ *   - Days >= 90% and < 100% of threshold → due.
+ *   - Days >= threshold → overdue.
+ *   - Boundary: exactly at 90% → due (not current).
+ *   - high velocity applies 60-day threshold from option.
+ *   - low velocity applies 365-day constant (not option).
+ *   - medium/default applies 180-day threshold from option.
+ *
+ * @package PeptideRepoCore
+ */
+
 declare(strict_types=1);
 
-/**
- * Tests for PR_Core_Verification_Scanner.
- *
- * What: Unit tests for status computation logic.
- * Dependencies: PHPUnit, WordPress test utilities.
- *
- * Mock strategy: Zero real DB calls — mock get_option() and update_post_meta().
- */
-class Test_Verification_Scanner extends \WP_UnitTestCase {
+require_once __DIR__ . '/../bootstrap.php';
 
-	/**
-	 * Test current status when days_since < threshold * 0.9.
-	 */
-	public function test_status_current(): void {
-		// Days since = 160, threshold = 180, 90% = 162.
-		// 160 < 162 => current.
-		$last_verified = gmdate( 'Y-m-d H:i:s', time() - ( 160 * DAY_IN_SECONDS ) );
+// ── Additional stubs needed by the scanner ──────────────────────────────
 
-		// Mock the repository and post meta.
-		$dto = $this->create_mock_dto( 1, $last_verified, 'medium' );
+if ( ! defined( 'DAY_IN_SECONDS' ) ) {
+	define( 'DAY_IN_SECONDS', 86400 );
+}
 
-		$status = $this->compute_status( $dto, 180, 'medium' );
-		$this->assertEquals( 'current', $status );
-	}
+/** @var array<string, mixed> $GLOBALS['pr_core_options'] Mocked option store. */
+$GLOBALS['pr_core_options'] = [];
 
-	/**
-	 * Test due status when threshold * 0.9 <= days_since < threshold.
-	 */
-	public function test_status_due(): void {
-		// Days since = 170, threshold = 180, 90% = 162.
-		// 162 <= 170 < 180 => due.
-		$last_verified = gmdate( 'Y-m-d H:i:s', time() - ( 170 * DAY_IN_SECONDS ) );
-
-		$dto = $this->create_mock_dto( 2, $last_verified, 'medium' );
-		$status = $this->compute_status( $dto, 180, 'medium' );
-		$this->assertEquals( 'due', $status );
-	}
-
-	/**
-	 * Test overdue status when days_since >= threshold.
-	 */
-	public function test_status_overdue(): void {
-		// Days since = 190, threshold = 180.
-		// 190 >= 180 => overdue.
-		$last_verified = gmdate( 'Y-m-d H:i:s', time() - ( 190 * DAY_IN_SECONDS ) );
-
-		$dto = $this->create_mock_dto( 3, $last_verified, 'medium' );
-		$status = $this->compute_status( $dto, 180, 'medium' );
-		$this->assertEquals( 'overdue', $status );
-	}
-
-	/**
-	 * Test empty verified date => overdue.
-	 */
-	public function test_empty_verified_date_is_overdue(): void {
-		$dto = $this->create_mock_dto( 4, '', 'medium' );
-		$status = $this->compute_status( $dto, 180, 'medium', true );
-		$this->assertEquals( 'overdue', $status );
-	}
-
-	/**
-	 * Test high velocity threshold.
-	 */
-	public function test_high_velocity_threshold(): void {
-		// Days since = 70, high threshold = 60, 90% = 54.
-		// 54 <= 70 => due (not current even with high velocity).
-		$last_verified = gmdate( 'Y-m-d H:i:s', time() - ( 70 * DAY_IN_SECONDS ) );
-
-		$dto = $this->create_mock_dto( 5, $last_verified, 'high' );
-		$status = $this->compute_status( $dto, 60, 'high' );
-		$this->assertEquals( 'due', $status );
-	}
-
-	/**
-	 * Test low velocity threshold.
-	 */
-	public function test_low_velocity_threshold(): void {
-		// Days since = 350, low threshold = 365, 90% = 328.5.
-		// 328.5 < 350 < 365 => due.
-		$last_verified = gmdate( 'Y-m-d H:i:s', time() - ( 350 * DAY_IN_SECONDS ) );
-
-		$dto = $this->create_mock_dto( 6, $last_verified, 'low' );
-		$status = $this->compute_status( $dto, 365, 'low' );
-		$this->assertEquals( 'due', $status );
-	}
-
-	/**
-	 * Create a mock DTO.
-	 *
-	 * @param int    $id Post ID.
-	 * @param string $last_verified Verified date (or empty).
-	 * @param string $velocity Velocity level.
-	 * @return object Mock DTO.
-	 */
-	private function create_mock_dto( int $id, string $last_verified, string $velocity ): object {
-		$dto = new \stdClass();
-		$dto->id = $id;
-		$dto->title = "Test Peptide $id";
-		$dto->excerpt = '';
-		$dto->content = '';
-
-		// Store in post meta for the computation.
-		update_post_meta( $id, '_pr_last_source_verified', $last_verified );
-		update_post_meta( $id, '_pr_verification_velocity', $velocity );
-
-		return $dto;
-	}
-
-	/**
-	 * Compute status using the scanner logic inline (no DB calls beyond meta).
-	 *
-	 * @param object $dto Peptide DTO.
-	 * @param int    $threshold Threshold in days.
-	 * @param string $velocity Velocity level.
-	 * @param bool   $empty_date Whether date is empty.
-	 * @return string Status.
-	 */
-	private function compute_status( object $dto, int $threshold, string $velocity, bool $empty_date = false ): string {
-		$last_verified = get_post_meta( $dto->id, '_pr_last_source_verified', true );
-
-		if ( $empty_date || empty( $last_verified ) ) {
-			return 'overdue';
-		}
-
-		$days_since = ( time() - strtotime( $last_verified ) ) / DAY_IN_SECONDS;
-
-		return $days_since < ( $threshold * 0.9 )
-			? 'current'
-			: ( $days_since < $threshold ? 'due' : 'overdue' );
+if ( ! function_exists( 'get_option' ) ) {
+	function get_option( string $key, $default = false ) {
+		return $GLOBALS['pr_core_options'][ $key ] ?? $default;
 	}
 }
+
+// ── Load the scanner class ──────────────────────────────────────────────
+
+require_once __DIR__ . '/../../includes/scanner/class-pr-core-verification-scanner.php';
+
+// ── Helper: build a date N days ago ────────────────────────────────────
+
+function days_ago( int $days ): string {
+	return gmdate( 'Y-m-d', time() - ( $days * DAY_IN_SECONDS ) );
+}
+
+echo "== PR_Core_Verification_Scanner::compute_status() unit tests ==\n\n";
+
+// ── Empty last_verified ─────────────────────────────────────────────────
+
+echo "Empty last_verified:\n";
+pr_assert_equals(
+	'overdue',
+	PR_Core_Verification_Scanner::compute_status( '', 'medium' ),
+	'empty string → overdue'
+);
+
+// ── Medium velocity (default 180-day threshold) ─────────────────────────
+
+echo "\nMedium velocity (threshold=180, option default):\n";
+$GLOBALS['pr_core_options'] = [];
+
+// 160 days ago → 160 < 162 (90% of 180) → current.
+pr_assert_equals( 'current', PR_Core_Verification_Scanner::compute_status( days_ago( 160 ), 'medium' ), '160 days → current' );
+
+// 163 days ago → 163 >= 162 and < 180 → due.
+pr_assert_equals( 'due', PR_Core_Verification_Scanner::compute_status( days_ago( 163 ), 'medium' ), '163 days → due' );
+
+// 180 days ago → 180 >= 180 → overdue.
+pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 180 ), 'medium' ), '180 days → overdue' );
+
+// 200 days ago → overdue.
+pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 200 ), 'medium' ), '200 days → overdue' );
+
+// ── 90% boundary exactness ──────────────────────────────────────────────
+
+echo "\n90% boundary (threshold=100):\n";
+$GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 100 ];
+
+// 89 days → 89 < 90 (90% of 100) → current.
+pr_assert_equals( 'current', PR_Core_Verification_Scanner::compute_status( days_ago( 89 ), 'medium' ), '89 days (threshold 100) → current' );
+
+// 90 days → 90 >= 90 and < 100 → due.
+pr_assert_equals( 'due', PR_Core_Verification_Scanner::compute_status( days_ago( 90 ), 'medium' ), '90 days (threshold 100) → due (at boundary)' );
+
+// 100 days → 100 >= 100 → overdue.
+pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 100 ), 'medium' ), '100 days (threshold 100) → overdue' );
+
+// ── High velocity (60-day threshold from option) ────────────────────────
+
+echo "\nHigh velocity (threshold=60 from option):\n";
+$GLOBALS['pr_core_options'] = [ 'pr_core_high_velocity_threshold' => 60 ];
+
+// 50 days → 50 < 54 (90% of 60) → current.
+pr_assert_equals( 'current', PR_Core_Verification_Scanner::compute_status( days_ago( 50 ), 'high' ), 'high: 50 days → current' );
+
+// 55 days → 55 >= 54, < 60 → due.
+pr_assert_equals( 'due', PR_Core_Verification_Scanner::compute_status( days_ago( 55 ), 'high' ), 'high: 55 days → due' );
+
+// 61 days → overdue.
+pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 61 ), 'high' ), 'high: 61 days → overdue' );
+
+// ── Low velocity (365-day constant — ignores option) ────────────────────
+
+echo "\nLow velocity (threshold=365, constant, ignores option):\n";
+$GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 999 ]; // Should be ignored for low.
+
+// 300 days → 300 < 328.5 (90% of 365) → current.
+pr_assert_equals( 'current', PR_Core_Verification_Scanner::compute_status( days_ago( 300 ), 'low' ), 'low: 300 days → current' );
+
+// 340 days → 340 >= 328.5, < 365 → due.
+pr_assert_equals( 'due', PR_Core_Verification_Scanner::compute_status( days_ago( 340 ), 'low' ), 'low: 340 days → due' );
+
+// 366 days → overdue.
+pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 366 ), 'low' ), 'low: 366 days → overdue' );
+
+// ── Unknown velocity falls through to medium/default ────────────────────
+
+echo "\nUnknown velocity (falls to default/medium):\n";
+$GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 180 ];
+pr_assert_equals( 'current', PR_Core_Verification_Scanner::compute_status( days_ago( 100 ), 'unknown' ), 'unknown velocity: 100 days → current (uses default 180)' );
+
+// ── Summary ─────────────────────────────────────────────────────────────
+
+exit( pr_test_summary() );
