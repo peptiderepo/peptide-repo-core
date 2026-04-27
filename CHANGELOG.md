@@ -3,41 +3,39 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
-## [0.3.2] — 2026-04-25
-
-### Fixed
-- Remove `rest_namespace` from peptide CPT registration. Custom namespace prevented Gutenberg block editor from loading peptide posts for editing (404 on wp/v2 REST route). All 89 peptide entries are now editable in the block editor. (#5)
-
-## [0.3.1] — 2026-04-24
-
-### Fixed
-- Add missing `PR_Core_Related_Posts_Provider` interface file (`class-pr-core-related-posts-provider.php`).
-  Omitted from v0.3.0 deploy caused a fatal on every page load. Site was down until this fix.
-
-## [0.3.0] — 2026-04-24
+## [0.4.0] — 2026-04-27
 
 ### Added
-- **Related Articles feature** — New `peptide_topic` taxonomy links blog posts to peptides by slug. Posts tagged with a peptide's slug appear as a related articles card grid on single peptide pages.
-- `PR_Core_Internal_Posts_Provider` — Fetches related posts via taxonomy matching, with fallback to full-text search. Results cached 1 hour per peptide.
-- `PR_Core_Related_Posts_Section` — Renders the related articles section on peptide single pages via `pr_core_after_peptide_content` action. Respects admin settings for feature toggle and display limit.
-- `PR_Core_Settings` — Admin settings page under Peptides menu. Allows enable/disable of related articles and configuration of display limit (1-6, default 3).
-- Template part `template-parts/related-posts/card.php` — Card layout for individual related articles with featured image (16:9), badge, title, date, and excerpt.
-- CSS file `assets/css/related-posts.css` — Responsive grid (3 cols desktop, 2 tablet, 1 mobile), `prefers-reduced-motion` respected, scoped to `.pr-related-posts`.
-- Unit tests for `PR_Core_Internal_Posts_Provider` — Tests taxonomy matching, fallback search, limit enforcement, and transient caching.
-- `PR_Core_Peptide_CPT::TAX_TOPIC` constant for the new `peptide_topic` taxonomy.
+- **Verification Scanner**: Automated periodic scanning of all published peptides to compute verification status (current/due/overdue) based on days since last verification and configurable velocity-based thresholds.
+- **Verification Settings**: New admin settings page under Peptides menu with configuration for scan cadence (daily/weekly/monthly), staleness thresholds (default 180 days, high-velocity 60 days, low-velocity 365 days), and notification email recipients.
+- **Dashboard Widget**: "Monographs Needing Review" dashboard widget showing all peptides due or overdue for verification, sorted by staleness, with direct edit links and one-click scan trigger.
+- **Editor Sidebar Meta Box**: New "Verification Status" sidebar meta box on peptide edit screen showing last-verified date, velocity selector, status badge, and one-click "Mark Verified Today" button that sets verification date to current time and recomputes status.
+- **Admin AJAX Handlers**: Two new admin-ajax actions:
+  - `pr_core_mark_verified`: Sets `_pr_last_source_verified` to today, saves optional notes, recomputes status.
+  - `pr_core_scan_now`: Runs verification scanner immediately from the dashboard widget.
+- **Frontend Verification Display**: On single-peptide pages, displays "Last verified: [date] — methodology" text after the verdict card div (requires non-empty `_pr_last_source_verified` meta field).
+- **Verification Meta Fields** (registered in CPT):
+  - `_pr_last_source_verified`: ISO datetime of most recent source verification.
+  - `_pr_last_reviewed`: ISO datetime of editorial review (phase 2 integration point).
+  - `_pr_next_review_by`: ISO datetime of next scheduled review (phase 2 integration point).
+  - `_pr_verification_velocity`: Enum (low/medium/high) controlling threshold application.
+  - `_pr_verification_notes`: Textarea for reviewer notes on the most recent verification pass.
+  - `_pr_verification_status`: Enum (current/due/overdue) computed by scanner; drives widget sorting and badge color.
+- **Scan Log**: Option `pr_core_verification_scan_log` stores last 90 scan summaries (timestamp, total count, due count, overdue count) for audit trail and health monitoring.
+- **Email Digest**: When scans detect due/overdue peptides, a digest email is sent to configured recipients (default: none, must opt-in) with links to edit each peptide and the verification dashboard.
 
 ### Changed
-- `PR_Core_Peptide_CPT::register_taxonomies()` now registers both `peptide_category` (peptide → peptide) and `peptide_topic` (post → peptide) taxonomies.
-- `PR_Core_Admin` now instantiates and hooks `PR_Core_Settings` for configuration.
-- `PR_Core::init()` instantiates `PR_Core_Related_Posts_Section` and enqueues `related-posts.css` on single peptide pages.
-- `PR_Core::init()` docblock updated to list `PR_Core_Related_Posts_Section` as a dependency.
-- Version bumped to `0.3.0`.
+- CPT meta field registration now includes 6 new verification fields alongside existing dosing/legal/editorial fields.
 
-### Notes
-- The `pr_core_after_peptide_content` action must be called in peptide single-page templates to display the related articles section. This hook fires after the main peptide content.
-- Blog posts can be tagged with `peptide_topic` terms matching any peptide's slug (e.g., 'bpc-157', 'tb-500') to appear as related articles on that peptide's page.
-- Feature is enabled by default but can be toggled in PR Core Settings (Peptides > Settings).
-- Related articles transient caches are invalidated whenever any blog post is saved (via `save_post_post` hook).
+### Technical
+- New classes: `PR_Core_Verification_Scanner`, `PR_Core_Settings`, `PR_Core_Verification_Widget`, `PR_Core_Verification_Display`, `PR_Core_Ajax_Handlers`.
+- New unit tests: `test-verification-scanner.php` (status computation logic), `test-verification-settings.php` (cadence/cron scheduling).
+- WordPress cron integration: `pr_core_verification_scan` hook scheduled at activation, cleared at deactivation, rescheduled when cadence changes.
+
+## [0.2.2] — 2026-04-25
+
+### Fixed
+- Remove `rest_namespace` from peptide CPT registration. Custom namespace prevented Gutenberg block editor from loading peptide posts for editing (404 on wp/v2 REST route). All 89 peptide entries are now editable in the block editor.
 
 ## [0.2.1] — 2026-04-22
 
@@ -59,49 +57,3 @@ Format: [Semantic Versioning](https://semver.org/).
 ### Added
 - `PR_Core_Activator::maybe_flush_on_version_change()` — one-shot rewrite flush on in-place version bumps (hooked at `init` priority 999). Eliminates the need for a manual `wp rewrite flush` after updates that change CPT/taxonomy slugs.
 - `_pr_core_authored` post-meta flag contract — peptide posts created via PR Core UI carry this flag; `uninstall.php` uses it to scope teardown to plugin-owned posts only.
-- Lightweight unit-test harness (`tests/bootstrap.php` + `tests/unit/test-peptide-cpt.php`) that exercises CPT/taxonomy guards and args payload shape without a PHPUnit + wp-env dependency. Wired into the existing PHP-lint CI job.
-
-### Removed
-- `pr_peptide_family` taxonomy — never populated, never surfaced in UI.
-- All `pr_peptide*` CPT-slug-derived references (constants, docblock mentions, uninstall string literals).
-- Blanket `DELETE FROM posts WHERE post_type = 'pr_peptide'` on uninstall. Replaced with a join-on-`_pr_core_authored` selective delete so PSA-authored peptide posts are never destroyed by PR Core teardown.
-- Taxonomy-term cleanup on uninstall. `peptide_category` is shared ownership post-v0.2.0; term data the site still needs is preserved.
-
-### Fixed
-- Production peptide detail pages (all 89) were 404'ing due to a rewrite slug collision between PSA's `peptide` CPT and PR Core's `pr_peptide` CPT both claiming `/peptides/%postname%/`. PR Core v0.1.1's empty `pr_peptide` CPT was winning the rewrite resolution. This release consolidates both to a single `peptide` CPT owned by PR Core.
-
-### Notes
-- Scope of the `pr_peptide*` scrub is intentionally narrow: CPT-slug-derived identifiers only. Class names (`PR_Core_Peptide_CPT`), file names (`class-pr-core-peptide-cpt.php`), plugin constants (`PR_CORE_VERSION`), option keys (`pr_core_*`), and the REST namespace (`pr-core/v1`) are the plugin's own namespace, not the CPT slug, and are preserved verbatim.
-- PR Core-defined meta keys (`display_name`, `aliases`, `evidence_strength`, `editorial_review_status`, …) are gated by `manage_peptide_content`. The activator grants this capability to `administrator` and `editor` roles on activation. Prod sites where the activation hook never fired (v0.1.1 was deployed manually) will receive the grant on next `wp plugin activate peptide-repo-core`. Follow-up thread to decide whether a dedicated `peptide_editor` role is more appropriate than extending core `editor`.
-
-## [0.1.1] — 2026-04-19
-
-### Fixed
-- **Fatal error on activation: `NAMESPACE` is a PHP reserved keyword.** Renamed
-  to `REST_NAMESPACE` in the REST controller.
-- **Fatal error: autoloader cannot resolve `PR_Core` class.** Class name equals
-  the autoloader prefix exactly, producing wrong filename. Added explicit
-  require_once in bootstrap (same pattern as PRAutoBlogger).
-
-## [0.1.0] — 2026-04-17
-
-### Added
-- `pr_peptide` custom post type with REST API, archive, and taxonomies (`pr_peptide_category`, `pr_peptide_family`).
-- Post-meta fields: display_name, aliases, molecular_formula, molecular_weight, cas_number, drugbank_id, chembl_id, evidence_strength, editorial_review_status, last_editorial_review_at, medical_editor_id.
-- Custom table `pr_dosing_rows` with schema migration 0001 — high-cardinality dosing data with citation tracking, evidence strength, and supersede (soft-delete) pattern.
-- Custom table `pr_legal_cells` with schema migration 0002 — per-country legal status with unique constraint on peptide x country (active).
-- Custom table `pr_ai_candidate_queue` with schema migration 0003 — AI-extracted dosing candidates awaiting human review.
-- Migration runner with sequential versioning (`pr_core_schema_version` option, `PR_CORE_TARGET_SCHEMA_VERSION` constant).
-- Typed DTOs: `PR_Core_Peptide_DTO`, `PR_Core_Dosing_Row_DTO`, `PR_Core_Legal_Cell_DTO`, `PR_Core_Candidate_DTO`.
-- Repository classes: `PR_Core_Peptide_Repository`, `PR_Core_Dosing_Repository`, `PR_Core_Legal_Repository`, `PR_Core_Candidate_Queue_Repository`.
-- REST API (`pr-core/v1`): list/get peptides, list/create dosing rows, list/create legal cells.
-- Admin UI: Scientific Identifiers meta box, Dosing Data meta box (read-only), Legal Status meta box (read-only), custom list-table columns (Evidence, Editorial, Dosing Rows).
-- AI Candidate Queue admin page with approve/reject workflow (copies approved rows to dosing table).
-- Shared disclaimer component: `[pr_disclaimer surface="dosing"]` shortcode, `PR_Core_Disclaimer::render()` static method, `pr_core_disclaimer_for_surface` filter.
-- JSON-LD emission: schema.org `Drug` type on single peptide pages with `pr_core_jsonld_peptide` filter.
-- Public API filters: `pr_core_get_indexable_corpus`, `pr_core_disclaimer_for_surface`, `pr_core_evidence_strength_label`.
-- Public API actions: `pr_core_before/after_peptide_publish`, `pr_core_before/after_dosing_row_publish`, `pr_core_before/after_legal_cell_publish`, `pr_core_candidate_approved/rejected`.
-- `manage_peptide_content` capability granted to administrators and editors on activation.
-- Full teardown in `uninstall.php` (tables, posts, terms, options, capabilities).
-- Seed data fixture: 3 peptides (BPC-157, Semaglutide, TB-500), 10 dosing rows, 5 legal cells.
-- CI workflow: PHP lint (8.0/8.1/8.2), PHPCS (WordPress standard), 300-line file check.

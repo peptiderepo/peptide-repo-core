@@ -4,16 +4,15 @@ declare(strict_types=1);
 /**
  * Admin initialization and hook registration.
  *
- * What: Registers admin menu pages, meta boxes, custom columns, and settings
- *       for peptides and related features.
+ * What: Registers admin menu pages, meta boxes, and custom columns for peptides.
  * Who calls it: PR_Core::init() when is_admin().
- * Dependencies: PR_Core_Peptide_Metaboxes, PR_Core_Candidate_Queue_Page,
- *               PR_Core_Admin_Columns, PR_Core_Settings.
+ * Dependencies: PR_Core_Peptide_Metaboxes, PR_Core_Verification_Metabox,
+ *               PR_Core_Candidate_Queue_Page, PR_Core_Admin_Columns.
  *
  * @see admin/class-pr-core-peptide-metaboxes.php    — Dosing + legal meta boxes.
+ * @see admin/class-pr-core-verification-metabox.php — Verification sidebar meta box.
  * @see admin/class-pr-core-candidate-queue-page.php — Candidate review screen.
  * @see admin/class-pr-core-admin-columns.php        — Custom list-table columns.
- * @see admin/class-pr-core-settings.php             — Plugin settings page.
  */
 class PR_Core_Admin {
 
@@ -29,12 +28,11 @@ class PR_Core_Admin {
 		add_action( 'add_meta_boxes', [ $metaboxes, 'add_meta_boxes' ] );
 		add_action( 'save_post_' . PR_Core_Peptide_CPT::POST_TYPE, [ $metaboxes, 'save_meta' ], 10, 2 );
 
+		add_action( 'add_meta_boxes', [ PR_Core_Verification_Metabox::class, 'register' ] );
+
 		$columns = new PR_Core_Admin_Columns();
 		add_filter( 'manage_' . PR_Core_Peptide_CPT::POST_TYPE . '_posts_columns', [ $columns, 'add_columns' ] );
 		add_action( 'manage_' . PR_Core_Peptide_CPT::POST_TYPE . '_posts_custom_column', [ $columns, 'render_column' ], 10, 2 );
-
-		$settings = new PR_Core_Settings();
-		$settings->register_hooks();
 
 		add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_styles' ] );

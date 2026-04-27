@@ -21,6 +21,10 @@ class PR_Core_Deactivator {
 	 * @return void
 	 */
 	public static function deactivate(): void {
+		// Clear verification scan cron.
+		wp_clear_scheduled_hook( 'pr_core_verification_scan' );
+
+		// Flush rewrite rules.
 		flush_rewrite_rules();
 	}
 }
