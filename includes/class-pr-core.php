@@ -41,13 +41,30 @@ class PR_Core {
 		// without a deactivate/reactivate cycle (e.g., SCP/rsync pushes).
 		add_action( 'init', [ PR_Core_Activator::class, 'maybe_flush_on_version_change' ], 999 );
 
+		// Verification scanner: register cron hook and schedule if not already scheduled.
+		if ( ! wp_next_scheduled( 'pr_core_verification_scan' ) ) {
+			wp_schedule_event( time(), get_option( 'pr_core_scan_cadence', 'weekly' ), 'pr_core_verification_scan' );
+		}
+		add_action( 'pr_core_verification_scan', [ PR_Core_Verification_Scanner::class, 'run_scan' ] );
+
+		// Ajax handlers must be registered outside is_admin() — admin-ajax.php
+		// does not define WP_ADMIN, so is_admin() returns false for ajax requests.
+		add_action( 'wp_ajax_pr_core_mark_verified', [ PR_Core_Ajax_Handlers::class, 'handle_mark_verified' ] );
+		add_action( 'wp_ajax_pr_core_scan_now',      [ PR_Core_Ajax_Handlers::class, 'handle_scan_now' ] );
+
 		// Admin UI (fires on admin_init, admin_menu).
 		if ( is_admin() ) {
+			add_action( 'admin_menu', [ PR_Core_Settings::class, 'add_settings_page' ] );
+			add_action( 'admin_init', [ PR_Core_Settings::class, 'register_settings' ] );
+			add_action( 'wp_dashboard_setup', [ PR_Core_Verification_Widget::class, 'register' ] );
+
 			$admin = new PR_Core_Admin();
 			$admin->register_hooks();
 		}
 
-		// Frontend: disclaimer shortcode + JSON-LD.
+		// Frontend: disclaimer shortcode + JSON-LD + verification display.
+		PR_Core_Verification_Display::init();
+
 		$disclaimer = new PR_Core_Disclaimer();
 		$disclaimer->register_hooks();
 

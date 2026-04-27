@@ -2,22 +2,18 @@
 declare(strict_types=1);
 
 /**
- * Registers the peptide custom post type and associated taxonomies.
+ * Registers the peptide custom post type and associated taxonomy.
  *
- * What: Defines the peptide CPT with REST support, archive, and monograph meta fields.
- *       Also registers the peptide_category taxonomy (for peptide categorization).
+ * What: Defines peptide CPT with REST support, archive, and meta fields.
  * Who calls it: PR_Core::init() on plugins_loaded.
  * Dependencies: None.
  *
- * Ownership: As of v0.2.0, PR Core is the canonical owner of the `peptide` CPT
- * and `peptide_category` taxonomy (previously registered by Peptide Search AI
- * pre-schema-sprint; PSA v4.5.0 drops its registrations in favor of this one).
- * Registration is guarded by `post_type_exists()` / `taxonomy_exists()` so
- * deploy order between the two plugins does not matter — whichever runs first
- * wins, the other no-ops.
+ * Ownership: As of v0.2.0, PR Core owns the `peptide` CPT and `peptide_category` taxonomy
+ * (previously PSA v4.5.0). Registration guarded by post_type_exists/taxonomy_exists
+ * so deploy order does not matter.
  *
- * @see ARCHITECTURE.md — CPT specification and post-meta field definitions.
- * @see CONVENTIONS.md — CPT ownership rule (no plugin registers a CPT another plugin owns).
+ * @see ARCHITECTURE.md
+ * @see CONVENTIONS.md
  */
 class PR_Core_Peptide_CPT {
 
@@ -119,6 +115,36 @@ class PR_Core_Peptide_CPT {
 				'default'  => 0,
 				'sanitize' => 'absint',
 			],
+			'_pr_last_source_verified' => [
+				'type'     => 'string',
+				'default'  => '',
+				'sanitize' => 'sanitize_text_field',
+			],
+			'_pr_last_reviewed'        => [
+				'type'     => 'string',
+				'default'  => '',
+				'sanitize' => 'sanitize_text_field',
+			],
+			'_pr_next_review_by'       => [
+				'type'     => 'string',
+				'default'  => '',
+				'sanitize' => 'sanitize_text_field',
+			],
+			'_pr_verification_velocity' => [
+				'type'     => 'string',
+				'default'  => 'medium',
+				'sanitize' => [ PR_Core_Verification_Sanitizers::class, 'sanitize_velocity' ],
+			],
+			'_pr_verification_notes'    => [
+				'type'     => 'string',
+				'default'  => '',
+				'sanitize' => 'sanitize_textarea_field',
+			],
+			'_pr_verification_status'   => [
+				'type'     => 'string',
+				'default'  => 'current',
+				'sanitize' => [ PR_Core_Verification_Sanitizers::class, 'sanitize_status' ],
+			],
 		];
 	}
 
@@ -164,17 +190,8 @@ class PR_Core_Peptide_CPT {
 			'menu_name'          => __( 'Peptides', 'peptide-repo-core' ),
 		];
 
-		/*
-		 * Args are a harmonized superset of PR Core's prior `pr_peptide` args
-		 * and PSA's `peptide` args, so the 89 existing posts (authored under
-		 * PSA's registration) keep every capability they relied on:
-		 *   - supports: union of both — thumbnail comes from PSA, revisions +
-		 *     custom-fields come from PR Core.
-		 *   - capability_type + map_meta_cap: preserve PSA's per-role perms.
-		 *   - rewrite slug `peptides`: unchanged from both plugins, so
-		 *     /peptides/%postname%/ URLs keep working and theme templates
-		 *     single-peptide.php / archive-peptide.php continue to match.
-		 */
+		// Args harmonized superset of PR Core + PSA for 89 existing posts.
+		// Supports union, capability/role perms preserved, slugs unchanged.
 		$args = [
 			'labels'             => $labels,
 			'public'             => true,
@@ -184,8 +201,10 @@ class PR_Core_Peptide_CPT {
 			'show_in_nav_menus'  => true,
 			'show_in_rest'       => true,
 			'rest_base'          => 'peptides',
-			// 'rest_namespace' omitted — custom namespaces break Gutenberg
-			// (it fetches wp/v2 hardcoded). WordPress defaults to wp/v2. (#5)
+			// Note: 'rest_namespace' is deliberately omitted. Custom namespaces prevent
+			// Gutenberg's block editor from loading posts for editing (it fetches the
+			// hardcoded wp/v2 REST route). WordPress defaults to wp/v2 — appropriate for
+			// this CPT — and keeps the REST endpoint at /wp-json/wp/v2/peptides/.
 			'menu_position'      => 25,
 			'menu_icon'          => 'dashicons-database',
 			'capability_type'    => 'post',
@@ -195,7 +214,6 @@ class PR_Core_Peptide_CPT {
 			'rewrite'            => [ 'slug' => 'peptides', 'with_front' => false ],
 			'supports'           => [ 'title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'custom-fields' ],
 		];
-
 		register_post_type( self::POST_TYPE, $args );
 	}
 
@@ -203,36 +221,35 @@ class PR_Core_Peptide_CPT {
 	 * Register the `peptide_category` taxonomy.
 	 *
 	 * Guarded with `taxonomy_exists()` for the same reason CPT registration
-	 * is guarded. The 8 existing category terms + term_relationships stay intact —
+	 * is guarded. The 8 existing terms + term_relationships stay intact —
 	 * they key on taxonomy name `peptide_category` in wp_term_taxonomy,
 	 * which is exactly what we register here.
 	 *
 	 * v0.2.0: `pr_peptide_family` taxonomy removed — never populated, never
 	 * surfaced in UI.
 	 *
-	 * v0.3.0: `peptide_topic` taxonomy moved to PR_Core_Topic_Taxonomy class.
-	 *
 	 * Side effects: registers taxonomy with WordPress.
 	 *
 	 * @return void
 	 */
 	public static function register_taxonomies(): void {
-		// Register peptide_category taxonomy.
-		if ( ! taxonomy_exists( self::TAX_CATEGORY ) ) {
-			register_taxonomy( self::TAX_CATEGORY, self::POST_TYPE, [
-				'labels'             => [
-					'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
-					'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
-				],
-				'public'             => true,
-				'publicly_queryable' => true,
-				'show_in_rest'       => true,
-				'show_ui'            => true,
-				'show_admin_column'  => true,
-				'hierarchical'       => true,
-				'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
-			] );
+		if ( taxonomy_exists( self::TAX_CATEGORY ) ) {
+			return;
 		}
+
+		register_taxonomy( self::TAX_CATEGORY, self::POST_TYPE, [
+			'labels'             => [
+				'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
+				'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
+			],
+			'public'             => true,
+			'publicly_queryable' => true,
+			'show_in_rest'       => true,
+			'show_ui'            => true,
+			'show_admin_column'  => true,
+			'hierarchical'       => true,
+			'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
+		] );
 	}
 
 	/**
@@ -255,12 +272,7 @@ class PR_Core_Peptide_CPT {
 		}
 	}
 
-	/**
-	 * Sanitize a JSON array string (e.g., aliases field).
-	 *
-	 * @param mixed $value Raw input.
-	 * @return string Valid JSON array string.
-	 */
+	/** Sanitize a JSON array string (e.g., aliases field). */
 	public static function sanitize_json_array( $value ): string {
 		if ( is_array( $value ) ) {
 			$value = wp_json_encode( array_map( 'sanitize_text_field', $value ) );
@@ -274,23 +286,13 @@ class PR_Core_Peptide_CPT {
 		return wp_json_encode( array_values( array_map( 'sanitize_text_field', $decoded ) ) );
 	}
 
-	/**
-	 * Sanitize evidence_strength to allowed enum values.
-	 *
-	 * @param mixed $value Raw input.
-	 * @return string Valid enum value.
-	 */
+	/** Sanitize evidence_strength to allowed enum values. */
 	public static function sanitize_evidence_strength( $value ): string {
 		$value = sanitize_text_field( (string) $value );
 		return in_array( $value, self::EVIDENCE_STRENGTHS, true ) ? $value : 'preclinical';
 	}
 
-	/**
-	 * Sanitize editorial_review_status to allowed enum values.
-	 *
-	 * @param mixed $value Raw input.
-	 * @return string Valid enum value.
-	 */
+	/** Sanitize editorial_review_status to allowed enum values. */
 	public static function sanitize_review_status( $value ): string {
 		$value = sanitize_text_field( (string) $value );
 		return in_array( $value, self::REVIEW_STATUSES, true ) ? $value : 'draft';
