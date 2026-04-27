@@ -51,7 +51,6 @@ jobs:
   smoke:
     name: Smoke tests (staging)
     needs: deploy-staging
-    continue-on-error: true
     uses: peptiderepo/peptide-e2e/.github/workflows/smoke.yml@main
     secrets:
       STAGING_WP_ADMIN_USER: ${{ secrets.STAGING_WP_ADMIN_USER }}
@@ -59,7 +58,7 @@ jobs:
 
   deploy-production:
     name: Deploy to Production
-    needs: [ci, deploy-staging, smoke]
+    needs: [ci, deploy-staging]  # smoke is informational; not gating prod
     runs-on: ubuntu-latest
     environment: production
     steps:
