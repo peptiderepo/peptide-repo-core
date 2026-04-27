@@ -34,6 +34,11 @@ class PR_Core_Admin {
 		add_filter( 'manage_' . PR_Core_Peptide_CPT::POST_TYPE . '_posts_columns', [ $columns, 'add_columns' ] );
 		add_action( 'manage_' . PR_Core_Peptide_CPT::POST_TYPE . '_posts_custom_column', [ $columns, 'render_column' ], 10, 2 );
 
+		// Repo Daily meta boxes.
+		$repo_daily_metaboxes = new PR_Core_Repo_Daily_Metaboxes();
+		add_action( 'add_meta_boxes', [ $repo_daily_metaboxes, 'add_meta_boxes' ] );
+		add_action( 'save_post_' . PR_Core_Repo_Daily_CPT::POST_TYPE, [ $repo_daily_metaboxes, 'save_meta' ], 10, 2 );
+
 		add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_styles' ] );
 	}

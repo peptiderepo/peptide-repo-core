@@ -35,6 +35,14 @@ class PR_Core {
 		$topic_tax = new PR_Core_Topic_Taxonomy();
 		$topic_tax->register_hooks();
 
+		// Register repo_daily CPT (fires on init).
+		$repo_daily_cpt = new PR_Core_Repo_Daily_CPT();
+		$repo_daily_cpt->register_hooks();
+
+		// Register repo_daily_category taxonomy (fires on init).
+		$repo_daily_tax = new PR_Core_Repo_Daily_Taxonomy();
+		$repo_daily_tax->register_hooks();
+
 		// One-shot rewrite flush on in-place version bumps. Runs at the very
 		// end of init (priority 999) so all CPTs/taxonomies — ours and
 		// anyone else's — are registered first. Handles updates deployed

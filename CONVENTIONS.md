@@ -14,13 +14,20 @@
 Autoloader convention: `PR_Core_Foo_Bar` maps to `class-pr-core-foo-bar.php`.
 Files live in `includes/` or one level of subdirectory under `includes/`.
 
-## How To: Add a New Post-Meta Field
+## How To: Add a New Post-Meta Field to Peptide Posts
 
 1. Add the field to `PR_Core_Peptide_CPT::get_meta_fields()` in `cpt/class-pr-core-peptide-cpt.php`.
 2. Add the field to `PR_Core_Peptide_DTO` constructor and `to_array()` in `dto/class-pr-core-peptide-dto.php`.
 3. Add the field to `PR_Core_Peptide_Repository::post_to_dto()` in `repositories/class-pr-core-peptide-repository.php`.
 4. Add a form input in `PR_Core_Peptide_Metaboxes::render_identifiers_box()` in `admin/class-pr-core-peptide-metaboxes.php`.
 5. The `save_meta()` method reads from the same field list — no changes needed unless custom save logic applies.
+
+## How To: Add a New Post-Meta Field to Repo Daily Posts
+
+1. Define the meta key (start with `_repo_daily_`) and sanitization logic (use `sanitize_text_field()` for strings, cast to bool for checkboxes).
+2. Create a new metabox or extend `PR_Core_Repo_Daily_Metaboxes::render_meta_box()` in `admin/class-pr-core-repo-daily-metaboxes.php`.
+3. In `PR_Core_Repo_Daily_Metaboxes::save_meta()`, handle the field: read from `$_POST`, sanitize, and call `update_post_meta()`.
+4. Example: The `_repo_daily_clinical_review_required` checkbox checks for `isset( $_POST['key'] )` and stores `'1'` or `''`; `get_post_meta()` is type-safe because the value is always one of two strings, never a bool.
 
 ## How To: Add a New Migration
 
