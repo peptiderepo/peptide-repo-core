@@ -3,7 +3,7 @@
  * Plugin Name: Peptide Repo Core
  * Plugin URI:  https://peptiderepo.com
  * Description: Canonical peptide schema — shared data layer for the peptiderepo.com ecosystem. Provides the peptide CPT, dosing rows, legal status cells, AI candidate queue, disclaimer component, and JSON-LD output.
- * Version:     0.4.0
+ * Version:     0.5.0
  * Author:      peptiderepo
  * Author URI:  https://peptiderepo.com
  * License:     GPL-2.0-or-later
