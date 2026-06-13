@@ -168,6 +168,12 @@ $single = json_decode( $migration->parse_aliases_string( 'Only One' ), true );
 pr_assert_equals( 1, count( $single ), 'single alias produces array of 1' );
 
 // ── sanitize_formula() ───────────────────────────────────────────────────
+// Five required cases (Option B — validate, don't allowlist):
+//   1. Valid formula unchanged.
+//   2. Parenthesised formula preserved.
+//   3. Newline-injected payload — "injection" stripped, formula kept.
+//   4. Fully invalid string (script tag contents) → empty.
+//   5. Empty / whitespace-only → empty.
 
 echo "\nPR_Core_Schema_Sanitizers::sanitize_molecular_formula():\n";
 
@@ -184,15 +190,33 @@ pr_assert_equals(
 );
 
 pr_assert_equals(
+	'C2H5(OH)',
+	PR_Core_Schema_Sanitizers::sanitize_molecular_formula( 'C2H5(OH)' ),
+	'parenthesised formula preserved unchanged'
+);
+
+pr_assert_equals(
 	'C10H12',
 	PR_Core_Schema_Sanitizers::sanitize_molecular_formula( "C10H12\ninjection" ),
-	'non-formula characters removed'
+	'non-formula characters removed — newline+word stripped, formula kept'
+);
+
+pr_assert_equals(
+	'',
+	PR_Core_Schema_Sanitizers::sanitize_molecular_formula( '<script>alert(1)</script>' ),
+	'fully invalid string returns empty string'
 );
 
 pr_assert_equals(
 	'',
 	PR_Core_Schema_Sanitizers::sanitize_molecular_formula( '' ),
 	'empty string returns empty string'
+);
+
+pr_assert_equals(
+	'',
+	PR_Core_Schema_Sanitizers::sanitize_molecular_formula( '   ' ),
+	'whitespace-only returns empty string'
 );
 
 // ── Idempotency: skips when all three PR Core keys populated ─────────────

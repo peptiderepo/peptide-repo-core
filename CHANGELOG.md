@@ -33,6 +33,7 @@ Format: [Semantic Versioning](https://semver.org/).
 ### Fixed
 - `tests/unit/test-migration-0004.php`: `error_log()` stub now guarded with `function_exists()` to prevent PHP fatal redeclaration error in CI PHP Lint (8.1/8.2/8.3).
 - `tests/bootstrap.php`: `wp_json_encode` stub updated to accept `int $flags = 0` second argument, matching production call signature; guarded with `function_exists()`.
+- `cpt/class-pr-core-schema-sanitizers.php`: `sanitize_molecular_formula()` rewritten from character-allowlist to element-formula grammar validation (Option B). Now strips control characters first, then extracts the maximal leading run of valid `[A-Z][a-z]?\d*` element tokens and group separators. Inputs containing trailing English words (e.g., `"C10H12\ninjection"`) correctly return the formula prefix only (`"C10H12"`); fully invalid inputs (e.g., `"<script>alert(1)</script>"`) return `""`. Parenthesised formulas (e.g., `"C2H5(OH)"`) preserved unchanged. Seven-case unit test coverage added.
 
 ### Technical
 - Schema version: `PR_CORE_TARGET_SCHEMA_VERSION` = 4.

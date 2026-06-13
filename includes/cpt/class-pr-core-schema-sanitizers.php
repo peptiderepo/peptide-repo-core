@@ -18,17 +18,61 @@ declare(strict_types=1);
 class PR_Core_Schema_Sanitizers {
 
 	/**
+	 * Regex token for a single element symbol + optional count (e.g., "C10", "Na", "O").
+	 *
+	 * Matches: one uppercase letter, optionally followed by one lowercase letter,
+	 * optionally followed by one or more digits.
+	 *
+	 * @var string
+	 */
+	const FORMULA_TOKEN = '[A-Z][a-z]?\d*';
+
+	/**
+	 * Regex character class for allowed group-separator / structural characters.
+	 *
+	 * Covers: parentheses, square brackets, interpunct (·, U+00B7), period, digits.
+	 * These may appear between element tokens in complex or hydrated formulas.
+	 *
+	 * @var string
+	 */
+	const FORMULA_SEP = '[().\[\]\xB7\d]';
+
+	/**
 	 * Sanitize a molecular formula string (for _pr_molecular_formula).
 	 *
-	 * Strips HTML tags and allows only characters valid in a chemical formula.
-	 * Input is treated as UNTRUSTED.
+	 * Strips HTML tags and control characters, then validates the value against
+	 * an element-formula grammar. Returns the longest leading run of valid
+	 * formula tokens and separators; returns '' when nothing valid is found.
+	 *
+	 * Grammar (per token): [A-Z][a-z]?\d* — an element symbol plus optional count.
+	 * Separators: ( ) [ ] · . and standalone digits (for hydrated formulas).
+	 * Input is treated as UNTRUSTED; downstream JSON escaping is unchanged.
+	 *
+	 * Examples:
+	 *   "C62H98N16O22"          → "C62H98N16O22"  (valid, unchanged)
+	 *   "C10H12\ninjection"     → "C10H12"         (injection stripped)
+	 *   "C2H5(OH)"              → "C2H5(OH)"       (parenthesised formula preserved)
+	 *   "<script>alert(1)</script>" → ""            (no valid leading token)
+	 *   ""                      → ""               (empty input)
 	 *
 	 * @param mixed $value Raw input value.
-	 * @return string Sanitized formula string (e.g., "C62H98N16O22").
+	 * @return string Sanitized formula string, or '' when no valid formula found.
 	 */
 	public static function sanitize_molecular_formula( $value ): string {
-		$value = sanitize_text_field( wp_strip_all_tags( (string) $value ) );
-		return preg_replace( '/[^A-Za-z0-9().\[\]{}]/', '', $value ) ?? '';
+		// 1. Strip control characters (including newlines, tabs, null bytes).
+		$value = preg_replace( '/[\x00-\x1F\x7F]/', '', (string) $value ) ?? '';
+		// 2. Strip HTML tags; then strip remaining unsafe text characters.
+		$value = sanitize_text_field( wp_strip_all_tags( $value ) );
+		if ( '' === $value ) {
+			return '';
+		}
+		// 3. Extract the maximal leading run of valid element tokens and separators.
+		//    A valid run must start with an element token ([A-Z][a-z]?\d*), not a separator.
+		$pattern = '/^((?:' . self::FORMULA_TOKEN . '|' . self::FORMULA_SEP . ')+)/u';
+		if ( preg_match( $pattern, $value, $m ) ) {
+			return $m[1];
+		}
+		return '';
 	}
 
 	/**
