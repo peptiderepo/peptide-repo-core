@@ -16,7 +16,13 @@ declare(strict_types=1);
  *   - PR_Core_Jsonld_Drug, PR_Core_Jsonld_Webpage, PR_Core_Jsonld_Faq (builders).
  *   - PR_Core_Peptide_Repository, PR_Core_Peptide_CPT (data).
  *
- * Contract (ratified 2026-06-11, jsonld-contract-v1.md):
+ * Yoast integration contract (ratified 2026-06-13, v0.6.2):
+ *   - wpseo_schema_graph_pieces delivers OBJECTS (Abstract_Schema_Piece subclasses)
+ *     to Yoast, which calls get_class() + is_needed() on every item. Injecting plain
+ *     arrays there causes a PHP Fatal. Drug/FAQ nodes must be injected via
+ *     wpseo_schema_graph instead, which receives the fully-assembled graph as
+ *     array-of-arrays and is safe for plain array appends.
+ *   - wpseo_schema_graph_pieces is therefore left UNHOOKED by this plugin.
  *   - Integrated path: Yoast owns WebPage and BreadcrumbList — we never duplicate.
  *   - Standalone fallback: emits a complete @graph (Drug + FAQPage) only.
  *   - Drug @id: {permalink}#drug (stable for cross-plugin linking).
@@ -49,59 +55,68 @@ class PR_Core_Jsonld {
 	/**
 	 * Register hooks for JSON-LD output.
 	 *
-	 * Registers both the Yoast-integrated path (active when Yoast is loaded)
-	 * and the standalone wp_head fallback (active only when Yoast is absent).
+	 * Registers the Yoast-integrated path via wpseo_schema_graph (safe for plain
+	 * array appends) and the standalone wp_head fallback (active only when Yoast
+	 * is absent). Does NOT hook wpseo_schema_graph_pieces — Yoast calls
+	 * get_class() + is_needed() on every item in that filter's array and will
+	 * fatal on a plain PHP array (see class-level docblock).
 	 *
 	 * Side effects: calls add_filter(), add_action().
 	 *
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		// Integrated path: hook into Yoast's schema graph.
-		// wpseo_schema_graph_pieces: filter on the array of schema piece objects.
-		// wpseo_schema_webpage_type: filter returning the WebPage @type string.
-		add_filter( 'wpseo_schema_graph_pieces', [ $this, 'inject_graph_pieces' ], 11, 2 );
+		// wpseo_schema_webpage_type: retype WebPage -> MedicalWebPage on peptide singles.
 		add_filter( 'wpseo_schema_webpage_type', [ $this->webpage_enricher, 'retype_to_medical_webpage' ] );
+
+		// wpseo_schema_graph: two callbacks at different priorities.
+		// Priority 11 -- enrich_webpage_piece: merge lastReviewed/reviewedBy/audience into the
+		//               existing WebPage node that Yoast already emitted.
+		// Priority 12 -- inject_graph_nodes: append Drug + FAQPage arrays to the graph.
+		//               Must run after enrich_webpage_piece so the WebPage node is already
+		//               enriched before Drug/FAQ are appended.
 		add_filter( 'wpseo_schema_graph', [ $this->webpage_enricher, 'enrich_webpage_piece' ], 11, 2 );
+		add_filter( 'wpseo_schema_graph', [ $this, 'inject_graph_nodes' ], 12, 2 );
 
 		// Standalone fallback: emits only when Yoast is not producing output.
 		add_action( 'wp_head', [ $this, 'emit_standalone_fallback' ], 99 );
 	}
 
 	/**
-	 * Inject Drug and FAQPage pieces into Yoast's schema graph.
+	 * Append Drug and FAQPage nodes to Yoast's fully-assembled schema graph.
 	 *
-	 * Hooked on: wpseo_schema_graph_pieces (priority 11, after Yoast's own pieces).
-	 * This filter receives Yoast's piece objects array. We append plain arrays;
-	 * Yoast 27.6 accepts both objects and plain arrays in this filter.
+	 * Hooked on: wpseo_schema_graph (priority 12, after enrich_webpage_piece).
+	 * This filter receives Yoast's completed graph as an array of plain arrays.
+	 * Appending plain Drug/FAQ arrays here is safe -- unlike wpseo_schema_graph_pieces
+	 * which calls get_class() and is_needed() on each item expecting objects.
 	 *
-	 * @param array<int, mixed>     $pieces  Existing graph pieces from Yoast.
-	 * @param \WPSEO_Schema_Context $context Yoast schema context object.
-	 * @return array<int, mixed> Pieces array with Drug and FAQPage appended.
+	 * @param array<int, array<string, mixed>>                        $graph   Assembled Yoast graph.
+	 * @param \Yoast\WP\SEO\Context\Meta_Tags_Context|null            $context Yoast schema context.
+	 * @return array<int, array<string, mixed>> Graph with Drug (and optionally FAQ) appended.
 	 */
-	public function inject_graph_pieces( array $pieces, $context ): array {
+	public function inject_graph_nodes( array $graph, $context ): array {
 		if ( ! is_singular( PR_Core_Peptide_CPT::POST_TYPE ) ) {
-			return $pieces;
+			return $graph;
 		}
 
 		$post_id = get_the_ID();
 		if ( ! $post_id ) {
-			return $pieces;
+			return $graph;
 		}
 
 		$peptide = ( new PR_Core_Peptide_Repository() )->find_by_id( (int) $post_id );
 		if ( ! $peptide ) {
-			return $pieces;
+			return $graph;
 		}
 
-		$pieces[] = $this->drug_builder->build( $peptide );
+		$graph[] = $this->drug_builder->build( $peptide );
 
-		$faq_piece = $this->faq_builder->build( (int) $post_id, get_permalink( (int) $post_id ) );
-		if ( null !== $faq_piece ) {
-			$pieces[] = $faq_piece;
+		$faq_node = $this->faq_builder->build( (int) $post_id, get_permalink( (int) $post_id ) );
+		if ( null !== $faq_node ) {
+			$graph[] = $faq_node;
 		}
 
-		return $pieces;
+		return $graph;
 	}
 
 	/**
@@ -109,7 +124,7 @@ class PR_Core_Jsonld {
 	 *
 	 * Guard: suppressed if Yoast is loaded (function_exists check). This is the
 	 * no-Yoast fallback required by the jsonld-contract. When Yoast is present,
-	 * the integrated path (inject_graph_pieces) handles emission.
+	 * the integrated path (inject_graph_nodes via wpseo_schema_graph) handles emission.
 	 *
 	 * Side effects: outputs a script tag in wp_head.
 	 *
@@ -137,9 +152,9 @@ class PR_Core_Jsonld {
 		$permalink = get_permalink( (int) $post_id );
 		$graph     = [ $this->drug_builder->build( $peptide ) ];
 
-		$faq_piece = $this->faq_builder->build( (int) $post_id, $permalink );
-		if ( null !== $faq_piece ) {
-			$graph[] = $faq_piece;
+		$faq_node = $this->faq_builder->build( (int) $post_id, $permalink );
+		if ( null !== $faq_node ) {
+			$graph[] = $faq_node;
 		}
 
 		printf(

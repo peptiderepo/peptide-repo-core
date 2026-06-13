@@ -3,6 +3,19 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.6.2] — 2026-06-13
+
+### Fixed
+- **Critical**: Peptide monograph pages (e.g. `/peptides/bpc-157/`) returned HTTP 500 after v0.6.0 launch. Root cause: `PR_Core_Jsonld::inject_graph_pieces()` appended plain PHP arrays (Drug, FAQ) to Yoast's `wpseo_schema_graph_pieces` filter. Yoast's `Schema_Generator::filter_graph_pieces_to_generate()` then called `get_class()` and `is_needed()` on every piece, expecting `Abstract_Schema_Piece` objects — a plain array causes `PHP Fatal: get_class(): Argument #1 ($object) must be of type object, array given`. Non-peptide pages (/, /about/, /peptides/ archive) were unaffected because the `is_singular('peptide')` guard prevented entry.
+- Fix: removed `wpseo_schema_graph_pieces` hook entirely. Drug and FAQPage nodes are now injected via a new `inject_graph_nodes()` method hooked on `wpseo_schema_graph` at priority 12, which receives Yoast's fully-assembled graph as an array of plain arrays — safe for plain array appends.
+- Added regression test `tests/unit/test-jsonld-peptide-piece.php` that reproduces the v0.6.1 `get_class(array)` fatal and verifies the v0.6.2 `inject_graph_nodes` path emits Drug + FAQ correctly across peptide, non-peptide, and empty-FAQ scenarios.
+
+### Changed
+- `PR_Core_Jsonld::register_hooks()`: no longer registers `wpseo_schema_graph_pieces`; registers `wpseo_schema_graph` at priority 12 for Drug/FAQ injection (in addition to priority 11 for `enrich_webpage_piece`, unchanged).
+- `PR_Core_Jsonld::inject_graph_pieces()` renamed to `inject_graph_nodes()`; signature updated from `(array $pieces, $context)` to `(array $graph, $context)` to reflect that it now receives the assembled graph, not the pieces array.
+
+
+
 ## [0.6.1] — 2026-06-13
 
 ### Fixed
