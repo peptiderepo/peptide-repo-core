@@ -71,9 +71,11 @@ function esc_html( string $val ): string {
 	return htmlspecialchars( $val, ENT_QUOTES, 'UTF-8' );
 }
 
-function error_log( string $msg ): bool {
-	// Suppress during tests.
-	return true;
+if ( ! function_exists( 'error_log' ) ) {
+	function error_log( string $msg ): bool {
+		// Suppress during tests.
+		return true;
+	}
 }
 
 // Load dependencies.

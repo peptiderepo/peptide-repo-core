@@ -30,6 +30,10 @@ Format: [Semantic Versioning](https://semver.org/).
 - `ARCHITECTURE.md` — §#6 JSON-LD rewritten; §2.9 uninstall spec updated; file tree updated for new classes.
 - `CONVENTIONS.md` — schema-input meta convention added; Yoast JSON-LD extension pattern added.
 
+### Fixed
+- `tests/unit/test-migration-0004.php`: `error_log()` stub now guarded with `function_exists()` to prevent PHP fatal redeclaration error in CI PHP Lint (8.1/8.2/8.3).
+- `tests/bootstrap.php`: `wp_json_encode` stub updated to accept `int $flags = 0` second argument, matching production call signature; guarded with `function_exists()`.
+
 ### Technical
 - Schema version: `PR_CORE_TARGET_SCHEMA_VERSION` = 4.
 - New test files: `tests/unit/test-migration-0004.php`, `tests/unit/test-jsonld.php`.

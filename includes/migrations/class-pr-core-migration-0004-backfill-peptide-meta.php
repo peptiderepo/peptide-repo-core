@@ -93,6 +93,11 @@ class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 		$existing_weight  = (string) get_post_meta( $post_id, self::META_WEIGHT, true );
 		$existing_aliases = (string) get_post_meta( $post_id, self::META_ALIASES, true );
 
+		// Idempotency limitation: this guard is all-or-nothing. A peptide that legitimately
+		// has no aliases (e.g., a novel compound) will never satisfy all three conditions and
+		// the migration will re-run on every manual re-invoke. This is safe because
+		// write_meta_from_psa() / write_meta_from_pubchem() only overwrite with non-empty
+		// values, but callers should be aware the 'skipped' result requires all three keys set.
 		if ( '' !== $existing_formula && '' !== $existing_weight && '' !== $existing_aliases ) {
 			return 'skipped';
 		}

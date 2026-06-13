@@ -38,6 +38,7 @@ Files live in `includes/` or one level of subdirectory under `includes/`.
 3. Add the class name to `PR_Core_Migration_Runner::MIGRATIONS` array (index = version - 1).
 4. Bump `PR_CORE_TARGET_SCHEMA_VERSION` in `peptide-repo-core.php`.
 5. All migrations must be idempotent (safe to run twice).
+6. **Idempotency caveat (all-or-nothing skip):** migration 0004's skip guard requires *all* populated keys; a post with legitimately empty aliases will re-run on manual re-invoke — this is safe (write_meta only overwrites with non-empty values) but expected.
 
 ## How To: Add a New REST Endpoint
 
