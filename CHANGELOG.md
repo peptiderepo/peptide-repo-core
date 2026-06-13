@@ -3,6 +3,13 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.6.1] — 2026-06-13
+
+### Fixed
+- Fix: Yoast `wpseo_schema_webpage_type` passes `string|array` on singulars — accept `string|array` in `retype_to_medical_webpage()` signature; return type updated to match (PHP 8.1+ union). Eliminates `TypeError` → HTTP 500 on all singular pages (monographs + plain Pages) under `strict_types=1`.
+- Fix: `enrich_webpage_piece` compared `'WebPage' === $piece['@type']` but Yoast sets `@type` as an array on singular pages. Normalise `@type` to array before `in_array()` check; `lastReviewed`, `reviewedBy`, and `audience` now inject correctly.
+- Add regression test `tests/unit/test-jsonld-webpage.php`: exercises `retype_to_medical_webpage()` with array input for peptide and non-peptide contexts (no TypeError), and `enrich_webpage_piece` with `@type` as array (enrichment injects). Tests fail against v0.6.0, pass after fix.
+
 ## [0.6.0] — 2026-06-13
 
 ### Added
