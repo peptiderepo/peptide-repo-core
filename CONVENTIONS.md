@@ -21,6 +21,8 @@ Files live in `includes/` or one level of subdirectory under `includes/`.
 3. Add the field to `PR_Core_Peptide_Repository::post_to_dto()` in `repositories/class-pr-core-peptide-repository.php`.
 4. Add a form input in `PR_Core_Peptide_Metaboxes::render_identifiers_box()` in `admin/class-pr-core-peptide-metaboxes.php`.
 5. The `save_meta()` method reads from the same field list — no changes needed unless custom save logic applies.
+6. **Schema-input meta fields** (`_pr_*` keys introduced in v0.6.0) use `PR_Core_Schema_Sanitizers` as the sanitize_callback. Add new sanitizers to `cpt/class-pr-core-schema-sanitizers.php`, not to `PR_Core_Peptide_CPT` (keeps CPT under 300 lines).
+7. If the field is purged on uninstall, add it to the `$schema_meta_keys` array in `uninstall.php`.
 
 ## How To: Add a New Post-Meta Field to Repo Daily Posts
 
@@ -49,6 +51,16 @@ Files live in `includes/` or one level of subdirectory under `includes/`.
 1. Add a default text entry in `PR_Core_Disclaimer::DEFAULTS`.
 2. Use `[pr_disclaimer surface="new-surface"]` in templates.
 3. Custom copy can be set via `PR_Core_Disclaimer::update_disclaimer()`.
+
+## How To: Extend the JSON-LD Drug Schema
+
+v0.6.0 uses four focused classes (see ARCHITECTURE.md §#6). To add a new field to the Drug node:
+
+1. Add the logic to `PR_Core_Jsonld_Drug::build()` in `includes/frontend/class-pr-core-jsonld-drug.php`.
+2. Read data from the appropriate `_pr_*` post-meta key (not from PSA `psa_*` keys directly).
+3. **Always omit the field when the meta is empty** — never emit blank/null/zero values.
+4. To add a new schema piece (not Drug), create a new `PR_Core_Jsonld_<Piece>` class in `frontend/` and inject it from `PR_Core_Jsonld::inject_graph_pieces()`.
+5. The `pr_core_jsonld_peptide` filter on the Drug node array is preserved for consumer plugins.
 
 ## Error Handling
 

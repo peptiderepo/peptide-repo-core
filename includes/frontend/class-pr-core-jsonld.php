@@ -4,33 +4,122 @@ declare(strict_types=1);
 /**
  * JSON-LD / schema.org structured data emission for peptide pages.
  *
- * What: Emits Drug schema on single peptide pages, Dataset schema on archives.
- * Who calls it: PR_Core::init() registers wp_head hook.
- * Dependencies: PR_Core_Peptide_Repository for data lookup.
+ * What: Integrates Drug, MedicalWebPage, and FAQPage schema into Yoast's graph
+ *       on single peptide pages. When Yoast is inactive, emits a standalone
+ *       @graph block via wp_head as a fallback.
  *
- * Consumer plugins can override via pr_core_jsonld_peptide filter.
+ * Who calls it: PR_Core::init() calls register_hooks(). Yoast hooks fire on
+ *               every frontend page that Yoast processes.
  *
- * @see ARCHITECTURE.md — Section 2.7 JSON-LD output.
+ * Dependencies:
+ *   - Yoast SEO (wordpress-seo) ≥ 27.6 for integrated emission path.
+ *   - PR_Core_Jsonld_Drug, PR_Core_Jsonld_Webpage, PR_Core_Jsonld_Faq (builders).
+ *   - PR_Core_Peptide_Repository, PR_Core_Peptide_CPT (data).
+ *
+ * Contract (ratified 2026-06-11, jsonld-contract-v1.md):
+ *   - Integrated path: Yoast owns WebPage and BreadcrumbList — we never duplicate.
+ *   - Standalone fallback: emits a complete @graph (Drug + FAQPage) only.
+ *   - Drug @id: {permalink}#drug (stable for cross-plugin linking).
+ *
+ * @see frontend/class-pr-core-jsonld-drug.php    — Drug piece builder.
+ * @see frontend/class-pr-core-jsonld-webpage.php — MedicalWebPage enrichment.
+ * @see frontend/class-pr-core-jsonld-faq.php     — FAQPage piece builder.
+ * @see ARCHITECTURE.md                           — §2.7 JSON-LD output.
  */
 class PR_Core_Jsonld {
+
+	/** @var PR_Core_Jsonld_Drug Drug piece builder. */
+	private PR_Core_Jsonld_Drug $drug_builder;
+
+	/** @var PR_Core_Jsonld_Webpage MedicalWebPage enricher. */
+	private PR_Core_Jsonld_Webpage $webpage_enricher;
+
+	/** @var PR_Core_Jsonld_Faq FAQ piece builder. */
+	private PR_Core_Jsonld_Faq $faq_builder;
+
+	/**
+	 * Construct the orchestrator with its piece builders.
+	 */
+	public function __construct() {
+		$this->drug_builder     = new PR_Core_Jsonld_Drug();
+		$this->webpage_enricher = new PR_Core_Jsonld_Webpage();
+		$this->faq_builder      = new PR_Core_Jsonld_Faq();
+	}
 
 	/**
 	 * Register hooks for JSON-LD output.
 	 *
+	 * Registers both the Yoast-integrated path (active when Yoast is loaded)
+	 * and the standalone wp_head fallback (active only when Yoast is absent).
+	 *
+	 * Side effects: calls add_filter(), add_action().
+	 *
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'wp_head', [ $this, 'emit_jsonld' ], 99 );
+		// Integrated path: hook into Yoast's schema graph.
+		// wpseo_schema_graph_pieces: filter on the array of schema piece objects.
+		// wpseo_schema_webpage_type: filter returning the WebPage @type string.
+		add_filter( 'wpseo_schema_graph_pieces', [ $this, 'inject_graph_pieces' ], 11, 2 );
+		add_filter( 'wpseo_schema_webpage_type', [ $this->webpage_enricher, 'retype_to_medical_webpage' ] );
+		add_filter( 'wpseo_schema_graph', [ $this->webpage_enricher, 'enrich_webpage_piece' ], 11, 2 );
+
+		// Standalone fallback: emits only when Yoast is not producing output.
+		add_action( 'wp_head', [ $this, 'emit_standalone_fallback' ], 99 );
 	}
 
 	/**
-	 * Emit JSON-LD on peptide single pages.
+	 * Inject Drug and FAQPage pieces into Yoast's schema graph.
 	 *
-	 * Side effects: outputs script tag in wp_head.
+	 * Hooked on: wpseo_schema_graph_pieces (priority 11, after Yoast's own pieces).
+	 * This filter receives Yoast's piece objects array. We append plain arrays;
+	 * Yoast 27.6 accepts both objects and plain arrays in this filter.
+	 *
+	 * @param array<int, mixed>     $pieces  Existing graph pieces from Yoast.
+	 * @param \WPSEO_Schema_Context $context Yoast schema context object.
+	 * @return array<int, mixed> Pieces array with Drug and FAQPage appended.
+	 */
+	public function inject_graph_pieces( array $pieces, $context ): array {
+		if ( ! is_singular( PR_Core_Peptide_CPT::POST_TYPE ) ) {
+			return $pieces;
+		}
+
+		$post_id = get_the_ID();
+		if ( ! $post_id ) {
+			return $pieces;
+		}
+
+		$peptide = ( new PR_Core_Peptide_Repository() )->find_by_id( (int) $post_id );
+		if ( ! $peptide ) {
+			return $pieces;
+		}
+
+		$pieces[] = $this->drug_builder->build( $peptide );
+
+		$faq_piece = $this->faq_builder->build( (int) $post_id, get_permalink( (int) $post_id ) );
+		if ( null !== $faq_piece ) {
+			$pieces[] = $faq_piece;
+		}
+
+		return $pieces;
+	}
+
+	/**
+	 * Emit a standalone @graph block via wp_head when Yoast is not active.
+	 *
+	 * Guard: suppressed if Yoast is loaded (function_exists check). This is the
+	 * no-Yoast fallback required by the jsonld-contract. When Yoast is present,
+	 * the integrated path (inject_graph_pieces) handles emission.
+	 *
+	 * Side effects: outputs a script tag in wp_head.
 	 *
 	 * @return void
 	 */
-	public function emit_jsonld(): void {
+	public function emit_standalone_fallback(): void {
+		if ( function_exists( 'YoastSEO' ) ) {
+			return;
+		}
+
 		if ( ! is_singular( PR_Core_Peptide_CPT::POST_TYPE ) ) {
 			return;
 		}
@@ -40,86 +129,25 @@ class PR_Core_Jsonld {
 			return;
 		}
 
-		$repo    = new PR_Core_Peptide_Repository();
-		$peptide = $repo->find_by_id( $post_id );
-
+		$peptide = ( new PR_Core_Peptide_Repository() )->find_by_id( (int) $post_id );
 		if ( ! $peptide ) {
 			return;
 		}
 
-		$schema = $this->build_drug_schema( $peptide );
+		$permalink = get_permalink( (int) $post_id );
+		$graph     = [ $this->drug_builder->build( $peptide ) ];
 
-		/**
-		 * Filter the JSON-LD schema for a peptide page.
-		 *
-		 * @param array<string, mixed>  $schema  Schema.org data array.
-		 * @param PR_Core_Peptide_DTO   $peptide The peptide DTO.
-		 */
-		$schema = apply_filters( 'pr_core_jsonld_peptide', $schema, $peptide );
-
-		if ( empty( $schema ) ) {
-			return;
+		$faq_piece = $this->faq_builder->build( (int) $post_id, $permalink );
+		if ( null !== $faq_piece ) {
+			$graph[] = $faq_piece;
 		}
 
 		printf(
 			'<script type="application/ld+json">%s</script>' . "\n",
-			wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT )
+			wp_json_encode(
+				[ '@context' => 'https://schema.org', '@graph' => $graph ],
+				JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
+			)
 		);
-	}
-
-	/**
-	 * Build a schema.org Drug object for a peptide.
-	 *
-	 * @param PR_Core_Peptide_DTO $peptide Peptide data.
-	 * @return array<string, mixed> Schema.org JSON-LD structure.
-	 */
-	private function build_drug_schema( PR_Core_Peptide_DTO $peptide ): array {
-		$schema = [
-			'@context'         => 'https://schema.org',
-			'@type'            => 'Drug',
-			'name'             => $peptide->display_name ?: $peptide->title,
-			'url'              => get_permalink( $peptide->id ),
-			'description'      => $peptide->excerpt,
-		];
-
-		if ( ! empty( $peptide->aliases ) ) {
-			$schema['alternateName'] = $peptide->aliases;
-		}
-
-		if ( '' !== $peptide->molecular_formula ) {
-			$schema['molecularFormula'] = $peptide->molecular_formula;
-		}
-
-		if ( $peptide->molecular_weight > 0 ) {
-			$schema['molecularWeight'] = [
-				'@type'    => 'QuantitativeValue',
-				'value'    => $peptide->molecular_weight,
-				'unitText' => 'Da',
-			];
-		}
-
-		// External identifiers as codes.
-		$codes = [];
-		if ( '' !== $peptide->cas_number ) {
-			$codes[] = [
-				'@type'       => 'MedicalCode',
-				'codeValue'   => $peptide->cas_number,
-				'codingSystem' => 'CAS',
-			];
-		}
-
-		if ( '' !== $peptide->drugbank_id ) {
-			$codes[] = [
-				'@type'       => 'MedicalCode',
-				'codeValue'   => $peptide->drugbank_id,
-				'codingSystem' => 'DrugBank',
-			];
-		}
-
-		if ( ! empty( $codes ) ) {
-			$schema['code'] = $codes;
-		}
-
-		return $schema;
 	}
 }

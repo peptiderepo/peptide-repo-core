@@ -29,6 +29,7 @@ class PR_Core_Migration_Runner {
 		'PR_Core_Migration_0001_Dosing_Rows',
 		'PR_Core_Migration_0002_Legal_Cells',
 		'PR_Core_Migration_0003_Candidate_Queue',
+		'PR_Core_Migration_0004_Backfill_Peptide_Meta',
 	];
 
 	/**

@@ -70,6 +70,7 @@ peptide-repo-core/
 │   │
 │   ├── cpt/
 │   │   ├── class-pr-core-peptide-cpt.php       # CPT + peptide_category registration (guarded), meta fields, sanitizers
+│   │   └── class-pr-core-schema-sanitizers.php # Sanitizers for v0.6.0 schema-input meta (formula, weight, aliases, FAQ)
 │   │   └── class-pr-core-repo-daily-cpt.php    # Repo Daily CPT registration for editorial content
 │   │
 │   ├── taxonomies/
@@ -79,7 +80,9 @@ peptide-repo-core/
 │   │   ├── class-pr-core-migration-runner.php           # Sequential migration engine
 │   │   ├── class-pr-core-migration-0001-dosing-rows.php # pr_dosing_rows table
 │   │   ├── class-pr-core-migration-0002-legal-cells.php # pr_legal_cells table + unique constraint
-│   │   └── class-pr-core-migration-0003-candidate-queue.php # pr_ai_candidate_queue table
+│   │   ├── class-pr-core-migration-0003-candidate-queue.php # pr_ai_candidate_queue table
+│   │   ├── class-pr-core-migration-0004-backfill-peptide-meta.php # Backfill _pr_* schema meta from PSA psa_* keys
+│   │   └── class-pr-core-pubchem-client.php              # PubChem REST client (used by migration 0004)
 │   │
 │   ├── dto/
 │   │   ├── class-pr-core-peptide-dto.php     # Typed peptide value object
@@ -101,8 +104,11 @@ peptide-repo-core/
 │   │   └── class-pr-core-candidate-queue-page.php     # AI candidate review admin screen
 │   │
 │   ├── frontend/
-│   │   ├── class-pr-core-disclaimer.php   # Shortcode + static API for surface disclaimers
-│   │   └── class-pr-core-jsonld.php       # schema.org Drug JSON-LD on single peptide pages
+│   │   ├── class-pr-core-disclaimer.php       # Shortcode + static API for surface disclaimers
+│   │   ├── class-pr-core-jsonld.php           # Orchestrator: Yoast-integrated Drug/FAQ/MedicalWebPage emission
+│   │   ├── class-pr-core-jsonld-drug.php      # Drug (+ MolecularEntity) schema piece builder
+│   │   ├── class-pr-core-jsonld-webpage.php   # MedicalWebPage retype + lastReviewed/reviewedBy enrichment
+│   │   └── class-pr-core-jsonld-faq.php       # FAQPage schema piece (emits only when _pr_faq_items populated)
 │   │
 │   └── api/
 │       └── class-pr-core-rest-controller.php  # REST endpoints for peptides, dosing, legal
@@ -197,8 +203,26 @@ Automated extraction populates the queue; humans approve/reject. Approved rows c
 ### #5: Disclaimer component owned by core
 Single editorial review point. All consumer plugins render the same versioned disclaimer text. Surface-specific copy (dosing, legal, reconstitution, AI answer) stored in one wp_option.
 
-### #6: JSON-LD from day one
+### #6: JSON-LD from day one (v0.6.0: Yoast-integrated)
 Drug schema on single pages increases LLM citation rate. Filter hook allows consumer plugins to extend the schema object.
+
+**v0.6.0 Yoast integration (ratified jsonld-contract-v1 2026-06-11):**
+
+- **Integrated path (Yoast active):** PR Core hooks into `wpseo_schema_graph_pieces` (priority 11) to inject Drug and FAQPage pieces. Yoast owns `WebPage`/`BreadcrumbList` — we never emit those. `wpseo_schema_webpage_type` filter retypes the page node to `MedicalWebPage`. `wpseo_schema_graph` (priority 11) enriches the existing WebPage piece with `lastReviewed`, `reviewedBy`, and `audience`.
+- **Standalone fallback (no Yoast):** `wp_head` action (priority 99) emits a complete `@graph` (Drug + FAQPage) only. Suppressed automatically when `function_exists('YoastSEO')` is true.
+- **Drug `@id`:** `{permalink}#drug` — stable for cross-plugin `about` linkage from PRAutoBlogger articles.
+- **Molecular data source:** `_pr_molecular_formula`, `_pr_molecular_weight`, `_pr_aliases` (written by migration 0004, sourced from PSA `psa_*` keys or PubChem REST API).
+- **FAQ emission:** `_pr_faq_items` post-meta (JSON array of `{question, answer}` objects). Node emitted only when items exist.
+- **Dosing omitted from schema:** YMYL constraint — no dosing data in JSON-LD.
+
+JSON-LD class tree (v0.6.0):
+
+| Class | File | Responsibility |
+|---|---|---|
+| `PR_Core_Jsonld` | `frontend/class-pr-core-jsonld.php` | Orchestrator: registers hooks, Yoast vs. standalone routing |
+| `PR_Core_Jsonld_Drug` | `frontend/class-pr-core-jsonld-drug.php` | Builds Drug (+ MolecularEntity) schema node |
+| `PR_Core_Jsonld_Webpage` | `frontend/class-pr-core-jsonld-webpage.php` | MedicalWebPage retype + lastReviewed/reviewedBy enrichment |
+| `PR_Core_Jsonld_Faq` | `frontend/class-pr-core-jsonld-faq.php` | FAQPage node (emit-only-when-populated) |
 
 ### #7: PR Core owns the `peptide` CPT and `peptide_category` taxonomy (v0.2.0)
 Prior to v0.2.0, PR Core registered `pr_peptide` while Peptide Search AI registered `peptide` — both claimed the public rewrite slug `peptides`, and WP's rewrite resolver picked PR Core's empty CPT, 404'ing all 89 production peptide detail pages. v0.2.0 consolidates both registrations onto a single `peptide` CPT, owned by PR Core. PSA v4.5.0 drops its CPT/taxonomy registration; its meta boxes (`psa_peptide_data`, `psa_extended_data`), directory shortcode, KB article renderer, and search widget continue operating on the shared `peptide` CPT regardless of who registers it. Registration on both sides is guarded with `post_type_exists()` / `taxonomy_exists()` so deploy order is forgiving.
@@ -212,3 +236,4 @@ PR Core `uninstall.php` removes plugin-owned data only:
 3. **Does not delete `peptide_category` terms.** Shared-ownership taxonomy; term metadata the site relies on outlasts this plugin.
 4. **Deletes `pr_core_*` options.**
 5. **Removes `manage_peptide_content` capability from all roles.**
+6. **Deletes v0.6.0 schema-input meta keys** (`_pr_molecular_formula`, `_pr_molecular_weight`, `_pr_aliases`, `_pr_faq_items`) from all peptide posts. These are PR Core-authored values (sourced from PubChem / PSA) and are safe to remove on uninstall. They do not overlap with PSA's `psa_*` namespace — PSA's own meta is unaffected.

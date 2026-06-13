@@ -68,7 +68,7 @@ class PR_Core_Peptide_CPT {
 			'aliases'                 => [
 				'type'     => 'string',
 				'default'  => '[]',
-				'sanitize' => [ __CLASS__, 'sanitize_json_array' ],
+				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_json_array' ],
 			],
 			'molecular_formula'       => [
 				'type'     => 'string',
@@ -145,6 +145,28 @@ class PR_Core_Peptide_CPT {
 				'default'  => 'current',
 				'sanitize' => [ PR_Core_Verification_Sanitizers::class, 'sanitize_status' ],
 			],
+			// Schema-input meta (v0.6.0): molecular data sourced from PSA psa_* keys via migration 0004.
+			'_pr_molecular_formula'     => [
+				'type'     => 'string',
+				'default'  => '',
+				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_molecular_formula' ],
+			],
+			'_pr_molecular_weight'      => [
+				'type'     => 'string',
+				'default'  => '',
+				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_molecular_weight_string' ],
+			],
+			'_pr_aliases'               => [
+				'type'     => 'string',
+				'default'  => '[]',
+				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_json_array' ],
+			],
+			// FAQ items (v0.6.0): [{question, answer}] JSON for FAQPage schema. Populated by CMO content sprint.
+			'_pr_faq_items'             => [
+				'type'     => 'string',
+				'default'  => '[]',
+				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_faq_items' ],
+			],
 		];
 	}
 
@@ -160,12 +182,7 @@ class PR_Core_Peptide_CPT {
 	}
 
 	/**
-	 * Register the `peptide` custom post type.
-	 *
-	 * Guarded with `post_type_exists()`: if another plugin (historically PSA)
-	 * has already registered the `peptide` post type, this call no-ops. This
-	 * makes deploy order between PR Core and PSA irrelevant during the
-	 * PSA v4.5.0 consolidation transition.
+	 * Register the `peptide` CPT. Guarded with post_type_exists() so deploy order is irrelevant.
 	 *
 	 * Side effects: registers CPT with WordPress.
 	 *
@@ -218,15 +235,7 @@ class PR_Core_Peptide_CPT {
 	}
 
 	/**
-	 * Register the `peptide_category` taxonomy.
-	 *
-	 * Guarded with `taxonomy_exists()` for the same reason CPT registration
-	 * is guarded. The 8 existing terms + term_relationships stay intact —
-	 * they key on taxonomy name `peptide_category` in wp_term_taxonomy,
-	 * which is exactly what we register here.
-	 *
-	 * v0.2.0: `pr_peptide_family` taxonomy removed — never populated, never
-	 * surfaced in UI.
+	 * Register the `peptide_category` taxonomy. Guarded with taxonomy_exists().
 	 *
 	 * Side effects: registers taxonomy with WordPress.
 	 *
@@ -270,20 +279,6 @@ class PR_Core_Peptide_CPT {
 				},
 			] );
 		}
-	}
-
-	/** Sanitize a JSON array string (e.g., aliases field). */
-	public static function sanitize_json_array( $value ): string {
-		if ( is_array( $value ) ) {
-			$value = wp_json_encode( array_map( 'sanitize_text_field', $value ) );
-		}
-
-		$decoded = json_decode( (string) $value, true );
-		if ( ! is_array( $decoded ) ) {
-			return '[]';
-		}
-
-		return wp_json_encode( array_values( array_map( 'sanitize_text_field', $decoded ) ) );
 	}
 
 	/** Sanitize evidence_strength to allowed enum values. */
