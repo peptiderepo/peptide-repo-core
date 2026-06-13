@@ -28,10 +28,17 @@ class PR_Core_Jsonld_Webpage {
 	 * Hooked on: wpseo_schema_webpage_type (Yoast SEO ≥ 19.x).
 	 * Passes through unchanged on non-peptide pages.
 	 *
-	 * @param string $type Existing Yoast page type (e.g., 'WebPage').
-	 * @return string 'MedicalWebPage' on peptide singles, $type otherwise.
+	 * Yoast contract: passes a plain string (e.g., 'CollectionPage') for
+	 * non-singular special types, but an ARRAY (e.g., ['WebPage']) for every
+	 * singular page — including plain Pages and monographs. Under strict_types=1
+	 * a string-only signature throws TypeError on all singulars. This method
+	 * therefore accepts string|array and returns the same union type so callers
+	 * (Yoast's filter chain) receive the value in the shape they passed it.
+	 *
+	 * @param string|array $type Existing Yoast page type — string or string[].
+	 * @return string|array 'MedicalWebPage' (string) on peptide singles; $type unchanged otherwise.
 	 */
-	public function retype_to_medical_webpage( string $type ): string {
+	public function retype_to_medical_webpage( string|array $type ): string|array {
 		if ( is_singular( PR_Core_Peptide_CPT::POST_TYPE ) ) {
 			return 'MedicalWebPage';
 		}
@@ -55,8 +62,8 @@ class PR_Core_Jsonld_Webpage {
 			return $graph;
 		}
 
-		$post_id      = get_the_ID();
-		$enrichments  = $this->build_webpage_enrichments( (int) $post_id );
+		$post_id     = get_the_ID();
+		$enrichments = $this->build_webpage_enrichments( (int) $post_id );
 
 		if ( empty( $enrichments ) ) {
 			return $graph;
@@ -67,8 +74,12 @@ class PR_Core_Jsonld_Webpage {
 				continue;
 			}
 
-			$type = $piece['@type'] ?? '';
-			if ( 'WebPage' === $type || 'MedicalWebPage' === $type ) {
+			// Yoast may set @type as a plain string OR an array of strings.
+			// Normalise to array so in_array() works regardless of shape.
+			$raw_type = $piece['@type'] ?? '';
+			$types    = is_array( $raw_type ) ? $raw_type : [ $raw_type ];
+
+			if ( in_array( 'WebPage', $types, true ) || in_array( 'MedicalWebPage', $types, true ) ) {
 				foreach ( $enrichments as $key => $value ) {
 					$piece[ $key ] = $value;
 				}
