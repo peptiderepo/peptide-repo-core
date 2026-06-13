@@ -3,6 +3,44 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+## [0.6.0] — 2026-06-13
+
+### Added
+- **Backfill migration 0004** (`class-pr-core-migration-0004-backfill-peptide-meta.php`): Copies PSA-stored PubChem data into new `_pr_*` schema-input meta keys across all published peptide posts. Source: `psa_molecular_formula` → `_pr_molecular_formula`, `psa_molecular_weight` → `_pr_molecular_weight` (strip "Da", floatval), `psa_aliases` → `_pr_aliases` (comma-split, sanitize, JSON array). For 4 posts without PSA data (igf-1-lr3, cagrilintide, ghk-cu, epitalon), falls back to PubChem REST API via new `PR_Core_Pubchem_Client`. Migration is idempotent + re-runnable; skips posts where all three keys are already populated.
+- **Schema-input meta keys** (registered in CPT, v0.6.0):
+  - `_pr_molecular_formula` — sanitized molecular formula string.
+  - `_pr_molecular_weight` — float as string (g/mol); "Da" suffix normalized out.
+  - `_pr_aliases` — JSON array of sanitized alternate names.
+  - `_pr_faq_items` — JSON array of `{question, answer}` objects for FAQPage emission.
+- **`PR_Core_Schema_Sanitizers`** (`cpt/class-pr-core-schema-sanitizers.php`): Static sanitizers for the four schema-input meta keys, split from `PR_Core_Peptide_CPT` to keep the CPT file under 300 lines.
+- **`PR_Core_Pubchem_Client`** (`migrations/class-pr-core-pubchem-client.php`): Lightweight PubChem REST client with CID/name lookup, synonym fetch, and MAX_RETRIES=3 exponential backoff. Used exclusively by migration 0004.
+- **Yoast-integrated JSON-LD emission** (replaces standalone `wp_head` script):
+  - `PR_Core_Jsonld_Drug` — builds Drug (+ MolecularEntity) schema node with stable `@id = {permalink}#drug`, reads `_pr_*` schema-input meta, `alternateName`/`molecularFormula`/`molecularWeight` (g/mol) emitted only when non-empty.
+  - `PR_Core_Jsonld_Webpage` — retypes Yoast's WebPage to `MedicalWebPage` via `wpseo_schema_webpage_type`; enriches it with `lastReviewed`, `reviewedBy` (Person or Organization), and `audience` via `wpseo_schema_graph`.
+  - `PR_Core_Jsonld_Faq` — builds FAQPage node from `_pr_faq_items`; emitted only when items exist.
+  - `PR_Core_Jsonld` — orchestrator hooking all three builders into Yoast's graph; maintains standalone `@graph` fallback when Yoast is inactive.
+- **`CONTEXT.md`** — new domain glossary covering all new terms (`_pr_*` keys, Drug node, MedicalWebPage, FAQPage, Yoast integration contract, PubChem CID).
+
+### Changed
+- `PR_Core_Jsonld` rewritten: replaces standalone `wp_head` script-tag emission with Yoast graph-filter integration. Standalone `@graph` retained as fallback only. **No duplicate WebPage/BreadcrumbList** — Yoast owns those.
+- `PR_Core_Peptide_CPT::get_meta_fields()` — adds 4 new `_pr_*` fields; existing `aliases`/`molecular_formula`/`molecular_weight` fields unchanged.
+- `PR_Core_Migration_Runner::MIGRATIONS` — adds `PR_Core_Migration_0004_Backfill_Peptide_Meta` at index 3.
+- `PR_CORE_TARGET_SCHEMA_VERSION` bumped from 3 to 4.
+- `uninstall.php` — purges `_pr_molecular_formula`, `_pr_molecular_weight`, `_pr_aliases`, `_pr_faq_items` from all peptide posts on uninstall.
+- `ARCHITECTURE.md` — §#6 JSON-LD rewritten; §2.9 uninstall spec updated; file tree updated for new classes.
+- `CONVENTIONS.md` — schema-input meta convention added; Yoast JSON-LD extension pattern added.
+
+### Fixed
+- `tests/unit/test-migration-0004.php`: `error_log()` stub now guarded with `function_exists()` to prevent PHP fatal redeclaration error in CI PHP Lint (8.1/8.2/8.3).
+- `tests/bootstrap.php`: `wp_json_encode` stub updated to accept `int $flags = 0` second argument, matching production call signature; guarded with `function_exists()`.
+- `cpt/class-pr-core-schema-sanitizers.php`: `sanitize_molecular_formula()` rewritten from character-allowlist to element-formula grammar validation (Option B). Now strips control characters first, then extracts the maximal leading run of valid `[A-Z][a-z]?\d*` element tokens and group separators. Inputs containing trailing English words (e.g., `"C10H12\ninjection"`) correctly return the formula prefix only (`"C10H12"`); fully invalid inputs (e.g., `"<script>alert(1)</script>"`) return `""`. Parenthesised formulas (e.g., `"C2H5(OH)"`) preserved unchanged. Seven-case unit test coverage added.
+
+### Technical
+- Schema version: `PR_CORE_TARGET_SCHEMA_VERSION` = 4.
+- New test files: `tests/unit/test-migration-0004.php`, `tests/unit/test-jsonld.php`.
+- Yoast filter names verified against Yoast 27.6: `wpseo_schema_graph_pieces`, `wpseo_schema_webpage_type`, `wpseo_schema_graph`.
+- No CAS/DrugBank emission in v0.6.0 (no reliable source — documented in ARCHITECTURE.md for future enrichment sprint).
+
 ## [0.5.0] — 2026-04-27
 
 ### Added

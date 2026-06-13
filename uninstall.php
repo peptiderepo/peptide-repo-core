@@ -76,6 +76,31 @@ $wpdb->query(
 	"DELETE FROM {$wpdb->options} WHERE option_name LIKE 'pr\_core\_%'"
 );
 
+/* ── 4b. Delete v0.6.0 schema-input meta keys from all peptide posts ──── */
+
+/*
+ * Migration 0004 writes _pr_molecular_formula, _pr_molecular_weight, _pr_aliases,
+ * and _pr_faq_items to the shared peptide posts. These are PR Core-authored values
+ * (derived from PubChem / PSA) and are safe to remove on uninstall.
+ *
+ * @see ARCHITECTURE.md — §2.9 Uninstall specification.
+ */
+$schema_meta_keys = [
+	'_pr_molecular_formula',
+	'_pr_molecular_weight',
+	'_pr_aliases',
+	'_pr_faq_items',
+];
+
+foreach ( $schema_meta_keys as $meta_key ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+	$wpdb->delete(
+		$wpdb->postmeta,
+		[ 'meta_key' => $meta_key ],
+		[ '%s' ]
+	);
+}
+
 /* ── 5. Remove manage_peptide_content capability from all roles ───────── */
 
 $editable_roles = wp_roles()->roles;

@@ -113,8 +113,10 @@ function sanitize_text_field( $value ): string {
 	return is_scalar( $value ) ? trim( (string) $value ) : '';
 }
 
-function wp_json_encode( $data ): string {
-	return json_encode( $data ) ?: '[]';
+if ( ! function_exists( 'wp_json_encode' ) ) {
+	function wp_json_encode( $data, int $flags = 0 ): string {
+		return json_encode( $data, $flags ) ?: '[]';
+	}
 }
 
 function absint( $value ): int {
