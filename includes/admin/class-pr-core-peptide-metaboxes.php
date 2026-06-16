@@ -1,5 +1,7 @@
 <?php
 /**
+ * Peptide Metaboxes.
+ *
  * @package Peptide_Repo_Core
  */
 
@@ -83,7 +85,7 @@ class PR_Core_Peptide_Metaboxes {
 				'<tr><th><label for="pr_core_%1$s">%2$s</label></th><td><input type="text" id="pr_core_%1$s" name="pr_core_%1$s" value="%3$s" class="regular-text" /></td></tr>',
 				esc_attr( $key ),
 				esc_html( $label ),
-				$value
+				$value // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_attr applied on assignment
 			);
 		}
 
@@ -144,8 +146,8 @@ class PR_Core_Peptide_Metaboxes {
 			echo '</tr></thead><tbody>';
 
 			foreach ( $rows as $row ) {
-				$dose = $row->dose_min !== null ? number_format( $row->dose_min, 2 ) : '?';
-				if ( $row->dose_max !== null && $row->dose_max !== $row->dose_min ) {
+				$dose = null !== $row->dose_min ? number_format( $row->dose_min, 2 ) : '?';
+				if ( null !== $row->dose_max && $row->dose_max !== $row->dose_min ) {
 					$dose .= ' – ' . number_format( $row->dose_max, 2 );
 				}
 				$dose .= ' ' . esc_html( $row->dose_unit );
@@ -243,7 +245,7 @@ class PR_Core_Peptide_Metaboxes {
 
 		foreach ( $meta_fields as $key => $config ) {
 			$input_key = 'pr_core_' . $key;
-			if ( ! isset( $_POST[ $input_key ] ) ) {
+			if ( ! isset( $_POST[ $input_key ] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- existence check only; unslash+sanitize below
 				continue;
 			}
 
@@ -256,10 +258,10 @@ class PR_Core_Peptide_Metaboxes {
 		}
 
 		// Set last_editorial_review_at when status changes to published.
-		$new_review_status = sanitize_text_field( $_POST['pr_core_editorial_review_status'] ?? '' );
+		$new_review_status = sanitize_text_field( wp_unslash( $_POST['pr_core_editorial_review_status'] ?? '' ) );
 		if ( 'published' === $new_review_status ) {
 			$old_status = get_post_meta( $post_id, 'editorial_review_status', true );
-			if ( $old_status !== 'published' ) {
+			if ( 'published' !== $old_status ) {
 				update_post_meta( $post_id, 'last_editorial_review_at', current_time( 'mysql' ) );
 				update_post_meta( $post_id, 'medical_editor_id', get_current_user_id() );
 			}

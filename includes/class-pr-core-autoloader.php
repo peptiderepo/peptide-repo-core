@@ -1,5 +1,7 @@
 <?php
 /**
+ * Autoloader.
+ *
  * @package Peptide_Repo_Core
  */
 

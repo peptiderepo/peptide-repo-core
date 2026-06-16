@@ -1,5 +1,7 @@
 <?php
 /**
+ * Repo Daily Cpt.
+ *
  * @package Peptide_Repo_Core
  */
 

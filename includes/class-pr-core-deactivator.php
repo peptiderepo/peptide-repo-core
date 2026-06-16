@@ -1,5 +1,7 @@
 <?php
 /**
+ * Deactivator.
+ *
  * @package Peptide_Repo_Core
  */
 

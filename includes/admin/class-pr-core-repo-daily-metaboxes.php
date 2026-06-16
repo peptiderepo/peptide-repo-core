@@ -1,5 +1,7 @@
 <?php
 /**
+ * Repo Daily Metaboxes.
+ *
  * @package Peptide_Repo_Core
  */
 

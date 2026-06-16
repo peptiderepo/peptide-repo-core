@@ -1,5 +1,7 @@
 <?php
 /**
+ * Dosing Row Dto.
+ *
  * @package Peptide_Repo_Core
  */
 

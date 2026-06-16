@@ -1,5 +1,7 @@
 <?php
 /**
+ * Candidate Dto.
+ *
  * @package Peptide_Repo_Core
  */
 

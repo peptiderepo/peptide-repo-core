@@ -1,5 +1,7 @@
 <?php
 /**
+ * Ajax Handlers.
+ *
  * @package Peptide_Repo_Core
  */
 

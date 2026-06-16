@@ -1,5 +1,7 @@
 <?php
 /**
+ * Peptide Meta Schema.
+ *
  * @package Peptide_Repo_Core
  */
 

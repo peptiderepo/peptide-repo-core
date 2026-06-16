@@ -1,5 +1,9 @@
 <?php
-/** @package Peptide_Repo_Core */
+/**
+ * Migration 0004: Backfill peptide schema meta.
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
 
 /**
@@ -31,32 +35,16 @@ declare(strict_types=1);
  */
 class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 
-	/**
-	 * Meta key: molecular formula (PR Core namespace).
-	 *
-	 * @var string Meta key: molecular formula (PR Core namespace).
-	 */
+	/** @var string Meta key: molecular formula (PR Core namespace). */
 	public const META_FORMULA = '_pr_molecular_formula';
 
-	/**
-	 * Meta key: molecular weight as float string (PR Core namespace).
-	 *
-	 * @var string Meta key: molecular weight as float string (PR Core namespace).
-	 */
+	/** @var string Meta key: molecular weight as float string (PR Core namespace). */
 	public const META_WEIGHT = '_pr_molecular_weight';
 
-	/**
-	 * Meta key: aliases JSON array (PR Core namespace).
-	 *
-	 * @var string Meta key: aliases JSON array (PR Core namespace).
-	 */
+	/** @var string Meta key: aliases JSON array (PR Core namespace). */
 	public const META_ALIASES = '_pr_aliases';
 
-	/**
-	 * HTTP client for PubChem REST API.
-	 *
-	 * @var PR_Core_Pubchem_Client HTTP client for PubChem REST API.
-	 */
+	/** @var PR_Core_Pubchem_Client HTTP client for PubChem REST API. */
 	private PR_Core_Pubchem_Client $pubchem;
 
 	/**

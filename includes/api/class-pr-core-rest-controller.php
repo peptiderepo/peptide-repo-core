@@ -1,5 +1,7 @@
 <?php
 /**
+ * Rest Controller.
+ *
  * @package Peptide_Repo_Core
  */
 
@@ -32,11 +34,7 @@ declare(strict_types=1);
  */
 class PR_Core_Rest_Controller {
 
-	/**
-	 * REST namespace.
-	 *
-	 * @var string REST namespace.
-	 */
+	/** @var string REST namespace. */
 	private const REST_NAMESPACE = 'pr-core/v1';
 
 	/**

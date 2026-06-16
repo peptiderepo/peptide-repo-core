@@ -1,5 +1,7 @@
 <?php
 /**
+ * Verification Widget.
+ *
  * @package Peptide_Repo_Core
  */
 
@@ -106,7 +108,7 @@ class PR_Core_Verification_Widget {
 					esc_html( ucfirst( $item['status'] ) ),
 					esc_html( ucfirst( $item['velocity'] ) ),
 					esc_html( $item['last_verified'] ?? '—' ),
-					$item['days_since'],
+					(int) $item['days_since'],  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- cast to int, safe
 					esc_url( $edit_url )
 				);
 			}

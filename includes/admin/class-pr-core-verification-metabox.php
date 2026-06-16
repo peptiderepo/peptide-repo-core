@@ -1,5 +1,7 @@
 <?php
 /**
+ * Verification Metabox.
+ *
  * @package Peptide_Repo_Core
  */
 
@@ -77,7 +79,7 @@ class PR_Core_Verification_Metabox {
 			'overdue' => 'style="background:#f44336;color:white;padding:4px 8px;border-radius:3px;"',
 			default => 'style="background:#4caf50;color:white;padding:4px 8px;border-radius:3px;"',
 		};
-		echo '<span ' . $badge_class . '>' . esc_html( ucfirst( $status ) ) . '</span></p>';
+		echo '<span ' . $badge_class . '>' . esc_html( ucfirst( $status ) ) . '</span></p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge_class is a hardcoded match expression
 
 		echo '<p><strong>' . esc_html__( 'Verification Notes', 'peptide-repo-core' ) . ':</strong><br />';
 		printf(

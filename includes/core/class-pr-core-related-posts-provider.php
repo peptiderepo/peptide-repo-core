@@ -1,5 +1,7 @@
 <?php
 /**
+ * Related Posts Provider.
+ *
  * @package Peptide_Repo_Core
  */
 

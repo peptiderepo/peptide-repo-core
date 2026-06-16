@@ -1,5 +1,7 @@
 <?php
 /**
+ * Topic Taxonomy.
+ *
  * @package Peptide_Repo_Core
  */
 

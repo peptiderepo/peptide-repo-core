@@ -1,5 +1,7 @@
 <?php
 /**
+ * Jsonld Drug.
+ *
  * @package Peptide_Repo_Core
  */
 

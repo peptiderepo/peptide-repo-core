@@ -1,5 +1,7 @@
 <?php
 /**
+ * Migration Runner.
+ *
  * @package Peptide_Repo_Core
  */
 

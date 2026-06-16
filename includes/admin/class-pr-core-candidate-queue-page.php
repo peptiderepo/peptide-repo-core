@@ -1,5 +1,7 @@
 <?php
 /**
+ * Candidate Queue Page.
+ *
  * @package Peptide_Repo_Core
  */
 

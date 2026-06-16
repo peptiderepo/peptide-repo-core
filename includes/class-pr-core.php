@@ -1,5 +1,7 @@
 <?php
 /**
+ * Class Pr Core.
+ *
  * @package Peptide_Repo_Core
  */
 

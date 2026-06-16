@@ -1,5 +1,7 @@
 <?php
 /**
+ * Admin Columns.
+ *
  * @package Peptide_Repo_Core
  */
 

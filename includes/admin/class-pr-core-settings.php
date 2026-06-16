@@ -1,15 +1,11 @@
 <?php
 /**
+ * Settings.
+ *
  * @package Peptide_Repo_Core
  */
 
 declare(strict_types=1);
-
-/**
- * Static admin settings class
- *
- * @package Peptide_Repo_Core
- */
 
 /**
  * Settings page for PR Core plugin configuration.
@@ -23,53 +19,25 @@ declare(strict_types=1);
  */
 class PR_Core_Settings {
 
-	/**
-	 * Option group shared by all PR Core settings.
-	 *
-	 * @var string Option group shared by all PR Core settings.
-	 */
+	/** @var string Option group shared by all PR Core settings. */
 	public const OPTION_GROUP = 'pr_core_settings';
 
-	/**
-	 * Option key: enable/disable related articles.
-	 *
-	 * @var string Option key: enable/disable related articles.
-	 */
+	/** @var string Option key: enable/disable related articles. */
 	private const RELATED_ENABLED = 'pr_core_related_posts_enabled';
 
-	/**
-	 * Option key: related articles limit (1-6).
-	 *
-	 * @var string Option key: related articles limit (1-6).
-	 */
+	/** @var string Option key: related articles limit (1-6). */
 	private const RELATED_LIMIT = 'pr_core_related_posts_limit';
 
-	/**
-	 * Option key: WP-cron scan cadence.
-	 *
-	 * @var string Option key: WP-cron scan cadence.
-	 */
+	/** @var string Option key: WP-cron scan cadence. */
 	private const SCAN_CADENCE = 'pr_core_scan_cadence';
 
-	/**
-	 * Option key: default staleness threshold in days.
-	 *
-	 * @var string Option key: default staleness threshold in days.
-	 */
+	/** @var string Option key: default staleness threshold in days. */
 	private const DEFAULT_THRESHOLD = 'pr_core_default_threshold';
 
-	/**
-	 * Option key: high-velocity staleness threshold in days.
-	 *
-	 * @var string Option key: high-velocity staleness threshold in days.
-	 */
+	/** @var string Option key: high-velocity staleness threshold in days. */
 	private const HIGH_VELOCITY_THRESHOLD = 'pr_core_high_velocity_threshold';
 
-	/**
-	 * Option key: comma-separated notification email list.
-	 *
-	 * @var string Option key: comma-separated notification email list.
-	 */
+	/** @var string Option key: comma-separated notification email list. */
 	private const VERIFICATION_EMAIL = 'pr_core_verification_email';
 
 	/**
@@ -90,6 +58,10 @@ class PR_Core_Settings {
 		);
 	}
 
+	/**
+	 * Render the settings page HTML. Delegates to PR_Core_Settings_Renderer.
+	 * @return void
+	 */
 	public static function render_page(): void {
 		PR_Core_Settings_Renderer::render_page();
 	}
@@ -140,10 +112,18 @@ class PR_Core_Settings {
 		add_settings_field( self::RELATED_LIMIT, __( 'Number of Articles', 'peptide-repo-core' ), array( __CLASS__, 'render_limit_field' ), self::OPTION_GROUP, 'pr_core_related_articles' );
 	}
 
+	/**
+	 * Render the enable/disable checkbox field. Delegates to PR_Core_Settings_Renderer.
+	 * @return void
+	 */
 	public static function render_enabled_field(): void {
 		PR_Core_Settings_Renderer::render_enabled_field();
 	}
 
+	/**
+	 * Render the article count limit field. Delegates to PR_Core_Settings_Renderer.
+	 * @return void
+	 */
 	public static function render_limit_field(): void {
 		PR_Core_Settings_Renderer::render_limit_field();
 	}
@@ -210,22 +190,42 @@ class PR_Core_Settings {
 		add_settings_field( self::VERIFICATION_EMAIL, __( 'Notification email(s)', 'peptide-repo-core' ), array( __CLASS__, 'render_email_field' ), self::OPTION_GROUP, 'pr_core_verification' );
 	}
 
+	/**
+	 * Render the verification section header. Delegates to PR_Core_Settings_Renderer.
+	 * @return void
+	 */
 	public static function render_verification_section(): void {
 		PR_Core_Settings_Renderer::render_verification_section();
 	}
 
+	/**
+	 * Render the scan cadence select field. Delegates to PR_Core_Settings_Renderer.
+	 * @return void
+	 */
 	public static function render_cadence_field(): void {
 		PR_Core_Settings_Renderer::render_cadence_field();
 	}
 
+	/**
+	 * Render the score threshold input field. Delegates to PR_Core_Settings_Renderer.
+	 * @return void
+	 */
 	public static function render_threshold_field(): void {
 		PR_Core_Settings_Renderer::render_threshold_field();
 	}
 
+	/**
+	 * Render the high-velocity scan toggle field. Delegates to PR_Core_Settings_Renderer.
+	 * @return void
+	 */
 	public static function render_high_velocity_field(): void {
 		PR_Core_Settings_Renderer::render_high_velocity_field();
 	}
 
+	/**
+	 * Render the alert email input field. Delegates to PR_Core_Settings_Renderer.
+	 * @return void
+	 */
 	public static function render_email_field(): void {
 		PR_Core_Settings_Renderer::render_email_field();
 	}

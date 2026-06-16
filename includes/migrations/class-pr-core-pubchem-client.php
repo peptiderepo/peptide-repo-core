@@ -1,5 +1,7 @@
 <?php
 /**
+ * Pubchem Client.
+ *
  * @package Peptide_Repo_Core
  */
 

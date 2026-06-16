@@ -1,5 +1,7 @@
 <?php
 /**
+ * Jsonld Faq.
+ *
  * @package Peptide_Repo_Core
  */
 

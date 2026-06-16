@@ -1,5 +1,7 @@
 <?php
 /**
+ * Migration 0003 Candidate Queue.
+ *
  * @package Peptide_Repo_Core
  */
 

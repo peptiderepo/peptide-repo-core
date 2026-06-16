@@ -1,5 +1,7 @@
 <?php
 /**
+ * Repo Daily Taxonomy.
+ *
  * @package Peptide_Repo_Core
  */
 

@@ -1,5 +1,7 @@
 <?php
 /**
+ * Settings Renderer.
+ *
  * @package Peptide_Repo_Core
  */
 

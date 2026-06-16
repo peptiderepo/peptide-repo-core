@@ -1,5 +1,7 @@
 <?php
 /**
+ * Peptide Repository.
+ *
  * @package Peptide_Repo_Core
  */
 

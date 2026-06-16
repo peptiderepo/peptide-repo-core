@@ -1,5 +1,7 @@
 <?php
 /**
+ * Migration 0002 Legal Cells.
+ *
  * @package Peptide_Repo_Core
  */
 

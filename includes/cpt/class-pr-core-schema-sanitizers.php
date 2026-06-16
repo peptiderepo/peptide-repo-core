@@ -1,5 +1,7 @@
 <?php
 /**
+ * Schema Sanitizers.
+ *
  * @package Peptide_Repo_Core
  */
 

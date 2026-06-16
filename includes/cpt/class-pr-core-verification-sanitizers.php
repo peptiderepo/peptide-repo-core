@@ -1,5 +1,7 @@
 <?php
 /**
+ * Verification Sanitizers.
+ *
  * @package Peptide_Repo_Core
  */
 

@@ -1,5 +1,7 @@
 <?php
 /**
+ * Activator.
+ *
  * @package Peptide_Repo_Core
  */
 

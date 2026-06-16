@@ -1,5 +1,7 @@
 <?php
 /**
+ * Legal Cell Dto.
+ *
  * @package Peptide_Repo_Core
  */
 

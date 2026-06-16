@@ -1,5 +1,7 @@
 <?php
 /**
+ * Verification Display.
+ *
  * @package Peptide_Repo_Core
  */
 
