@@ -120,5 +120,4 @@ class PR_Core_Settings_Renderer {
 		);
 		echo '<p class="description">' . esc_html__( 'Comma-separated. Leave blank to disable email digests.', 'peptide-repo-core' ) . '</p>';
 	}
-
 }
