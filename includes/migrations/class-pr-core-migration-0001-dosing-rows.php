@@ -1,5 +1,17 @@
 <?php
+/**
+ * Migration 0001 Dosing Rows.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Creates the high-cardinality dosing data table (1:many with peptide)
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Migration 0001: Create the pr_dosing_rows table.

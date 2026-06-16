@@ -1,5 +1,17 @@
 <?php
+/**
+ * Verification Sanitizers.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Standalone sanitization functions for verification_velocity and verification_status fields
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Sanitizers for verification meta fields.
@@ -19,7 +31,7 @@ class PR_Core_Verification_Sanitizers {
 	 * @return string Valid enum value (low, medium, high).
 	 */
 	public static function sanitize_velocity( string $value ): string {
-		return in_array( $value, [ 'low', 'medium', 'high' ], true ) ? $value : 'medium';
+		return in_array( $value, array( 'low', 'medium', 'high' ), true ) ? $value : 'medium';
 	}
 
 	/**
@@ -29,6 +41,6 @@ class PR_Core_Verification_Sanitizers {
 	 * @return string Valid enum value (current, due, overdue).
 	 */
 	public static function sanitize_status( string $value ): string {
-		return in_array( $value, [ 'current', 'due', 'overdue' ], true ) ? $value : 'current';
+		return in_array( $value, array( 'current', 'due', 'overdue' ), true ) ? $value : 'current';
 	}
 }

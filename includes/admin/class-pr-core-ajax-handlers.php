@@ -1,5 +1,17 @@
 <?php
+/**
+ * Ajax Handlers.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Handles mark-verified and scan-now admin-ajax actions
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * AJAX handlers for verification scanner actions.
@@ -47,7 +59,7 @@ class PR_Core_Ajax_Handlers {
 		// Recompute status to 'current'.
 		update_post_meta( $post_id, '_pr_verification_status', 'current' );
 
-		wp_send_json_success( [ 'message' => 'Marked verified' ] );
+		wp_send_json_success( array( 'message' => 'Marked verified' ) );
 	}
 
 	/**
@@ -74,6 +86,6 @@ class PR_Core_Ajax_Handlers {
 		// Run scan.
 		PR_Core_Verification_Scanner::run_scan();
 
-		wp_send_json_success( [ 'message' => 'Scan complete' ] );
+		wp_send_json_success( array( 'message' => 'Scan complete' ) );
 	}
 }

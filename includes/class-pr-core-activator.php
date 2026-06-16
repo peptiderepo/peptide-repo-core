@@ -1,5 +1,17 @@
 <?php
+/**
+ * Activator.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Runs migrations, adds capabilities, flushes rewrite rules
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Plugin activation handler.
@@ -17,7 +29,11 @@ declare(strict_types=1);
  */
 class PR_Core_Activator {
 
-	/** @var string Option key storing the last activated/seen plugin version. */
+	/**
+	 * Option key storing the last activated/seen plugin version.
+	 *
+	 * @var string Option key storing the last activated/seen plugin version.
+	 */
 	private const VERSION_OPTION = 'pr_core_version';
 
 	/**
@@ -51,8 +67,8 @@ class PR_Core_Activator {
 		// Flush rewrite rules for the new CPT.
 		flush_rewrite_rules( false );
 
-		// Record the activated version so the init:999 drift handler can
-		// detect future in-place updates and re-flush without a manual
+		// Record the activated version so the init:999 drift handler can.
+		// detect future in-place updates and re-flush without a manual.
 		// deactivate/reactivate cycle.
 		update_option( self::VERSION_OPTION, PR_CORE_VERSION, false );
 	}
@@ -93,7 +109,7 @@ class PR_Core_Activator {
 	 */
 	private static function add_capabilities(): void {
 		$cap   = 'manage_peptide_content';
-		$roles = [ 'administrator', 'editor' ];
+		$roles = array( 'administrator', 'editor' );
 
 		foreach ( $roles as $role_name ) {
 			$role = get_role( $role_name );
@@ -156,4 +172,3 @@ class PR_Core_Activator {
 		}
 	}
 }
-

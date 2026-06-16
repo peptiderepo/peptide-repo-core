@@ -1,5 +1,17 @@
 <?php
+/**
+ * Related Posts Provider.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Interface defining the get_posts() contract for related-post providers
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Contract for any provider that retrieves posts related to a peptide.

@@ -1,5 +1,17 @@
 <?php
+/**
+ * Autoloader.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Resolves PR_Core_ class names to file paths under includes/
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * SPL autoloader for PR_Core_ prefixed classes.
@@ -15,8 +27,12 @@ declare(strict_types=1);
  */
 class PR_Core_Autoloader {
 
-	/** @var string[] Directories to scan for class files. */
-	private static array $dirs = [];
+	/**
+	 * Directories to scan for class files.
+	 *
+	 * @var string[] Directories to scan for class files.
+	 */
+	private static array $dirs = array();
 
 	/**
 	 * Register the autoloader with SPL.
@@ -35,22 +51,22 @@ class PR_Core_Autoloader {
 			self::$dirs[] = trailingslashit( $dir );
 		}
 
-		spl_autoload_register( [ __CLASS__, 'load' ] );
+		spl_autoload_register( array( __CLASS__, 'load' ) );
 	}
 
 	/**
 	 * Autoload callback. Only handles PR_Core_ prefixed classes.
 	 *
-	 * @param string $class Fully-qualified class name.
+	 * @param string $class_name Fully-qualified class name.
 	 * @return void
 	 */
-	public static function load( string $class ): void {
-		if ( 0 !== strpos( $class, 'PR_Core_' ) ) {
+	public static function load( string $class_name ): void {
+		if ( 0 !== strpos( $class_name, 'PR_Core_' ) ) {
 			return;
 		}
 
 		// PR_Core_Foo_Bar => foo-bar => class-pr-core-foo-bar.php.
-		$suffix   = substr( $class, 8 ); // Strip 'PR_Core_'.
+		$suffix   = substr( $class_name, 8 ); // Strip 'PR_Core_'.
 		$filename = 'class-pr-core-' . str_replace( '_', '-', strtolower( $suffix ) ) . '.php';
 
 		foreach ( self::$dirs as $dir ) {

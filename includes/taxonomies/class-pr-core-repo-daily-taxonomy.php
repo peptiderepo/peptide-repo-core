@@ -1,5 +1,17 @@
 <?php
+/**
+ * Repo Daily Taxonomy.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Defines the `repo_daily_category` taxonomy attached to repo_daily CPT
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Registers the repo_daily_category taxonomy for Repo Daily articles.
@@ -17,7 +29,11 @@ declare(strict_types=1);
  */
 class PR_Core_Repo_Daily_Taxonomy {
 
-	/** @var string Taxonomy: repo_daily_category. */
+	/**
+	 * Taxonomy: repo_daily_category.
+	 *
+	 * @var string Taxonomy: repo_daily_category.
+	 */
 	public const TAX_CATEGORY = 'repo_daily_category';
 
 	/**
@@ -26,7 +42,7 @@ class PR_Core_Repo_Daily_Taxonomy {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'init', [ __CLASS__, 'register_taxonomy' ] );
+		add_action( 'init', array( __CLASS__, 'register_taxonomy' ) );
 	}
 
 	/**
@@ -41,19 +57,26 @@ class PR_Core_Repo_Daily_Taxonomy {
 			return;
 		}
 
-		register_taxonomy( self::TAX_CATEGORY, PR_Core_Repo_Daily_CPT::POST_TYPE, [
-			'labels'             => [
-				'name'          => __( 'Category', 'peptide-repo-core' ),
-				'singular_name' => __( 'Category', 'peptide-repo-core' ),
-			],
-			'public'             => true,
-			'publicly_queryable' => true,
-			'show_in_rest'       => true,
-			'show_ui'            => true,
-			'show_admin_column'  => true,
-			'hierarchical'       => false,
-			'rewrite'            => [ 'slug' => 'daily/category', 'with_front' => false ],
-		] );
+		register_taxonomy(
+			self::TAX_CATEGORY,
+			PR_Core_Repo_Daily_CPT::POST_TYPE,
+			array(
+				'labels'             => array(
+					'name'          => __( 'Category', 'peptide-repo-core' ),
+					'singular_name' => __( 'Category', 'peptide-repo-core' ),
+				),
+				'public'             => true,
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
+				'show_ui'            => true,
+				'show_admin_column'  => true,
+				'hierarchical'       => false,
+				'rewrite'            => array(
+					'slug'       => 'daily/category',
+					'with_front' => false,
+				),
+			)
+		);
 	}
 
 	/**
@@ -67,7 +90,7 @@ class PR_Core_Repo_Daily_Taxonomy {
 	 * @return void
 	 */
 	public static function seed_terms(): void {
-		$terms = [ 'article', 'guide', 'comparison', 'news' ];
+		$terms = array( 'article', 'guide', 'comparison', 'news' );
 
 		foreach ( $terms as $term ) {
 			if ( ! term_exists( $term, self::TAX_CATEGORY ) ) {

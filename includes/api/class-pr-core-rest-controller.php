@@ -1,5 +1,17 @@
 <?php
+/**
+ * Rest Controller.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Exposes peptides, dosing rows, and legal cells via REST endpoints
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * REST API controller for peptide data (read-only public, write requires capability).
@@ -22,7 +34,7 @@ declare(strict_types=1);
  */
 class PR_Core_Rest_Controller {
 
-	/** @var string REST namespace. */
+	/** @var string REST namespace. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const REST_NAMESPACE = 'pr-core/v1';
 
 	/**
@@ -31,7 +43,7 @@ class PR_Core_Rest_Controller {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
 	/**
@@ -42,58 +54,106 @@ class PR_Core_Rest_Controller {
 	 * @return void
 	 */
 	public function register_routes(): void {
-		// GET /peptides
-		register_rest_route( self::REST_NAMESPACE, '/peptides', [
-			'methods'             => 'GET',
-			'callback'            => [ $this, 'list_peptides' ],
-			'permission_callback' => '__return_true',
-			'args'                => [
-				'category'          => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
-				'evidence_strength' => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
-				'search'            => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
-				'per_page'          => [ 'type' => 'integer', 'default' => 25, 'minimum' => 1, 'maximum' => 100 ],
-				'page'              => [ 'type' => 'integer', 'default' => 1, 'minimum' => 1 ],
-			],
-		] );
+		// GET /peptides.
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/peptides',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'list_peptides' ),
+				'permission_callback' => '__return_true',
+				'args'                => array(
+					'category'          => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'evidence_strength' => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'search'            => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'per_page'          => array(
+						'type'    => 'integer',
+						'default' => 25,
+						'minimum' => 1,
+						'maximum' => 100,
+					),
+					'page'              => array(
+						'type'    => 'integer',
+						'default' => 1,
+						'minimum' => 1,
+					),
+				),
+			)
+		);
 
-		// GET /peptides/{id}
-		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)', [
-			'methods'             => 'GET',
-			'callback'            => [ $this, 'get_peptide' ],
-			'permission_callback' => '__return_true',
-		] );
+		// GET /peptides/{id}.
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/peptides/(?P<id>\d+)',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'get_peptide' ),
+				'permission_callback' => '__return_true',
+			)
+		);
 
-		// GET /peptides/{id}/dosing
-		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)/dosing', [
-			'methods'             => 'GET',
-			'callback'            => [ $this, 'list_dosing' ],
-			'permission_callback' => '__return_true',
-			'args'                => [
-				'route'      => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
-				'population' => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
-			],
-		] );
+		// GET /peptides/{id}/dosing.
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/peptides/(?P<id>\d+)/dosing',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'list_dosing' ),
+				'permission_callback' => '__return_true',
+				'args'                => array(
+					'route'      => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'population' => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
+			)
+		);
 
-		// POST /peptides/{id}/dosing (auth required)
-		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)/dosing', [
-			'methods'             => 'POST',
-			'callback'            => [ $this, 'create_dosing' ],
-			'permission_callback' => [ $this, 'check_write_permission' ],
-		] );
+		// POST /peptides/{id}/dosing (auth required).
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/peptides/(?P<id>\d+)/dosing',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'create_dosing' ),
+				'permission_callback' => array( $this, 'check_write_permission' ),
+			)
+		);
 
-		// GET /peptides/{id}/legal
-		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)/legal', [
-			'methods'             => 'GET',
-			'callback'            => [ $this, 'list_legal' ],
-			'permission_callback' => '__return_true',
-		] );
+		// GET /peptides/{id}/legal.
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/peptides/(?P<id>\d+)/legal',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'list_legal' ),
+				'permission_callback' => '__return_true',
+			)
+		);
 
-		// POST /peptides/{id}/legal (auth required)
-		register_rest_route( self::REST_NAMESPACE, '/peptides/(?P<id>\d+)/legal', [
-			'methods'             => 'POST',
-			'callback'            => [ $this, 'create_legal' ],
-			'permission_callback' => [ $this, 'check_write_permission' ],
-		] );
+		// POST /peptides/{id}/legal (auth required).
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/peptides/(?P<id>\d+)/legal',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'create_legal' ),
+				'permission_callback' => array( $this, 'check_write_permission' ),
+			)
+		);
 	}
 
 	/**
@@ -109,12 +169,14 @@ class PR_Core_Rest_Controller {
 		if ( $search ) {
 			$peptides = $repo->search( $search, (int) $request->get_param( 'per_page' ) );
 		} else {
-			$peptides = $repo->find_all( [
-				'category'          => $request->get_param( 'category' ),
-				'evidence_strength' => $request->get_param( 'evidence_strength' ),
-				'per_page'          => $request->get_param( 'per_page' ),
-				'page'              => $request->get_param( 'page' ),
-			] );
+			$peptides = $repo->find_all(
+				array(
+					'category'          => $request->get_param( 'category' ),
+					'evidence_strength' => $request->get_param( 'evidence_strength' ),
+					'per_page'          => $request->get_param( 'per_page' ),
+					'page'              => $request->get_param( 'page' ),
+				)
+			);
 		}
 
 		$data = array_map( static fn( PR_Core_Peptide_DTO $p ) => $p->to_array(), $peptides );
@@ -133,7 +195,7 @@ class PR_Core_Rest_Controller {
 		$peptide = $repo->find_by_id( (int) $request->get_param( 'id' ) );
 
 		if ( ! $peptide ) {
-			return new \WP_Error( 'not_found', __( 'Peptide not found.', 'peptide-repo-core' ), [ 'status' => 404 ] );
+			return new \WP_Error( 'not_found', __( 'Peptide not found.', 'peptide-repo-core' ), array( 'status' => 404 ) );
 		}
 
 		return new \WP_REST_Response( $peptide->to_array(), 200 );
@@ -149,10 +211,12 @@ class PR_Core_Rest_Controller {
 		$repo = new PR_Core_Dosing_Repository();
 		$rows = $repo->find_by_peptide(
 			(int) $request->get_param( 'id' ),
-			array_filter( [
-				'route'      => $request->get_param( 'route' ),
-				'population' => $request->get_param( 'population' ),
-			] )
+			array_filter(
+				array(
+					'route'      => $request->get_param( 'route' ),
+					'population' => $request->get_param( 'population' ),
+				)
+			)
 		);
 
 		$data = array_map( static fn( PR_Core_Dosing_Row_DTO $r ) => $r->to_array(), $rows );
@@ -176,12 +240,12 @@ class PR_Core_Rest_Controller {
 		$id = $repo->insert( $data );
 
 		if ( 0 === $id ) {
-			return new \WP_Error( 'insert_failed', __( 'Failed to insert dosing row.', 'peptide-repo-core' ), [ 'status' => 500 ] );
+			return new \WP_Error( 'insert_failed', __( 'Failed to insert dosing row.', 'peptide-repo-core' ), array( 'status' => 500 ) );
 		}
 
 		$row = $repo->find_by_id( $id );
 
-		return new \WP_REST_Response( $row ? $row->to_array() : [ 'id' => $id ], 201 );
+		return new \WP_REST_Response( $row ? $row->to_array() : array( 'id' => $id ), 201 );
 	}
 
 	/**
@@ -208,19 +272,19 @@ class PR_Core_Rest_Controller {
 	public function create_legal( \WP_REST_Request $request ) {
 		$repo = new PR_Core_Legal_Repository();
 
-		$data               = $request->get_json_params();
-		$data['peptide_id'] = (int) $request->get_param( 'id' );
+		$data                = $request->get_json_params();
+		$data['peptide_id']  = (int) $request->get_param( 'id' );
 		$data['reviewer_id'] = get_current_user_id();
 
 		$id = $repo->insert( $data );
 
 		if ( 0 === $id ) {
-			return new \WP_Error( 'insert_failed', __( 'Failed to insert legal cell.', 'peptide-repo-core' ), [ 'status' => 500 ] );
+			return new \WP_Error( 'insert_failed', __( 'Failed to insert legal cell.', 'peptide-repo-core' ), array( 'status' => 500 ) );
 		}
 
 		$cell = $repo->find_by_id( $id );
 
-		return new \WP_REST_Response( $cell ? $cell->to_array() : [ 'id' => $id ], 201 );
+		return new \WP_REST_Response( $cell ? $cell->to_array() : array( 'id' => $id ), 201 );
 	}
 
 	/**

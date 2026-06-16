@@ -1,5 +1,17 @@
 <?php
+/**
+ * Migration 0002 Legal Cells.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Creates the per-country legal status table (1:many with peptide)
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Migration 0002: Create the pr_legal_cells table.
@@ -14,15 +26,19 @@ declare(strict_types=1);
  */
 class PR_Core_Migration_0002_Legal_Cells {
 
-	/** @var string[] Valid legal status enum values. */
-	public const STATUSES = [
+	/**
+	 * Valid legal status enum values.
+	 *
+	 * @var string[] Valid legal status enum values.
+	 */
+	public const STATUSES = array(
 		'prescription',
 		'ruo',
 		'otc',
 		'restricted',
 		'banned',
 		'unclear',
-	];
+	);
 
 	/**
 	 * Create the pr_legal_cells table.
@@ -36,7 +52,7 @@ class PR_Core_Migration_0002_Legal_Cells {
 		$table   = $wpdb->prefix . 'pr_legal_cells';
 		$charset = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE {$table} (
+		$sql = "CREATE TABLE {$table} ( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			id                     BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 			peptide_id             BIGINT UNSIGNED NOT NULL,
 			country_code           CHAR(2) NOT NULL,
@@ -61,7 +77,7 @@ class PR_Core_Migration_0002_Legal_Cells {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$index_exists = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND INDEX_NAME = %s",
+				'SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND INDEX_NAME = %s',
 				DB_NAME,
 				$table,
 				'uq_peptide_country_active'
@@ -71,7 +87,7 @@ class PR_Core_Migration_0002_Legal_Cells {
 		if ( '0' === $index_exists ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->query(
-				"ALTER TABLE {$table} ADD UNIQUE KEY uq_peptide_country_active (peptide_id, country_code, superseded_by_id)"
+				"ALTER TABLE {$table} ADD UNIQUE KEY uq_peptide_country_active (peptide_id, country_code, superseded_by_id)" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			);
 		}
 	}

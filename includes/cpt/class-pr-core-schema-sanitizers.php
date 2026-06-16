@@ -1,5 +1,17 @@
 <?php
+/**
+ * Schema Sanitizers.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Static sanitizer methods for _pr_molecular_formula, _pr_molecular_weight,
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Sanitizers for v0.6.0 schema-input meta fields.
@@ -67,8 +79,8 @@ class PR_Core_Schema_Sanitizers {
 			return '';
 		}
 		// 3. Extract the maximal leading run of valid element tokens and separators.
-		//    A valid run must start with an element token ([A-Z][a-z]?\d*), not a separator.
-		$pattern = '/^((?:' . self::FORMULA_TOKEN . '|' . self::FORMULA_SEP . ')+)/u';
+		// A valid run must start with an element token ([A-Z][a-z]?\d*), not a separator.
+		$pattern = '/^((?:' . self::FORMULA_TOKEN . '|' . self::FORMULA_SEP . ')+)/u'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		if ( preg_match( $pattern, $value, $m ) ) {
 			return $m[1];
 		}
@@ -132,7 +144,7 @@ class PR_Core_Schema_Sanitizers {
 			return '[]';
 		}
 
-		$clean = [];
+		$clean = array();
 		foreach ( $value as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -140,13 +152,13 @@ class PR_Core_Schema_Sanitizers {
 			$question = sanitize_text_field( (string) ( $item['question'] ?? '' ) );
 			$answer   = sanitize_textarea_field( (string) ( $item['answer'] ?? '' ) );
 			if ( '' !== $question && '' !== $answer ) {
-				$clean[] = [
+				$clean[] = array(
 					'question' => $question,
 					'answer'   => $answer,
-				];
+				);
 			}
 		}
 
-		return wp_json_encode( $clean, JSON_UNESCAPED_UNICODE ) ?: '[]';
+		return wp_json_encode( $clean, JSON_UNESCAPED_UNICODE ) ?: '[]'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 	}
 }

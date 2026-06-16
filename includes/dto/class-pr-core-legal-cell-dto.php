@@ -1,5 +1,17 @@
 <?php
+/**
+ * Legal Cell Dto.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Immutable value object wrapping a row from pr_legal_cells
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Typed data-transfer object for a legal status cell.
@@ -13,20 +25,82 @@ declare(strict_types=1);
  */
 class PR_Core_Legal_Cell_DTO {
 
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $id;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $peptide_id;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $country_code;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $status;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $regulatory_framework;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $regulatory_text_url;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $regulatory_text_quote;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $notes;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $last_verified_at;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $schema_version;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $reviewer_id;
+	/**
+	 * ?int.
+	 *
+	 * @var ?int
+	 */
 	public readonly ?int $superseded_by_id;
 
 	/**
+	 *   Construct.
+	 *
 	 * @param array<string, mixed> $data Associative array from database row.
 	 */
 	public function __construct( array $data ) {
@@ -59,7 +133,7 @@ class PR_Core_Legal_Cell_DTO {
 	 * @return array<string, mixed>
 	 */
 	public function to_array(): array {
-		return [
+		return array(
 			'id'                    => $this->id,
 			'peptide_id'            => $this->peptide_id,
 			'country_code'          => $this->country_code,
@@ -70,6 +144,6 @@ class PR_Core_Legal_Cell_DTO {
 			'notes'                 => $this->notes,
 			'last_verified_at'      => $this->last_verified_at,
 			'is_active'             => $this->is_active(),
-		];
+		);
 	}
 }

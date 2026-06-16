@@ -1,5 +1,17 @@
 <?php
+/**
+ * Jsonld Webpage.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Hooks into Yoast's wpseo_schema_webpage_type filter to retype the page
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Enriches Yoast's WebPage node to MedicalWebPage for peptide single pages.
@@ -16,10 +28,18 @@ declare(strict_types=1);
  */
 class PR_Core_Jsonld_Webpage {
 
-	/** @var string Meta key for last editorial review date (ISO date string). */
+	/**
+	 * Meta key for last editorial review date (ISO date string).
+	 *
+	 * @var string Meta key for last editorial review date (ISO date string).
+	 */
 	private const META_LAST_REVIEWED = '_pr_last_reviewed';
 
-	/** @var string Meta key for last source verification date (ISO date string). */
+	/**
+	 * Meta key for last source verification date (ISO date string).
+	 *
+	 * @var string Meta key for last source verification date (ISO date string).
+	 */
 	private const META_LAST_VERIFIED = '_pr_last_source_verified';
 
 	/**
@@ -77,7 +97,7 @@ class PR_Core_Jsonld_Webpage {
 			// Yoast may set @type as a plain string OR an array of strings.
 			// Normalise to array so in_array() works regardless of shape.
 			$raw_type = $piece['@type'] ?? '';
-			$types    = is_array( $raw_type ) ? $raw_type : [ $raw_type ];
+			$types    = is_array( $raw_type ) ? $raw_type : array( $raw_type );
 
 			if ( in_array( 'WebPage', $types, true ) || in_array( 'MedicalWebPage', $types, true ) ) {
 				foreach ( $enrichments as $key => $value ) {
@@ -97,16 +117,16 @@ class PR_Core_Jsonld_Webpage {
 	 * @return array<string, mixed> Enrichment fields to merge into the WebPage node.
 	 */
 	private function build_webpage_enrichments( int $post_id ): array {
-		$enrichments = [];
+		$enrichments = array();
 
-		// lastReviewed: prefer _pr_last_reviewed, fall back to _pr_last_source_verified,
+		// lastReviewed: prefer _pr_last_reviewed, fall back to _pr_last_source_verified,.
 		// then post modified date.
 		$last_reviewed = (string) get_post_meta( $post_id, self::META_LAST_REVIEWED, true );
 		if ( '' === $last_reviewed ) {
 			$last_reviewed = (string) get_post_meta( $post_id, self::META_LAST_VERIFIED, true );
 		}
 		if ( '' === $last_reviewed ) {
-			$last_reviewed = get_post_modified_time( 'Y-m-d', false, $post_id ) ?: '';
+			$last_reviewed = get_post_modified_time( 'Y-m-d', false, $post_id ) ?: ''; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		}
 
 		if ( '' !== $last_reviewed ) {
@@ -118,27 +138,27 @@ class PR_Core_Jsonld_Webpage {
 		if ( $editor_id > 0 ) {
 			$editor = get_userdata( $editor_id );
 			if ( $editor ) {
-				$enrichments['reviewedBy'] = [
+				$enrichments['reviewedBy'] = array(
 					'@type' => 'Person',
 					'name'  => sanitize_text_field( $editor->display_name ),
 					'url'   => get_author_posts_url( $editor_id ),
-				];
+				);
 			}
 		}
 
 		if ( ! isset( $enrichments['reviewedBy'] ) ) {
-			$enrichments['reviewedBy'] = [
+			$enrichments['reviewedBy'] = array(
 				'@type' => 'Organization',
 				'name'  => 'Peptide Repo',
 				'url'   => home_url(),
-			];
+			);
 		}
 
 		// audience: MedicalAudience for researchers.
-		$enrichments['audience'] = [
+		$enrichments['audience'] = array(
 			'@type'        => 'MedicalAudience',
 			'audienceType' => 'Researcher',
-		];
+		);
 
 		return $enrichments;
 	}

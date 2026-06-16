@@ -1,5 +1,17 @@
 <?php
+/**
+ * Migration Runner.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Compares current schema version against target, runs pending migrations
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Schema migration runner.
@@ -16,7 +28,11 @@ declare(strict_types=1);
  */
 class PR_Core_Migration_Runner {
 
-	/** @var string Option key storing current schema version. */
+	/**
+	 * Option key storing current schema version.
+	 *
+	 * @var string Option key storing current schema version.
+	 */
 	private const VERSION_OPTION = 'pr_core_schema_version';
 
 	/**
@@ -25,12 +41,12 @@ class PR_Core_Migration_Runner {
 	 *
 	 * @var string[]
 	 */
-	private const MIGRATIONS = [
+	private const MIGRATIONS = array(
 		'PR_Core_Migration_0001_Dosing_Rows',
 		'PR_Core_Migration_0002_Legal_Cells',
 		'PR_Core_Migration_0003_Candidate_Queue',
 		'PR_Core_Migration_0004_Backfill_Peptide_Meta',
-	];
+	);
 
 	/**
 	 * Run all pending migrations up to PR_CORE_TARGET_SCHEMA_VERSION.
@@ -86,11 +102,11 @@ class PR_Core_Migration_Runner {
 	 *
 	 * PR_Core_Migration_0001_Dosing_Rows => migrations/class-pr-core-migration-0001-dosing-rows.php
 	 *
-	 * @param string $class Fully-qualified class name.
+	 * @param string $class_name Fully-qualified class name.
 	 * @return string Absolute file path.
 	 */
-	private function class_to_file( string $class ): string {
-		$suffix = substr( $class, 8 ); // Strip 'PR_Core_'.
+	private function class_to_file( string $class_name ): string {
+		$suffix   = substr( $class_name, 8 ); // Strip 'PR_Core_'.
 		$filename = 'class-pr-core-' . str_replace( '_', '-', strtolower( $suffix ) ) . '.php';
 
 		return PR_CORE_PLUGIN_DIR . 'includes/migrations/' . $filename;

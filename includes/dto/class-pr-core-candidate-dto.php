@@ -1,5 +1,17 @@
 <?php
+/**
+ * Candidate Dto.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Immutable value object wrapping a row from pr_ai_candidate_queue
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Typed data-transfer object for an AI candidate queue entry.
@@ -13,32 +25,154 @@ declare(strict_types=1);
  */
 class PR_Core_Candidate_DTO {
 
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $id;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $peptide_id;
+	/**
+	 * ?float.
+	 *
+	 * @var ?float
+	 */
 	public readonly ?float $dose_min;
+	/**
+	 * ?float.
+	 *
+	 * @var ?float
+	 */
 	public readonly ?float $dose_max;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $dose_unit;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $route;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $frequency;
+	/**
+	 * ?int.
+	 *
+	 * @var ?int
+	 */
 	public readonly ?int $duration_value;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $duration_unit;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $population;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $indication;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $evidence_strength;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $study_title;
+	/**
+	 * ?int.
+	 *
+	 * @var ?int
+	 */
 	public readonly ?int $study_year;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $citation_pubmed_id;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $citation_doi;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $citation_url;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $notes;
+	/**
+	 * Float.
+	 *
+	 * @var float
+	 */
 	public readonly float $extraction_confidence;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $queue_status;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $extracted_at;
+	/**
+	 * ?int.
+	 *
+	 * @var ?int
+	 */
 	public readonly ?int $reviewed_by;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $reviewed_at;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $reviewer_notes;
 
 	/**
+	 *   Construct.
+	 *
 	 * @param array<string, mixed> $data Associative array from database row.
 	 */
 	public function __construct( array $data ) {
@@ -74,7 +208,7 @@ class PR_Core_Candidate_DTO {
 	 * @return array<string, mixed>
 	 */
 	public function to_array(): array {
-		return [
+		return array(
 			'id'                    => $this->id,
 			'peptide_id'            => $this->peptide_id,
 			'dose_min'              => $this->dose_min,
@@ -90,6 +224,6 @@ class PR_Core_Candidate_DTO {
 			'extraction_confidence' => $this->extraction_confidence,
 			'queue_status'          => $this->queue_status,
 			'extracted_at'          => $this->extracted_at,
-		];
+		);
 	}
 }

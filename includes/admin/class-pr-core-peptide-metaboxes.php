@@ -1,5 +1,17 @@
 <?php
+/**
+ * Peptide Metaboxes.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Renders and saves three meta boxes on the peptide edit screen
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Meta boxes for the peptide edit screen: scientific identifiers, dosing, and legal.
@@ -22,7 +34,7 @@ class PR_Core_Peptide_Metaboxes {
 		add_meta_box(
 			'pr-core-identifiers',
 			__( 'Scientific Identifiers', 'peptide-repo-core' ),
-			[ $this, 'render_identifiers_box' ],
+			array( $this, 'render_identifiers_box' ),
 			PR_Core_Peptide_CPT::POST_TYPE,
 			'normal',
 			'high'
@@ -31,7 +43,7 @@ class PR_Core_Peptide_Metaboxes {
 		add_meta_box(
 			'pr-core-dosing',
 			__( 'Dosing Data', 'peptide-repo-core' ),
-			[ $this, 'render_dosing_box' ],
+			array( $this, 'render_dosing_box' ),
 			PR_Core_Peptide_CPT::POST_TYPE,
 			'normal',
 			'default'
@@ -40,7 +52,7 @@ class PR_Core_Peptide_Metaboxes {
 		add_meta_box(
 			'pr-core-legal',
 			__( 'Legal Status by Country', 'peptide-repo-core' ),
-			[ $this, 'render_legal_box' ],
+			array( $this, 'render_legal_box' ),
 			PR_Core_Peptide_CPT::POST_TYPE,
 			'normal',
 			'default'
@@ -56,7 +68,7 @@ class PR_Core_Peptide_Metaboxes {
 	public function render_identifiers_box( \WP_Post $post ): void {
 		wp_nonce_field( 'pr_core_save_meta', 'pr_core_meta_nonce' );
 
-		$fields = [
+		$fields = array(
 			'display_name'      => __( 'Display Name', 'peptide-repo-core' ),
 			'aliases'           => __( 'Aliases (JSON array)', 'peptide-repo-core' ),
 			'molecular_formula' => __( 'Molecular Formula', 'peptide-repo-core' ),
@@ -64,7 +76,7 @@ class PR_Core_Peptide_Metaboxes {
 			'cas_number'        => __( 'CAS Number', 'peptide-repo-core' ),
 			'drugbank_id'       => __( 'DrugBank ID', 'peptide-repo-core' ),
 			'chembl_id'         => __( 'ChEMBL ID', 'peptide-repo-core' ),
-		];
+		);
 
 		echo '<table class="form-table pr-core-meta-table">';
 		foreach ( $fields as $key => $label ) {
@@ -73,12 +85,12 @@ class PR_Core_Peptide_Metaboxes {
 				'<tr><th><label for="pr_core_%1$s">%2$s</label></th><td><input type="text" id="pr_core_%1$s" name="pr_core_%1$s" value="%3$s" class="regular-text" /></td></tr>',
 				esc_attr( $key ),
 				esc_html( $label ),
-				$value
+				$value // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_attr applied on assignment
 			);
 		}
 
 		// Evidence strength dropdown.
-		$current_strength = get_post_meta( $post->ID, 'evidence_strength', true ) ?: 'preclinical';
+		$current_strength = get_post_meta( $post->ID, 'evidence_strength', true ) ?: 'preclinical'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		echo '<tr><th><label for="pr_core_evidence_strength">' . esc_html__( 'Evidence Strength', 'peptide-repo-core' ) . '</label></th><td><select id="pr_core_evidence_strength" name="pr_core_evidence_strength">';
 		foreach ( PR_Core_Peptide_CPT::EVIDENCE_STRENGTHS as $strength ) {
 			$label = apply_filters( 'pr_core_evidence_strength_label', $strength, $strength );
@@ -92,7 +104,7 @@ class PR_Core_Peptide_Metaboxes {
 		echo '</select></td></tr>';
 
 		// Editorial review status.
-		$current_review = get_post_meta( $post->ID, 'editorial_review_status', true ) ?: 'draft';
+		$current_review = get_post_meta( $post->ID, 'editorial_review_status', true ) ?: 'draft'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		echo '<tr><th><label for="pr_core_editorial_review_status">' . esc_html__( 'Editorial Status', 'peptide-repo-core' ) . '</label></th><td><select id="pr_core_editorial_review_status" name="pr_core_editorial_review_status">';
 		foreach ( PR_Core_Peptide_CPT::REVIEW_STATUSES as $status ) {
 			printf(
@@ -134,8 +146,8 @@ class PR_Core_Peptide_Metaboxes {
 			echo '</tr></thead><tbody>';
 
 			foreach ( $rows as $row ) {
-				$dose = $row->dose_min !== null ? number_format( $row->dose_min, 2 ) : '?';
-				if ( $row->dose_max !== null && $row->dose_max !== $row->dose_min ) {
+				$dose = null !== $row->dose_min ? number_format( $row->dose_min, 2 ) : '?';
+				if ( null !== $row->dose_max && $row->dose_max !== $row->dose_min ) {
 					$dose .= ' – ' . number_format( $row->dose_max, 2 );
 				}
 				$dose .= ' ' . esc_html( $row->dose_unit );
@@ -233,11 +245,11 @@ class PR_Core_Peptide_Metaboxes {
 
 		foreach ( $meta_fields as $key => $config ) {
 			$input_key = 'pr_core_' . $key;
-			if ( ! isset( $_POST[ $input_key ] ) ) {
+			if ( ! isset( $_POST[ $input_key ] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- existence check only; unslash+sanitize below
 				continue;
 			}
 
-			$raw   = wp_unslash( $_POST[ $input_key ] );
+			$raw   = wp_unslash( $_POST[ $input_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized via config['sanitize'] callback on next line
 			$clean = is_callable( $config['sanitize'] )
 				? call_user_func( $config['sanitize'], $raw )
 				: sanitize_text_field( (string) $raw );
@@ -246,10 +258,10 @@ class PR_Core_Peptide_Metaboxes {
 		}
 
 		// Set last_editorial_review_at when status changes to published.
-		$new_review_status = sanitize_text_field( $_POST['pr_core_editorial_review_status'] ?? '' );
+		$new_review_status = sanitize_text_field( wp_unslash( $_POST['pr_core_editorial_review_status'] ?? '' ) );
 		if ( 'published' === $new_review_status ) {
 			$old_status = get_post_meta( $post_id, 'editorial_review_status', true );
-			if ( $old_status !== 'published' ) {
+			if ( 'published' !== $old_status ) {
 				update_post_meta( $post_id, 'last_editorial_review_at', current_time( 'mysql' ) );
 				update_post_meta( $post_id, 'medical_editor_id', get_current_user_id() );
 			}

@@ -1,5 +1,17 @@
 <?php
+/**
+ * Verification Display.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Appends last-verified date after verdict card on reader-facing pages
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Frontend verification date display on peptide single pages.
@@ -20,7 +32,7 @@ class PR_Core_Verification_Display {
 	 * @return void
 	 */
 	public static function init(): void {
-		add_filter( 'the_content', [ __CLASS__, 'append_verification_display' ], 20 );
+		add_filter( 'the_content', array( __CLASS__, 'append_verification_display' ), 20 );
 	}
 
 	/**
@@ -63,10 +75,10 @@ class PR_Core_Verification_Display {
 	 * @return string HTML block.
 	 */
 	private static function render_verification_block( string $last_verified ): string {
-		$date_obj = new \DateTime( $last_verified );
+		$date_obj       = new \DateTime( $last_verified );
 		$formatted_date = $date_obj->format( get_option( 'date_format' ) );
 
-		$html = '<p class="pr-verification-date">';
+		$html  = '<p class="pr-verification-date">';
 		$html .= esc_html__( 'Last verified: ', 'peptide-repo-core' );
 		$html .= sprintf(
 			'<time datetime="%s">%s</time>',

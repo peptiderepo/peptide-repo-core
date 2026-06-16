@@ -1,5 +1,17 @@
 <?php
+/**
+ * Migration 0003 Candidate Queue.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Creates the AI-extracted dosing candidate queue table
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Migration 0003: Create the pr_ai_candidate_queue table.
@@ -15,13 +27,17 @@ declare(strict_types=1);
  */
 class PR_Core_Migration_0003_Candidate_Queue {
 
-	/** @var string[] Valid queue status enum values. */
-	public const STATUSES = [
+	/**
+	 * Valid queue status enum values.
+	 *
+	 * @var string[] Valid queue status enum values.
+	 */
+	public const STATUSES = array(
 		'pending',
 		'approved',
 		'rejected',
 		'merged',
-	];
+	);
 
 	/**
 	 * Create the pr_ai_candidate_queue table.

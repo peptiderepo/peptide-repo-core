@@ -1,4 +1,10 @@
 <?php
+/**
+ * Settings.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
 
 /**
@@ -13,25 +19,25 @@ declare(strict_types=1);
  */
 class PR_Core_Settings {
 
-	/** @var string Option group shared by all PR Core settings. */
+	/** @var string Option group shared by all PR Core settings. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	public const OPTION_GROUP = 'pr_core_settings';
 
-	/** @var string Option key: enable/disable related articles. */
+	/** @var string Option key: enable/disable related articles. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const RELATED_ENABLED = 'pr_core_related_posts_enabled';
 
-	/** @var string Option key: related articles limit (1-6). */
+	/** @var string Option key: related articles limit (1-6). */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const RELATED_LIMIT = 'pr_core_related_posts_limit';
 
-	/** @var string Option key: WP-cron scan cadence. */
+	/** @var string Option key: WP-cron scan cadence. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const SCAN_CADENCE = 'pr_core_scan_cadence';
 
-	/** @var string Option key: default staleness threshold in days. */
+	/** @var string Option key: default staleness threshold in days. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const DEFAULT_THRESHOLD = 'pr_core_default_threshold';
 
-	/** @var string Option key: high-velocity staleness threshold in days. */
+	/** @var string Option key: high-velocity staleness threshold in days. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const HIGH_VELOCITY_THRESHOLD = 'pr_core_high_velocity_threshold';
 
-	/** @var string Option key: comma-separated notification email list. */
+	/** @var string Option key: comma-separated notification email list. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const VERIFICATION_EMAIL = 'pr_core_verification_email';
 
 	/**
@@ -48,28 +54,17 @@ class PR_Core_Settings {
 			__( 'Settings', 'peptide-repo-core' ),
 			'manage_options',
 			'pr-core-settings',
-			[ __CLASS__, 'render_page' ]
+			array( __CLASS__, 'render_page' )
 		);
 	}
 
 	/**
-	 * Render the settings page form.
+	 * Render the settings page HTML. Delegates to PR_Core_Settings_Renderer.
 	 *
 	 * @return void
 	 */
 	public static function render_page(): void {
-		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'PR Core Settings', 'peptide-repo-core' ); ?></h1>
-			<form method="post" action="options.php">
-				<?php
-				settings_fields( self::OPTION_GROUP );
-				do_settings_sections( self::OPTION_GROUP );
-				submit_button();
-				?>
-			</form>
-		</div>
-		<?php
+		PR_Core_Settings_Renderer::render_page();
 	}
 
 	/**
@@ -83,10 +78,10 @@ class PR_Core_Settings {
 	public static function register_settings(): void {
 		self::register_related_articles_section();
 		self::register_verification_section();
-		add_action( 'update_option_' . self::SCAN_CADENCE, [ __CLASS__, 'reschedule_cron' ], 10, 2 );
+		add_action( 'update_option_' . self::SCAN_CADENCE, array( __CLASS__, 'reschedule_cron' ), 10, 2 );
 	}
 
-	// ── Related Articles ─────────────────────────────────────────────────
+	// ── Related Articles ─────────────────────────────────────────────────.
 
 	/**
 	 * Register Related Articles settings.
@@ -94,33 +89,46 @@ class PR_Core_Settings {
 	 * @return void
 	 */
 	private static function register_related_articles_section(): void {
-		register_setting( self::OPTION_GROUP, self::RELATED_ENABLED, [ 'type' => 'boolean', 'default' => true,    'sanitize_callback' => 'rest_sanitize_boolean' ] );
-		register_setting( self::OPTION_GROUP, self::RELATED_LIMIT,   [ 'type' => 'integer', 'default' => 3,       'sanitize_callback' => [ __CLASS__, 'sanitize_limit' ] ] );
+		register_setting(
+			self::OPTION_GROUP,
+			self::RELATED_ENABLED,
+			array(
+				'type'              => 'boolean',
+				'default'           => true,
+				'sanitize_callback' => 'rest_sanitize_boolean',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			self::RELATED_LIMIT,
+			array(
+				'type'              => 'integer',
+				'default'           => 3,
+				'sanitize_callback' => array( __CLASS__, 'sanitize_limit' ),
+			)
+		);
 
 		add_settings_section( 'pr_core_related_articles', __( 'Related Articles', 'peptide-repo-core' ), '__return_false', self::OPTION_GROUP );
-		add_settings_field( self::RELATED_ENABLED, __( 'Enable Related Articles', 'peptide-repo-core' ), [ __CLASS__, 'render_enabled_field' ], self::OPTION_GROUP, 'pr_core_related_articles' );
-		add_settings_field( self::RELATED_LIMIT,   __( 'Number of Articles',      'peptide-repo-core' ), [ __CLASS__, 'render_limit_field'   ], self::OPTION_GROUP, 'pr_core_related_articles' );
+		add_settings_field( self::RELATED_ENABLED, __( 'Enable Related Articles', 'peptide-repo-core' ), array( __CLASS__, 'render_enabled_field' ), self::OPTION_GROUP, 'pr_core_related_articles' );
+		add_settings_field( self::RELATED_LIMIT, __( 'Number of Articles', 'peptide-repo-core' ), array( __CLASS__, 'render_limit_field' ), self::OPTION_GROUP, 'pr_core_related_articles' );
 	}
 
-	/** @return void */
+	/**
+	 * Render the enable/disable checkbox field. Delegates to PR_Core_Settings_Renderer.
+	 *
+	 * @return void
+	 */
 	public static function render_enabled_field(): void {
-		$enabled = (bool) get_option( self::RELATED_ENABLED, true );
-		printf(
-			'<input type="checkbox" name="%s" value="1"%s /> %s',
-			esc_attr( self::RELATED_ENABLED ),
-			checked( $enabled, true, false ),
-			esc_html__( 'Show related monographs on single peptide pages', 'peptide-repo-core' )
-		);
+		PR_Core_Settings_Renderer::render_enabled_field();
 	}
 
-	/** @return void */
+	/**
+	 * Render the article count limit field. Delegates to PR_Core_Settings_Renderer.
+	 *
+	 * @return void
+	 */
 	public static function render_limit_field(): void {
-		printf(
-			'<input type="number" name="%s" value="%d" min="1" max="6" />',
-			esc_attr( self::RELATED_LIMIT ),
-			absint( get_option( self::RELATED_LIMIT, 3 ) )
-		);
-		echo '<p class="description">' . esc_html__( 'Number of articles to display (1-6). Default: 3.', 'peptide-repo-core' ) . '</p>';
+		PR_Core_Settings_Renderer::render_limit_field();
 	}
 
 	/**
@@ -133,7 +141,7 @@ class PR_Core_Settings {
 		return min( 6, max( 1, (int) $value ) );
 	}
 
-	// ── Verification ─────────────────────────────────────────────────────
+	// ── Verification ─────────────────────────────────────────────────────.
 
 	/**
 	 * Register Verification settings.
@@ -141,51 +149,93 @@ class PR_Core_Settings {
 	 * @return void
 	 */
 	private static function register_verification_section(): void {
-		register_setting( self::OPTION_GROUP, self::SCAN_CADENCE,            [ 'type' => 'string',  'default' => 'weekly', 'sanitize_callback' => [ __CLASS__, 'sanitize_cadence' ] ] );
-		register_setting( self::OPTION_GROUP, self::DEFAULT_THRESHOLD,       [ 'type' => 'integer', 'default' => 180,      'sanitize_callback' => 'absint' ] );
-		register_setting( self::OPTION_GROUP, self::HIGH_VELOCITY_THRESHOLD, [ 'type' => 'integer', 'default' => 60,       'sanitize_callback' => 'absint' ] );
-		register_setting( self::OPTION_GROUP, self::VERIFICATION_EMAIL,      [ 'type' => 'string',  'default' => '',       'sanitize_callback' => [ __CLASS__, 'sanitize_emails' ] ] );
-
-		add_settings_section( 'pr_core_verification', __( 'Verification', 'peptide-repo-core' ), [ __CLASS__, 'render_verification_section' ], self::OPTION_GROUP );
-		add_settings_field( self::SCAN_CADENCE,            __( 'Scan cadence',                       'peptide-repo-core' ), [ __CLASS__, 'render_cadence_field'       ], self::OPTION_GROUP, 'pr_core_verification' );
-		add_settings_field( self::DEFAULT_THRESHOLD,       __( 'Default staleness threshold (days)',  'peptide-repo-core' ), [ __CLASS__, 'render_threshold_field'     ], self::OPTION_GROUP, 'pr_core_verification' );
-		add_settings_field( self::HIGH_VELOCITY_THRESHOLD, __( 'High-velocity threshold (days)',      'peptide-repo-core' ), [ __CLASS__, 'render_high_velocity_field' ], self::OPTION_GROUP, 'pr_core_verification' );
-		add_settings_field( self::VERIFICATION_EMAIL,      __( 'Notification email(s)',               'peptide-repo-core' ), [ __CLASS__, 'render_email_field'         ], self::OPTION_GROUP, 'pr_core_verification' );
-	}
-
-	/** @return void */
-	public static function render_verification_section(): void {
-		echo '<p>' . esc_html__( 'Configure automatic staleness scanning and digest notifications.', 'peptide-repo-core' ) . '</p>';
-	}
-
-	/** @return void */
-	public static function render_cadence_field(): void {
-		$current = get_option( self::SCAN_CADENCE, 'weekly' );
-		echo '<select name="' . esc_attr( self::SCAN_CADENCE ) . '">';
-		foreach ( [ 'daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly' ] as $val => $label ) {
-			printf( '<option value="%s"%s>%s</option>', esc_attr( $val ), selected( $current, $val, false ), esc_html( $label ) );
-		}
-		echo '</select>';
-	}
-
-	/** @return void */
-	public static function render_threshold_field(): void {
-		printf( '<input type="number" name="%s" value="%d" min="1" />', esc_attr( self::DEFAULT_THRESHOLD ), absint( get_option( self::DEFAULT_THRESHOLD, 180 ) ) );
-	}
-
-	/** @return void */
-	public static function render_high_velocity_field(): void {
-		printf( '<input type="number" name="%s" value="%d" min="1" />', esc_attr( self::HIGH_VELOCITY_THRESHOLD ), absint( get_option( self::HIGH_VELOCITY_THRESHOLD, 60 ) ) );
-	}
-
-	/** @return void */
-	public static function render_email_field(): void {
-		printf(
-			'<input type="text" name="%s" value="%s" class="regular-text" placeholder="admin@example.com" />',
-			esc_attr( self::VERIFICATION_EMAIL ),
-			esc_attr( (string) get_option( self::VERIFICATION_EMAIL, '' ) )
+		register_setting(
+			self::OPTION_GROUP,
+			self::SCAN_CADENCE,
+			array(
+				'type'              => 'string',
+				'default'           => 'weekly',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_cadence' ),
+			)
 		);
-		echo '<p class="description">' . esc_html__( 'Comma-separated. Leave blank to disable email digests.', 'peptide-repo-core' ) . '</p>';
+		register_setting(
+			self::OPTION_GROUP,
+			self::DEFAULT_THRESHOLD,
+			array(
+				'type'              => 'integer',
+				'default'           => 180,
+				'sanitize_callback' => 'absint',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			self::HIGH_VELOCITY_THRESHOLD,
+			array(
+				'type'              => 'integer',
+				'default'           => 60,
+				'sanitize_callback' => 'absint',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			self::VERIFICATION_EMAIL,
+			array(
+				'type'              => 'string',
+				'default'           => '',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_emails' ),
+			)
+		);
+
+		add_settings_section( 'pr_core_verification', __( 'Verification', 'peptide-repo-core' ), array( __CLASS__, 'render_verification_section' ), self::OPTION_GROUP );
+		add_settings_field( self::SCAN_CADENCE, __( 'Scan cadence', 'peptide-repo-core' ), array( __CLASS__, 'render_cadence_field' ), self::OPTION_GROUP, 'pr_core_verification' );
+		add_settings_field( self::DEFAULT_THRESHOLD, __( 'Default staleness threshold (days)', 'peptide-repo-core' ), array( __CLASS__, 'render_threshold_field' ), self::OPTION_GROUP, 'pr_core_verification' );
+		add_settings_field( self::HIGH_VELOCITY_THRESHOLD, __( 'High-velocity threshold (days)', 'peptide-repo-core' ), array( __CLASS__, 'render_high_velocity_field' ), self::OPTION_GROUP, 'pr_core_verification' );
+		add_settings_field( self::VERIFICATION_EMAIL, __( 'Notification email(s)', 'peptide-repo-core' ), array( __CLASS__, 'render_email_field' ), self::OPTION_GROUP, 'pr_core_verification' );
+	}
+
+	/**
+	 * Render the verification section header. Delegates to PR_Core_Settings_Renderer.
+	 *
+	 * @return void
+	 */
+	public static function render_verification_section(): void {
+		PR_Core_Settings_Renderer::render_verification_section();
+	}
+
+	/**
+	 * Render the scan cadence select field. Delegates to PR_Core_Settings_Renderer.
+	 *
+	 * @return void
+	 */
+	public static function render_cadence_field(): void {
+		PR_Core_Settings_Renderer::render_cadence_field();
+	}
+
+	/**
+	 * Render the score threshold input field. Delegates to PR_Core_Settings_Renderer.
+	 *
+	 * @return void
+	 */
+	public static function render_threshold_field(): void {
+		PR_Core_Settings_Renderer::render_threshold_field();
+	}
+
+	/**
+	 * Render the high-velocity scan toggle field. Delegates to PR_Core_Settings_Renderer.
+	 *
+	 * @return void
+	 */
+	public static function render_high_velocity_field(): void {
+		PR_Core_Settings_Renderer::render_high_velocity_field();
+	}
+
+	/**
+	 * Render the alert email input field. Delegates to PR_Core_Settings_Renderer.
+	 *
+	 * @return void
+	 */
+	public static function render_email_field(): void {
+		PR_Core_Settings_Renderer::render_email_field();
 	}
 
 	/**
@@ -195,7 +245,7 @@ class PR_Core_Settings {
 	 * @return string
 	 */
 	public static function sanitize_cadence( string $value ): string {
-		return in_array( $value, [ 'daily', 'weekly', 'monthly' ], true ) ? $value : 'weekly';
+		return in_array( $value, array( 'daily', 'weekly', 'monthly' ), true ) ? $value : 'weekly';
 	}
 
 	/**

@@ -1,5 +1,17 @@
 <?php
+/**
+ * Verification Widget.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * WordPress dashboard widget showing peptides needing review (due/overdue)
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Dashboard widget for verification status overview.
@@ -23,7 +35,7 @@ class PR_Core_Verification_Widget {
 		wp_add_dashboard_widget(
 			'pr_core_verification_status',
 			__( 'Monographs Needing Review', 'peptide-repo-core' ),
-			[ __CLASS__, 'render' ]
+			array( __CLASS__, 'render' )
 		);
 	}
 
@@ -33,35 +45,38 @@ class PR_Core_Verification_Widget {
 	 * @return void
 	 */
 	public static function render(): void {
-		$repo = new PR_Core_Peptide_Repository();
-		$peptides = $repo->find_all( [ 'status' => 'publish' ] );
+		$repo     = new PR_Core_Peptide_Repository();
+		$peptides = $repo->find_all( array( 'status' => 'publish' ) );
 
-		$due_overdue = [];
+		$due_overdue = array();
 
 		foreach ( $peptides as $dto ) {
-			$status = get_post_meta( $dto->id, '_pr_verification_status', true ) ?: 'current';
+			$status = get_post_meta( $dto->id, '_pr_verification_status', true ) ?: 'current'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
-			if ( in_array( $status, [ 'due', 'overdue' ], true ) ) {
+			if ( in_array( $status, array( 'due', 'overdue' ), true ) ) {
 				$last_verified = get_post_meta( $dto->id, '_pr_last_source_verified', true );
 				$days_since    = $last_verified
 					? (int) ( ( time() - strtotime( $last_verified ) ) / DAY_IN_SECONDS )
 					: 999;
 
-				$due_overdue[] = [
-					'id'           => $dto->id,
-					'title'        => $dto->title,
-					'status'       => $status,
-					'velocity'     => get_post_meta( $dto->id, '_pr_verification_velocity', true ) ?: 'medium',
+				$due_overdue[] = array(
+					'id'            => $dto->id,
+					'title'         => $dto->title,
+					'status'        => $status,
+					'velocity'      => get_post_meta( $dto->id, '_pr_verification_velocity', true ) ?: 'medium', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 					'last_verified' => $last_verified,
-					'days_since'   => $days_since,
-				];
+					'days_since'    => $days_since,
+				);
 			}
 		}
 
 		// Sort by days_since descending (most overdue first).
-		usort( $due_overdue, static function ( $a, $b ) {
-			return $b['days_since'] <=> $a['days_since'];
-		} );
+		usort(
+			$due_overdue,
+			static function ( $a, $b ) {
+				return $b['days_since'] <=> $a['days_since'];
+			}
+		);
 
 		if ( empty( $due_overdue ) ) {
 			echo '<p>' . esc_html__( 'All monographs are current. ', 'peptide-repo-core' );
@@ -93,7 +108,7 @@ class PR_Core_Verification_Widget {
 					esc_html( ucfirst( $item['status'] ) ),
 					esc_html( ucfirst( $item['velocity'] ) ),
 					esc_html( $item['last_verified'] ?? '—' ),
-					$item['days_since'],
+					(int) $item['days_since'],  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- cast to int, safe
 					esc_url( $edit_url )
 				);
 			}

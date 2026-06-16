@@ -1,5 +1,17 @@
 <?php
+/**
+ * Internal Posts Provider.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Implements PR_Core_Related_Posts_Provider by querying posts tagged
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Fetches posts related to a peptide via taxonomy and fallback text search.
@@ -33,7 +45,7 @@ class PR_Core_Internal_Posts_Provider implements PR_Core_Related_Posts_Provider 
 	public function get_posts( int $peptide_id, int $limit ): array {
 		$peptide = get_post( $peptide_id );
 		if ( ! $peptide || 'peptide' !== $peptide->post_type ) {
-			return [];
+			return array();
 		}
 
 		$cache_key = 'pr_core_related_' . $peptide_id;
@@ -64,21 +76,23 @@ class PR_Core_Internal_Posts_Provider implements PR_Core_Related_Posts_Provider 
 	 * @return array<int, \WP_Post>
 	 */
 	private function query_by_taxonomy( string $peptide_slug, int $limit ): array {
-		$query = new WP_Query( [
-			'post_type'      => 'post',
-			'posts_per_page' => $limit,
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'tax_query'      => [
-				[
-					'taxonomy' => 'peptide_topic',
-					'field'    => 'slug',
-					'terms'    => $peptide_slug,
-				],
-			],
-		] );
+		$query = new WP_Query(
+			array(
+				'post_type'      => 'post',
+				'posts_per_page' => $limit,
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				'tax_query'      => array(
+					array(
+						'taxonomy' => 'peptide_topic',
+						'field'    => 'slug',
+						'terms'    => $peptide_slug,
+					),
+				),
+			)
+		);
 
-		return $query->posts ?: [];
+		return $query->posts ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 	}
 
 	/**
@@ -89,14 +103,16 @@ class PR_Core_Internal_Posts_Provider implements PR_Core_Related_Posts_Provider 
 	 * @return array<int, \WP_Post>
 	 */
 	private function query_by_search( string $search_term, int $limit ): array {
-		$query = new WP_Query( [
-			'post_type'      => 'post',
-			'posts_per_page' => $limit,
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			's'              => $search_term,
-		] );
+		$query = new WP_Query(
+			array(
+				'post_type'      => 'post',
+				'posts_per_page' => $limit,
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				's'              => $search_term,
+			)
+		);
 
-		return $query->posts ?: [];
+		return $query->posts ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 	}
 }

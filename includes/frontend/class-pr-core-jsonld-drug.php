@@ -1,5 +1,17 @@
 <?php
+/**
+ * Jsonld Drug.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Assembles a Drug (+ MolecularEntity) schema node from peptide DTO
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Builds the schema.org Drug graph piece for a peptide page.
@@ -17,17 +29,33 @@ declare(strict_types=1);
  */
 class PR_Core_Jsonld_Drug {
 
-	/** @var string Meta key: molecular formula sourced by migration 0004. */
-	private const META_FORMULA  = '_pr_molecular_formula';
+	/**
+	 * Meta key: molecular formula sourced by migration 0004.
+	 *
+	 * @var string Meta key: molecular formula sourced by migration 0004.
+	 */
+	private const META_FORMULA = '_pr_molecular_formula';
 
-	/** @var string Meta key: molecular weight (float string) sourced by migration 0004. */
-	private const META_WEIGHT   = '_pr_molecular_weight';
+	/**
+	 * Meta key: molecular weight (float string) sourced by migration 0004.
+	 *
+	 * @var string Meta key: molecular weight (float string) sourced by migration 0004.
+	 */
+	private const META_WEIGHT = '_pr_molecular_weight';
 
-	/** @var string Meta key: aliases JSON array sourced by migration 0004. */
-	private const META_ALIASES  = '_pr_aliases';
+	/**
+	 * Meta key: aliases JSON array sourced by migration 0004.
+	 *
+	 * @var string Meta key: aliases JSON array sourced by migration 0004.
+	 */
+	private const META_ALIASES = '_pr_aliases';
 
-	/** @var string Unit text for molecularWeight QuantitativeValue. */
-	private const UNIT_TEXT     = 'g/mol';
+	/**
+	 * Unit text for molecularWeight QuantitativeValue.
+	 *
+	 * @var string Unit text for molecularWeight QuantitativeValue.
+	 */
+	private const UNIT_TEXT = 'g/mol';
 
 	/**
 	 * Build a schema.org Drug piece array for a peptide.
@@ -38,12 +66,12 @@ class PR_Core_Jsonld_Drug {
 	public function build( PR_Core_Peptide_DTO $peptide ): array {
 		$permalink = get_permalink( $peptide->id );
 
-		$node = [
-			'@type' => [ 'Drug', 'MolecularEntity' ],
+		$node = array(
+			'@type' => array( 'Drug', 'MolecularEntity' ),
 			'@id'   => $permalink . '#drug',
-			'name'  => $peptide->display_name ?: $peptide->title,
+			'name'  => $peptide->display_name ?: $peptide->title, // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 			'url'   => $permalink,
-		];
+		);
 
 		if ( '' !== $peptide->excerpt ) {
 			$node['description'] = $peptide->excerpt;
@@ -64,11 +92,11 @@ class PR_Core_Jsonld_Drug {
 		// molecularWeight: prefer _pr_molecular_weight, fall back to DTO field.
 		$weight = $this->get_weight( $peptide );
 		if ( $weight > 0.0 ) {
-			$node['molecularWeight'] = [
+			$node['molecularWeight'] = array(
 				'@type'    => 'QuantitativeValue',
 				'value'    => $weight,
 				'unitText' => self::UNIT_TEXT,
-			];
+			);
 		}
 
 		// External identifiers: CAS and DrugBank omitted in v0.6.0 (no source).
@@ -150,9 +178,9 @@ class PR_Core_Jsonld_Drug {
 	 * @return array<string, string>|null
 	 */
 	private function build_legal_status(): ?array {
-		return [
+		return array(
 			'@type'       => 'DrugLegalStatus',
 			'description' => esc_html__( 'Not approved for human therapeutic use; supplied for laboratory research purposes only.', 'peptide-repo-core' ),
-		];
+		);
 	}
 }

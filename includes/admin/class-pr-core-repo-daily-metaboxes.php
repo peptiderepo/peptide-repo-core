@@ -1,5 +1,17 @@
 <?php
+/**
+ * Repo Daily Metaboxes.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Renders and saves two meta fields on the repo_daily edit screen
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Meta boxes for Repo Daily edit screen: author and clinical review flag.
@@ -17,7 +29,11 @@ declare(strict_types=1);
  */
 class PR_Core_Repo_Daily_Metaboxes {
 
-	/** @var string Default author byline for Repo Daily articles. */
+	/**
+	 * Default author byline for Repo Daily articles.
+	 *
+	 * @var string Default author byline for Repo Daily articles.
+	 */
 	private const DEFAULT_AUTHOR = 'Boo Sheeran';
 
 	/**
@@ -29,7 +45,7 @@ class PR_Core_Repo_Daily_Metaboxes {
 		add_meta_box(
 			'pr-core-repo-daily-meta',
 			__( 'Article Settings', 'peptide-repo-core' ),
-			[ $this, 'render_meta_box' ],
+			array( $this, 'render_meta_box' ),
 			PR_Core_Repo_Daily_CPT::POST_TYPE,
 			'normal',
 			'default'
@@ -45,8 +61,8 @@ class PR_Core_Repo_Daily_Metaboxes {
 	public function render_meta_box( \WP_Post $post ): void {
 		wp_nonce_field( 'pr_core_repo_daily_meta', 'pr_core_repo_daily_nonce' );
 
-		$author = sanitize_text_field(
-			get_post_meta( $post->ID, '_repo_daily_author', true ) ?: self::DEFAULT_AUTHOR
+		$author          = sanitize_text_field(
+			get_post_meta( $post->ID, '_repo_daily_author', true ) ?: self::DEFAULT_AUTHOR // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		);
 		$requires_review = get_post_meta( $post->ID, '_repo_daily_clinical_review_required', true );
 

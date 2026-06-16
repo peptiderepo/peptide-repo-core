@@ -1,5 +1,17 @@
 <?php
+/**
+ * Pubchem Client.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Fetches molecular formula, molecular weight, and synonyms from the
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Lightweight PubChem REST client for the backfill migration.
@@ -20,16 +32,32 @@ declare(strict_types=1);
  */
 class PR_Core_Pubchem_Client {
 
-	/** @var string PubChem REST base URL. */
+	/**
+	 * PubChem REST base URL.
+	 *
+	 * @var string PubChem REST base URL.
+	 */
 	private const BASE = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug';
 
-	/** @var int HTTP timeout per request (seconds). */
+	/**
+	 * HTTP timeout per request (seconds).
+	 *
+	 * @var int HTTP timeout per request (seconds).
+	 */
 	private const TIMEOUT = 8;
 
-	/** @var int Maximum retry attempts with exponential backoff. */
+	/**
+	 * Maximum retry attempts with exponential backoff.
+	 *
+	 * @var int Maximum retry attempts with exponential backoff.
+	 */
 	private const MAX_RETRIES = 3;
 
-	/** @var int Maximum synonyms to return (keeps post-meta size reasonable). */
+	/**
+	 * Maximum synonyms to return (keeps post-meta size reasonable).
+	 *
+	 * @var int Maximum synonyms to return (keeps post-meta size reasonable).
+	 */
 	private const MAX_SYNONYMS = 10;
 
 	/**
@@ -109,11 +137,11 @@ class PR_Core_Pubchem_Client {
 			return null;
 		}
 
-		return [
+		return array(
 			'formula' => $formula,
 			'weight'  => $weight,
 			'cid'     => $cid,
-		];
+		);
 	}
 
 	/**
@@ -130,14 +158,14 @@ class PR_Core_Pubchem_Client {
 		$body = $this->get_with_retry( $url );
 
 		if ( null === $body ) {
-			return [];
+			return array();
 		}
 
 		$data     = json_decode( $body, true );
-		$synonyms = $data['InformationList']['Information'][0]['Synonym'] ?? [];
+		$synonyms = $data['InformationList']['Information'][0]['Synonym'] ?? array();
 
 		if ( ! is_array( $synonyms ) ) {
-			return [];
+			return array();
 		}
 
 		return array_slice( $synonyms, 0, self::MAX_SYNONYMS );
@@ -176,10 +204,13 @@ class PR_Core_Pubchem_Client {
 	 */
 	private function get_once( string $url ): ?string {
 		if ( function_exists( 'wp_remote_get' ) ) {
-			$response = wp_remote_get( $url, [
-				'timeout' => self::TIMEOUT,
-				'headers' => [ 'Accept' => 'application/json' ],
-			] );
+			$response = wp_remote_get(
+				$url,
+				array(
+					'timeout' => self::TIMEOUT,
+					'headers' => array( 'Accept' => 'application/json' ),
+				)
+			);
 
 			if ( is_wp_error( $response ) ) {
 				return null;
@@ -194,13 +225,15 @@ class PR_Core_Pubchem_Client {
 		}
 
 		// WP-CLI / plain PHP fallback.
-		$context = stream_context_create( [
-			'http' => [
-				'timeout' => self::TIMEOUT,
-				'header'  => "Accept: application/json\r\n",
-				'method'  => 'GET',
-			],
-		] );
+		$context = stream_context_create(
+			array(
+				'http' => array(
+					'timeout' => self::TIMEOUT,
+					'header'  => "Accept: application/json\r\n",
+					'method'  => 'GET',
+				),
+			)
+		);
 
 		$body = @file_get_contents( $url, false, $context );
 		return ( false === $body ) ? null : $body;

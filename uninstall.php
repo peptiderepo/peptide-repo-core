@@ -8,6 +8,7 @@
  * peptide_category taxonomy terms) is preserved.
  *
  * @see ARCHITECTURE.md — §2.9 Uninstall specification.
+ * @package Peptide_Repo_Core
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
@@ -18,15 +19,16 @@ global $wpdb;
 
 /* ── 1. Drop custom tables ────────────────────────────────────────────── */
 
-$tables = [
+$tables = array(
 	$wpdb->prefix . 'pr_dosing_rows',
 	$wpdb->prefix . 'pr_legal_cells',
 	$wpdb->prefix . 'pr_ai_candidate_queue',
-];
+);
 
 foreach ( $tables as $table ) {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
-	$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 }
 
 /* ── 2. Delete only peptide posts authored through PR Core's UI ───────── */
@@ -44,7 +46,7 @@ foreach ( $tables as $table ) {
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 $post_ids = $wpdb->get_col(
 	$wpdb->prepare(
-		"SELECT p.ID FROM {$wpdb->posts} p
+		"SELECT p.ID FROM {$wpdb->posts} p // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		 INNER JOIN {$wpdb->postmeta} pm
 		   ON p.ID = pm.post_id AND pm.meta_key = %s AND pm.meta_value = %s
 		 WHERE p.post_type = %s",
@@ -54,7 +56,7 @@ $post_ids = $wpdb->get_col(
 	)
 );
 
-foreach ( $post_ids as $post_id ) {
+foreach ( $post_ids as $post_id ) { // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 	wp_delete_post( (int) $post_id, true );
 }
 
@@ -72,8 +74,9 @@ foreach ( $post_ids as $post_id ) {
 /* ── 4. Delete all pr_core_ prefixed options ──────────────────────────── */
 
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.NoCaching
 $wpdb->query(
-	"DELETE FROM {$wpdb->options} WHERE option_name LIKE 'pr\_core\_%'"
+	"DELETE FROM {$wpdb->options} WHERE option_name LIKE 'pr\_core\_%'" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 );
 
 /* ── 4b. Delete v0.6.0 schema-input meta keys from all peptide posts ──── */
@@ -85,19 +88,19 @@ $wpdb->query(
  *
  * @see ARCHITECTURE.md — §2.9 Uninstall specification.
  */
-$schema_meta_keys = [
+$schema_meta_keys = array(
 	'_pr_molecular_formula',
 	'_pr_molecular_weight',
 	'_pr_aliases',
 	'_pr_faq_items',
-];
+);
 
 foreach ( $schema_meta_keys as $meta_key ) {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 	$wpdb->delete(
 		$wpdb->postmeta,
-		[ 'meta_key' => $meta_key ],
-		[ '%s' ]
+		array( 'meta_key' => $meta_key ),
+		array( '%s' )
 	);
 }
 
@@ -106,7 +109,7 @@ foreach ( $schema_meta_keys as $meta_key ) {
 $editable_roles = wp_roles()->roles;
 
 foreach ( array_keys( $editable_roles ) as $role_name ) {
-	$role = get_role( $role_name );
+	$role = get_role( $role_name ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 	if ( $role && $role->has_cap( 'manage_peptide_content' ) ) {
 		$role->remove_cap( 'manage_peptide_content' );
 	}

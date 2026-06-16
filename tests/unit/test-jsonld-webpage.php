@@ -21,7 +21,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../bootstrap.php';
 
-// ── Additional stubs ─────────────────────────────────────────────────────
+// ── Additional stubs ─────────────────────────────────────────────────────.
 
 if ( ! defined( 'PR_CORE_TARGET_SCHEMA_VERSION' ) ) {
 	define( 'PR_CORE_TARGET_SCHEMA_VERSION', 4 );
@@ -81,7 +81,7 @@ echo "== JSON-LD WebPage v0.6.1 regression tests ==\n\n";
 
 $enricher = new PR_Core_Jsonld_Webpage();
 
-// ── retype_to_medical_webpage: array input, non-peptide singular ──────────
+// ── retype_to_medical_webpage: array input, non-peptide singular ──────────.
 
 echo "retype_to_medical_webpage — array input:\n";
 
@@ -106,7 +106,7 @@ $GLOBALS['pr_test_singular_type'] = '';
 $result = $enricher->retype_to_medical_webpage( 'CollectionPage' );
 pr_assert_equals( 'CollectionPage', $result, 'non-singular string: passes through unchanged' );
 
-// ── enrich_webpage_piece: @type as array injects enrichments ─────────────
+// ── enrich_webpage_piece: @type as array injects enrichments ─────────────.
 
 echo "\nenrich_webpage_piece — @type as array:\n";
 
@@ -160,6 +160,6 @@ $graph_non_peptide = [
 $result_non_peptide = $enricher->enrich_webpage_piece( $graph_non_peptide, new stdClass() );
 pr_assert( ! isset( $result_non_peptide[0]['lastReviewed'] ), 'non-peptide: lastReviewed NOT injected' );
 
-// ── Summary ──────────────────────────────────────────────────────────────
+// ── Summary ──────────────────────────────────────────────────────────────.
 
 exit( pr_test_summary() );

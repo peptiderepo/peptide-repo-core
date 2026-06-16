@@ -1,5 +1,17 @@
 <?php
+/**
+ * Repo Daily Cpt.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Defines the `repo_daily` CPT for articles, guides, comparisons, and news
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Registers the repo_daily custom post type for editorial publications.
@@ -18,7 +30,11 @@ declare(strict_types=1);
  */
 class PR_Core_Repo_Daily_CPT {
 
-	/** @var string Post type slug (repo_daily). */
+	/**
+	 * Post type slug (repo_daily).
+	 *
+	 * @var string Post type slug (repo_daily).
+	 */
 	public const POST_TYPE = 'repo_daily';
 
 	/**
@@ -27,7 +43,7 @@ class PR_Core_Repo_Daily_CPT {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'init', [ __CLASS__, 'register_post_type' ] );
+		add_action( 'init', array( __CLASS__, 'register_post_type' ) );
 	}
 
 	/**
@@ -42,7 +58,7 @@ class PR_Core_Repo_Daily_CPT {
 			return;
 		}
 
-		$labels = [
+		$labels = array(
 			'name'               => __( 'Repo Daily', 'peptide-repo-core' ),
 			'singular_name'      => __( 'Repo Daily', 'peptide-repo-core' ),
 			'add_new_item'       => __( 'Add New Article', 'peptide-repo-core' ),
@@ -54,9 +70,9 @@ class PR_Core_Repo_Daily_CPT {
 			'not_found_in_trash' => __( 'No articles found in trash', 'peptide-repo-core' ),
 			'all_items'          => __( 'All Articles', 'peptide-repo-core' ),
 			'menu_name'          => __( 'Repo Daily', 'peptide-repo-core' ),
-		];
+		);
 
-		$args = [
+		$args = array(
 			'labels'             => $labels,
 			'public'             => true,
 			'publicly_queryable' => true,
@@ -71,9 +87,12 @@ class PR_Core_Repo_Daily_CPT {
 			'map_meta_cap'       => true,
 			'hierarchical'       => false,
 			'has_archive'        => true,
-			'rewrite'            => [ 'slug' => 'daily', 'with_front' => false ],
-			'supports'           => [ 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields' ],
-		];
+			'rewrite'            => array(
+				'slug'       => 'daily',
+				'with_front' => false,
+			),
+			'supports'           => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields' ),
+		);
 
 		register_post_type( self::POST_TYPE, $args );
 	}

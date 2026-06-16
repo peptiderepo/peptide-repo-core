@@ -1,5 +1,17 @@
 <?php
+/**
+ * Deactivator.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Flushes rewrite rules on deactivation (data preserved)
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Plugin deactivation handler.

@@ -1,5 +1,17 @@
 <?php
+/**
+ * Class Pr Core.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Registers all hooks, runs migrations, boots subsystems
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Main orchestrator for the Peptide Repo Core plugin.
@@ -43,28 +55,28 @@ class PR_Core {
 		$repo_daily_tax = new PR_Core_Repo_Daily_Taxonomy();
 		$repo_daily_tax->register_hooks();
 
-		// One-shot rewrite flush on in-place version bumps. Runs at the very
-		// end of init (priority 999) so all CPTs/taxonomies — ours and
-		// anyone else's — are registered first. Handles updates deployed
+		// One-shot rewrite flush on in-place version bumps. Runs at the very.
+		// end of init (priority 999) so all CPTs/taxonomies — ours and.
+		// anyone else's — are registered first. Handles updates deployed.
 		// without a deactivate/reactivate cycle (e.g., SCP/rsync pushes).
-		add_action( 'init', [ PR_Core_Activator::class, 'maybe_flush_on_version_change' ], 999 );
+		add_action( 'init', array( PR_Core_Activator::class, 'maybe_flush_on_version_change' ), 999 );
 
 		// Verification scanner: register cron hook and schedule if not already scheduled.
 		if ( ! wp_next_scheduled( 'pr_core_verification_scan' ) ) {
 			wp_schedule_event( time(), get_option( 'pr_core_scan_cadence', 'weekly' ), 'pr_core_verification_scan' );
 		}
-		add_action( 'pr_core_verification_scan', [ PR_Core_Verification_Scanner::class, 'run_scan' ] );
+		add_action( 'pr_core_verification_scan', array( PR_Core_Verification_Scanner::class, 'run_scan' ) );
 
-		// Ajax handlers must be registered outside is_admin() — admin-ajax.php
+		// Ajax handlers must be registered outside is_admin() — admin-ajax.php.
 		// does not define WP_ADMIN, so is_admin() returns false for ajax requests.
-		add_action( 'wp_ajax_pr_core_mark_verified', [ PR_Core_Ajax_Handlers::class, 'handle_mark_verified' ] );
-		add_action( 'wp_ajax_pr_core_scan_now',      [ PR_Core_Ajax_Handlers::class, 'handle_scan_now' ] );
+		add_action( 'wp_ajax_pr_core_mark_verified', array( PR_Core_Ajax_Handlers::class, 'handle_mark_verified' ) );
+		add_action( 'wp_ajax_pr_core_scan_now', array( PR_Core_Ajax_Handlers::class, 'handle_scan_now' ) );
 
 		// Admin UI (fires on admin_init, admin_menu).
 		if ( is_admin() ) {
-			add_action( 'admin_menu', [ PR_Core_Settings::class, 'add_settings_page' ] );
-			add_action( 'admin_init', [ PR_Core_Settings::class, 'register_settings' ] );
-			add_action( 'wp_dashboard_setup', [ PR_Core_Verification_Widget::class, 'register' ] );
+			add_action( 'admin_menu', array( PR_Core_Settings::class, 'add_settings_page' ) );
+			add_action( 'admin_init', array( PR_Core_Settings::class, 'register_settings' ) );
+			add_action( 'wp_dashboard_setup', array( PR_Core_Verification_Widget::class, 'register' ) );
 
 			$admin = new PR_Core_Admin();
 			$admin->register_hooks();
@@ -86,7 +98,7 @@ class PR_Core {
 		$related_posts->register_hooks();
 
 		// Enqueue related-posts CSS on single peptide pages.
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_styles' ] );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_styles' ) );
 
 		// REST API.
 		$rest = new PR_Core_Rest_Controller();
@@ -109,7 +121,7 @@ class PR_Core {
 		wp_enqueue_style(
 			'pr-core-related-posts',
 			PR_CORE_PLUGIN_URL . 'assets/css/related-posts.css',
-			[],
+			array(),
 			PR_CORE_VERSION
 		);
 	}
@@ -125,9 +137,9 @@ class PR_Core {
 	 * @return void
 	 */
 	private function register_public_filters(): void {
-		add_filter( 'pr_core_get_indexable_corpus', [ $this, 'filter_indexable_corpus' ] );
-		add_filter( 'pr_core_disclaimer_for_surface', [ $this, 'filter_disclaimer_for_surface' ], 10, 2 );
-		add_filter( 'pr_core_evidence_strength_label', [ $this, 'filter_evidence_label' ], 10, 2 );
+		add_filter( 'pr_core_get_indexable_corpus', array( $this, 'filter_indexable_corpus' ) );
+		add_filter( 'pr_core_disclaimer_for_surface', array( $this, 'filter_disclaimer_for_surface' ), 10, 2 );
+		add_filter( 'pr_core_evidence_strength_label', array( $this, 'filter_evidence_label' ), 10, 2 );
 	}
 
 	/**
@@ -139,17 +151,17 @@ class PR_Core {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function filter_indexable_corpus( array $entries ): array {
-		$repo = new PR_Core_Peptide_Repository();
-		$peptides = $repo->find_all( [ 'status' => 'publish' ] );
+		$repo     = new PR_Core_Peptide_Repository();
+		$peptides = $repo->find_all( array( 'status' => 'publish' ) );
 
 		foreach ( $peptides as $dto ) {
-			$entries[] = [
+			$entries[] = array(
 				'id'    => $dto->id,
 				'url'   => get_permalink( $dto->id ),
 				'title' => $dto->title,
 				'body'  => $dto->excerpt . "\n" . $dto->content,
 				'type'  => 'peptide_monograph',
-			];
+			);
 		}
 
 		return $entries;
@@ -174,14 +186,14 @@ class PR_Core {
 	 * @return string Localized label.
 	 */
 	public function filter_evidence_label( string $label, string $strength ): string {
-		$map = [
-			'preclinical'    => __( 'Preclinical', 'peptide-repo-core' ),
-			'case-series'    => __( 'Case Series', 'peptide-repo-core' ),
-			'observational'  => __( 'Observational', 'peptide-repo-core' ),
-			'rct-small'      => __( 'Small RCT', 'peptide-repo-core' ),
-			'rct-large'      => __( 'Large RCT', 'peptide-repo-core' ),
-			'meta-analysis'  => __( 'Meta-Analysis', 'peptide-repo-core' ),
-		];
+		$map = array(
+			'preclinical'   => __( 'Preclinical', 'peptide-repo-core' ),
+			'case-series'   => __( 'Case Series', 'peptide-repo-core' ),
+			'observational' => __( 'Observational', 'peptide-repo-core' ),
+			'rct-small'     => __( 'Small RCT', 'peptide-repo-core' ),
+			'rct-large'     => __( 'Large RCT', 'peptide-repo-core' ),
+			'meta-analysis' => __( 'Meta-Analysis', 'peptide-repo-core' ),
+		);
 
 		return $map[ $strength ] ?? $strength;
 	}

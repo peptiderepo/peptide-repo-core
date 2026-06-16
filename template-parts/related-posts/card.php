@@ -1,5 +1,11 @@
 <?php
 /**
+ * Part of the Peptide Repo Core plugin.
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Related posts card template part.
  *
  * Variables:
@@ -12,7 +18,7 @@ if ( ! isset( $args['post'] ) ) {
 	return;
 }
 
-$post = $args['post'];
+$post = $args['post']; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 ?>
 <article class="pr-related-posts__card">
 	<?php
@@ -24,11 +30,11 @@ $post = $args['post'];
 				get_the_post_thumbnail(
 					$post,
 					'post-thumbnail',
-					[
+					array(
 						'class'    => 'pr-related-posts__image-element',
 						'loading'  => 'lazy',
 						'decoding' => 'async',
-					]
+					)
 				)
 			);
 			?>

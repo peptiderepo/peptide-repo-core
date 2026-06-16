@@ -1,5 +1,17 @@
 <?php
+/**
+ * Topic Taxonomy.
+ *
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
+
+/**
+ * Defines the `peptide_topic` taxonomy attached to the post CPT
+ *
+ * @package Peptide_Repo_Core
+ */
 
 /**
  * Registers the peptide_topic taxonomy for linking blog posts to peptides.
@@ -18,7 +30,11 @@ declare(strict_types=1);
  */
 class PR_Core_Topic_Taxonomy {
 
-	/** @var string Taxonomy: topic (links blog posts to peptides by slug). */
+	/**
+	 * Taxonomy: topic (links blog posts to peptides by slug).
+	 *
+	 * @var string Taxonomy: topic (links blog posts to peptides by slug).
+	 */
 	public const TAX_TOPIC = 'peptide_topic';
 
 	/**
@@ -27,7 +43,7 @@ class PR_Core_Topic_Taxonomy {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'init', [ __CLASS__, 'register_topic_taxonomy' ] );
+		add_action( 'init', array( __CLASS__, 'register_topic_taxonomy' ) );
 	}
 
 	/**
@@ -45,18 +61,25 @@ class PR_Core_Topic_Taxonomy {
 			return;
 		}
 
-		register_taxonomy( self::TAX_TOPIC, 'post', [
-			'labels'             => [
-				'name'          => __( 'Peptide Topics', 'peptide-repo-core' ),
-				'singular_name' => __( 'Peptide Topic', 'peptide-repo-core' ),
-			],
-			'public'             => true,
-			'publicly_queryable' => true,
-			'show_in_rest'       => true,
-			'show_ui'            => true,
-			'show_admin_column'  => true,
-			'hierarchical'       => false,
-			'rewrite'            => [ 'slug' => 'peptide-topic', 'with_front' => false ],
-		] );
+		register_taxonomy(
+			self::TAX_TOPIC,
+			'post',
+			array(
+				'labels'             => array(
+					'name'          => __( 'Peptide Topics', 'peptide-repo-core' ),
+					'singular_name' => __( 'Peptide Topic', 'peptide-repo-core' ),
+				),
+				'public'             => true,
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
+				'show_ui'            => true,
+				'show_admin_column'  => true,
+				'hierarchical'       => false,
+				'rewrite'            => array(
+					'slug'       => 'peptide-topic',
+					'with_front' => false,
+				),
+			)
+		);
 	}
 }
