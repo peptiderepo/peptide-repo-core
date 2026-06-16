@@ -249,7 +249,7 @@ class PR_Core_Peptide_Metaboxes {
 				continue;
 			}
 
-			$raw   = wp_unslash( $_POST[ $input_key ] );
+			$raw   = wp_unslash( $_POST[ $input_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized via config['sanitize'] callback on next line
 			$clean = is_callable( $config['sanitize'] )
 				? call_user_func( $config['sanitize'], $raw )
 				: sanitize_text_field( (string) $raw );

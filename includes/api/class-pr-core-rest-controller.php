@@ -34,7 +34,7 @@ declare(strict_types=1);
  */
 class PR_Core_Rest_Controller {
 
-	/** @var string REST namespace. */
+	/** @var string REST namespace. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const REST_NAMESPACE = 'pr-core/v1';
 
 	/**

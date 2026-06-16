@@ -36,16 +36,16 @@ declare(strict_types=1);
  */
 class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 
-	/** @var string Meta key: molecular formula (PR Core namespace). */
+	/** @var string Meta key: molecular formula (PR Core namespace). */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	public const META_FORMULA = '_pr_molecular_formula';
 
-	/** @var string Meta key: molecular weight as float string (PR Core namespace). */
+	/** @var string Meta key: molecular weight as float string (PR Core namespace). */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	public const META_WEIGHT = '_pr_molecular_weight';
 
-	/** @var string Meta key: aliases JSON array (PR Core namespace). */
+	/** @var string Meta key: aliases JSON array (PR Core namespace). */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	public const META_ALIASES = '_pr_aliases';
 
-	/** @var PR_Core_Pubchem_Client HTTP client for PubChem REST API. */
+	/** @var PR_Core_Pubchem_Client HTTP client for PubChem REST API. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private PR_Core_Pubchem_Client $pubchem;
 
 	/**

@@ -19,25 +19,25 @@ declare(strict_types=1);
  */
 class PR_Core_Settings {
 
-	/** @var string Option group shared by all PR Core settings. */
+	/** @var string Option group shared by all PR Core settings. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	public const OPTION_GROUP = 'pr_core_settings';
 
-	/** @var string Option key: enable/disable related articles. */
+	/** @var string Option key: enable/disable related articles. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const RELATED_ENABLED = 'pr_core_related_posts_enabled';
 
-	/** @var string Option key: related articles limit (1-6). */
+	/** @var string Option key: related articles limit (1-6). */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const RELATED_LIMIT = 'pr_core_related_posts_limit';
 
-	/** @var string Option key: WP-cron scan cadence. */
+	/** @var string Option key: WP-cron scan cadence. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const SCAN_CADENCE = 'pr_core_scan_cadence';
 
-	/** @var string Option key: default staleness threshold in days. */
+	/** @var string Option key: default staleness threshold in days. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const DEFAULT_THRESHOLD = 'pr_core_default_threshold';
 
-	/** @var string Option key: high-velocity staleness threshold in days. */
+	/** @var string Option key: high-velocity staleness threshold in days. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const HIGH_VELOCITY_THRESHOLD = 'pr_core_high_velocity_threshold';
 
-	/** @var string Option key: comma-separated notification email list. */
+	/** @var string Option key: comma-separated notification email list. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	private const VERIFICATION_EMAIL = 'pr_core_verification_email';
 
 	/**
