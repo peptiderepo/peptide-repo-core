@@ -2,13 +2,18 @@
 declare(strict_types=1);
 
 /**
+ * Defines the contract for retrieving posts related to a given peptide
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Interface for fetching related posts for a peptide.
  *
  * What: Defines the contract for retrieving posts related to a given peptide.
  * Who calls it: PR_Core_Related_Posts_Section uses implementations to fetch related articles.
  * Dependencies: None.
  *
- * @package Peptide_Repo_Core
  */
 interface PR_Core_Related_Posts_Provider {
 

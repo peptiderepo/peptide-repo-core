@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Implements PR_Core_Related_Posts_Provider by querying posts tagged
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Fetches posts related to a peptide via taxonomy and fallback text search.
  *
  * What: Implements PR_Core_Related_Posts_Provider by querying posts tagged
@@ -13,7 +19,6 @@ declare(strict_types=1);
  *
  * @see includes/interfaces/interface-related-posts-provider.php
  * @see includes/core/class-related-posts-section.php
- * @package Peptide_Repo_Core
  */
 class PR_Core_Internal_Posts_Provider implements PR_Core_Related_Posts_Provider {
 

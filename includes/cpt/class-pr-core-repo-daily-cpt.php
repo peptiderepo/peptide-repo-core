@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Defines the `repo_daily` CPT for articles, guides, comparisons, and news
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Registers the repo_daily custom post type for editorial publications.
  *
  * What: Defines the `repo_daily` CPT for articles, guides, comparisons, and news
@@ -15,7 +21,6 @@ declare(strict_types=1);
  *
  * @see ARCHITECTURE.md — Repo Daily type specification.
  * @see CONVENTIONS.md — CPT ownership and extension patterns.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Repo_Daily_CPT {
 

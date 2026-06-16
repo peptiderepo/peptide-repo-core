@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * WordPress dashboard widget showing peptides needing review (due/overdue)
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Dashboard widget for verification status overview.
  *
  * What: WordPress dashboard widget showing peptides needing review (due/overdue).
@@ -9,7 +15,6 @@ declare(strict_types=1);
  * Dependencies: PR_Core_Peptide_Repository.
  *
  * @see scanner/class-pr-core-verification-scanner.php — Computes status via run_scan().
- * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Widget {
 

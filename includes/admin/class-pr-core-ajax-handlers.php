@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Handles mark-verified and scan-now admin-ajax actions
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * AJAX handlers for verification scanner actions.
  *
  * What: Handles mark-verified and scan-now admin-ajax actions.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-peptide-metaboxes.php — "Mark verified today" button in sidebar.
  * @see admin/class-pr-core-verification-widget.php — "Scan now" button in dashboard widget.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Ajax_Handlers {
 

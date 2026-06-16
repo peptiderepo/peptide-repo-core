@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Provides hard-coded peptide, dosing, and legal data used by PR_Core_Seed_Data
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Static seed data fixtures for development and testing.
  *
  * What: Provides hard-coded peptide, dosing, and legal data used by PR_Core_Seed_Data.
@@ -9,7 +15,6 @@ declare(strict_types=1);
  * Dependencies: None.
  *
  * @see class-pr-core-seed-data.php — Orchestrator that consumes these fixtures.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Seed_Fixtures {
 

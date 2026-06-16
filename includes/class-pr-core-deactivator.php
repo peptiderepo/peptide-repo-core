@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Flushes rewrite rules on deactivation (data preserved)
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Plugin deactivation handler.
  *
  * What: Flushes rewrite rules on deactivation (data preserved).
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see peptide-repo-core.php — Registers this class on deactivation.
  * @see uninstall.php         — Full data teardown happens on uninstall, not deactivation.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Deactivator {
 

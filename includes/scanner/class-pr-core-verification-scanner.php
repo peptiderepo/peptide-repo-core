@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Runs periodic scans of all published peptides, computes verification status
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Verification scanner for peptide monographs.
  *
  * What: Runs periodic scans of all published peptides, computes verification status
@@ -11,7 +17,6 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-settings.php — Cadence and threshold settings.
  * @see cpt/class-pr-core-peptide-cpt.php — Verification meta field specs.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Scanner {
 

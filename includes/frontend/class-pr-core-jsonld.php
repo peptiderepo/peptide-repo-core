@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Integrates Drug, MedicalWebPage, and FAQPage schema into Yoast's graph
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * JSON-LD / schema.org structured data emission for peptide pages.
  *
  * What: Integrates Drug, MedicalWebPage, and FAQPage schema into Yoast's graph
@@ -32,7 +38,6 @@ declare(strict_types=1);
  * @see frontend/class-pr-core-jsonld-webpage.php — MedicalWebPage enrichment.
  * @see frontend/class-pr-core-jsonld-faq.php     — FAQPage piece builder.
  * @see ARCHITECTURE.md                           — §2.7 JSON-LD output.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Jsonld {
 

@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Renders a review screen for AI-extracted dosing candidates
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Admin page for the AI Candidate Queue.
  *
  * What: Renders a review screen for AI-extracted dosing candidates.
@@ -12,7 +18,6 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-admin.php                              — Menu registration.
  * @see repositories/class-pr-core-candidate-queue-repository.php  — Data layer.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Candidate_Queue_Page {
 
@@ -59,8 +64,8 @@ class PR_Core_Candidate_Queue_Page {
 			$peptide = $pep_repo->find_by_id( $c->peptide_id );
 			$name    = $peptide ? $peptide->title : '#' . $c->peptide_id;
 
-			$dose = $c->dose_min !== null ? number_format( $c->dose_min, 2 ) : '?';
-			if ( $c->dose_max !== null && $c->dose_max !== $c->dose_min ) {
+			$dose = null !== $c->dose_min ? number_format( $c->dose_min, 2 ) : '?';
+			if ( null !== $c->dose_max && $c->dose_max !== $c->dose_min ) {
 				$dose .= ' – ' . number_format( $c->dose_max, 2 );
 			}
 			$dose .= ' ' . esc_html( $c->dose_unit );
@@ -95,7 +100,7 @@ class PR_Core_Candidate_Queue_Page {
 			printf( '<td>%s</td>', esc_html( $c->route ) );
 			printf( '<td>%s</td>', esc_html( $dose ) );
 			printf( '<td>%s</td>', esc_html( $c->population ) );
-			printf( '<td>%s</td>', $study ); // Contains escaped HTML + link.
+			printf( '<td>%s</td>', $study ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $study is pre-escaped HTML.
 			printf( '<td>%s</td>', esc_html( $confidence_pct ) );
 			printf(
 				'<td><a href="%s" class="button button-primary button-small">%s</a> <a href="%s" class="button button-small">%s</a></td>',
@@ -118,7 +123,7 @@ class PR_Core_Candidate_Queue_Page {
 	 * @return void
 	 */
 	private function handle_actions(): void {
-		$action = sanitize_text_field( $_GET['action'] ?? '' );
+		$action = sanitize_text_field( wp_unslash( $_GET['action'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 
 		if ( ! in_array( $action, array( 'pr_core_approve', 'pr_core_reject' ), true ) ) {
 			return;
@@ -128,7 +133,7 @@ class PR_Core_Candidate_Queue_Page {
 			return;
 		}
 
-		$candidate_id = absint( $_GET['candidate_id'] ?? 0 );
+		$candidate_id = absint( wp_unslash( $_GET['candidate_id'] ?? 0 ) );
 		if ( 0 === $candidate_id ) {
 			return;
 		}

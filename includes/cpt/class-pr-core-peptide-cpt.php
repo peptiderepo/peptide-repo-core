@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Defines peptide CPT with REST support, archive, and meta fields
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Registers the peptide custom post type and associated taxonomy.
  *
  * What: Defines peptide CPT with REST support, archive, and meta fields.
@@ -14,7 +20,6 @@ declare(strict_types=1);
  *
  * @see ARCHITECTURE.md
  * @see CONVENTIONS.md
- * @package Peptide_Repo_Core
  */
 class PR_Core_Peptide_CPT {
 

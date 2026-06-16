@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Appends last-verified date after verdict card on reader-facing pages
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Frontend verification date display on peptide single pages.
  *
  * What: Appends last-verified date after verdict card on reader-facing pages.
@@ -9,7 +15,6 @@ declare(strict_types=1);
  * Dependencies: None (hooked via the_content).
  *
  * @see includes/class-pr-core.php — Registers the_content hook.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Display {
 

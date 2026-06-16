@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Hooks into Yoast's wpseo_schema_webpage_type filter to retype the page
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Enriches Yoast's WebPage node to MedicalWebPage for peptide single pages.
  *
  * What: Hooks into Yoast's wpseo_schema_webpage_type filter to retype the page
@@ -13,7 +19,6 @@ declare(strict_types=1);
  *
  * @see frontend/class-pr-core-jsonld.php — Parent orchestrator.
  * @see ARCHITECTURE.md                   — §2.7 JSON-LD output, Yoast integration contract.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Jsonld_Webpage {
 

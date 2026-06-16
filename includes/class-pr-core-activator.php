@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Runs migrations, adds capabilities, flushes rewrite rules
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Plugin activation handler.
  *
  * What: Runs migrations, adds capabilities, flushes rewrite rules.
@@ -14,7 +20,6 @@ declare(strict_types=1);
  *
  * @see peptide-repo-core.php — Registers this class on activation.
  * @see includes/class-pr-core.php — Wires the init:999 version-change handler.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Activator {
 

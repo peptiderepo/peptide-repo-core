@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Renders and saves two meta fields on the repo_daily edit screen
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Meta boxes for Repo Daily edit screen: author and clinical review flag.
  *
  * What: Renders and saves two meta fields on the repo_daily edit screen.
@@ -14,7 +20,6 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-admin.php — Registers these hooks.
  * @see cpt/class-pr-core-repo-daily-cpt.php — CPT definition.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Repo_Daily_Metaboxes {
 

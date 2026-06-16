@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Defines the `repo_daily_category` taxonomy attached to repo_daily CPT
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Registers the repo_daily_category taxonomy for Repo Daily articles.
  *
  * What: Defines the `repo_daily_category` taxonomy attached to repo_daily CPT.
@@ -14,7 +20,6 @@ declare(strict_types=1);
  *
  * @see ARCHITECTURE.md — Content type taxonomy specification.
  * @see CONVENTIONS.md — Taxonomy ownership pattern.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Repo_Daily_Taxonomy {
 

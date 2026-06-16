@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Adds evidence strength, editorial status, and dosing count columns
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Custom admin list-table columns for the peptide CPT.
  *
  * What: Adds evidence strength, editorial status, and dosing count columns.
@@ -9,7 +15,6 @@ declare(strict_types=1);
  * Dependencies: PR_Core_Dosing_Repository for row counts.
  *
  * @see admin/class-pr-core-admin.php — Registers column hooks.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Admin_Columns {
 

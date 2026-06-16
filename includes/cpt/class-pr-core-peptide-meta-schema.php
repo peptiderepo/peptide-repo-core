@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Returns the complete meta field definition map used by PR_Core_Peptide_CPT
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Meta field schema definitions for the peptide CPT.
  *
  * What: Returns the complete meta field definition map used by PR_Core_Peptide_CPT.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *               PR_Core_Verification_Sanitizers.
  *
  * @see cpt/class-pr-core-peptide-cpt.php — Consumer of this schema.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Peptide_Meta_Schema {
 

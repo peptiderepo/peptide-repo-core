@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Hooks into pr_core_after_peptide_content and renders a card grid
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Renders the related articles section on peptide single pages.
  *
  * What: Hooks into pr_core_after_peptide_content and renders a card grid
@@ -13,7 +19,6 @@ declare(strict_types=1);
  * - pr_core_related_posts_enabled (bool, default true)
  * - pr_core_related_posts_limit (int, default 3, range 1-6)
  *
- * @package Peptide_Repo_Core
  */
 class PR_Core_Related_Posts_Section {
 

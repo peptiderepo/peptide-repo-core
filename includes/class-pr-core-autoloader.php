@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Resolves PR_Core_ class names to file paths under includes/
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * SPL autoloader for PR_Core_ prefixed classes.
  *
  * What: Resolves PR_Core_ class names to file paths under includes/.
@@ -12,7 +18,6 @@ declare(strict_types=1);
  * Scans includes/ and all immediate subdirectories.
  *
  * @see peptide-repo-core.php — Registers this autoloader at boot.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Autoloader {
 

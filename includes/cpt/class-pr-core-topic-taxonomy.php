@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Defines the `peptide_topic` taxonomy attached to the post CPT
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Registers the peptide_topic taxonomy for linking blog posts to peptides.
  *
  * What: Defines the `peptide_topic` taxonomy attached to the post CPT.
@@ -15,7 +21,6 @@ declare(strict_types=1);
  *
  * @see ARCHITECTURE.md — Taxonomy specification.
  * @see CONVENTIONS.md — Taxonomy ownership rule.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Topic_Taxonomy {
 

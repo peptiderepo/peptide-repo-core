@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Creates 3 peptide posts, 10 dosing rows, and 5 legal cells using fixture data
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Seed data orchestrator for development and testing.
  *
  * What: Creates 3 peptide posts, 10 dosing rows, and 5 legal cells using fixture data.
@@ -11,7 +17,6 @@ declare(strict_types=1);
  *
  * @see class-pr-core-seed-fixtures.php — Static fixture data arrays.
  * @see ARCHITECTURE.md — Seed data specification.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Seed_Data {
 

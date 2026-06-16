@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * CRUD operations over peptide posts, returning typed DTOs
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Repository for peptide CPT records.
  *
  * What: CRUD operations over peptide posts, returning typed DTOs.
@@ -11,7 +17,6 @@ declare(strict_types=1);
  * @see dto/class-pr-core-peptide-dto.php         — Return type.
  * @see cpt/class-pr-core-peptide-cpt.php         — CPT and meta registration.
  * @see repositories/class-pr-core-dosing-repository.php — Related dosing data.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Peptide_Repository {
 

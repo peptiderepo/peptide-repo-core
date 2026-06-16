@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Immutable value object wrapping a peptide post + its meta fields
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Typed data-transfer object for a peptide record.
  *
  * What: Immutable value object wrapping a peptide post + its meta fields.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see cpt/class-pr-core-peptide-cpt.php       — Meta field definitions.
  * @see repositories/class-pr-core-peptide-repository.php — Creates these from WP_Post.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Peptide_DTO {
 

@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Creates the high-cardinality dosing data table (1:many with peptide)
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Migration 0001: Create the pr_dosing_rows table.
  *
  * What: Creates the high-cardinality dosing data table (1:many with peptide).
@@ -9,7 +15,6 @@ declare(strict_types=1);
  * Dependencies: WordPress $wpdb, dbDelta().
  *
  * @see ARCHITECTURE.md — Table schema specification.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_0001_Dosing_Rows {
 

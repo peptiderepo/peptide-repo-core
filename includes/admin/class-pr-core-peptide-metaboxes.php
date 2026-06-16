@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Renders and saves three meta boxes on the peptide edit screen
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Meta boxes for the peptide edit screen: scientific identifiers, dosing, and legal.
  *
  * What: Renders and saves three meta boxes on the peptide edit screen.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-admin.php — Registers these hooks.
  * @see cpt/class-pr-core-peptide-cpt.php — Meta field definitions.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Peptide_Metaboxes {
 

@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Registers all hooks, runs migrations, boots subsystems
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Main orchestrator for the Peptide Repo Core plugin.
  *
  * What: Registers all hooks, runs migrations, boots subsystems.
@@ -12,7 +18,6 @@ declare(strict_types=1);
  *
  * @see peptide-repo-core.php — Bootstrap that instantiates this class.
  * @see ARCHITECTURE.md    — Full data flow diagram.
- * @package Peptide_Repo_Core
  */
 class PR_Core {
 

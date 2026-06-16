@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Fetches molecular formula, molecular weight, and synonyms from the
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Lightweight PubChem REST client for the backfill migration.
  *
  * What: Fetches molecular formula, molecular weight, and synonyms from the
@@ -17,7 +23,6 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0004-backfill-peptide-meta.php — Caller.
  * @see ARCHITECTURE.md — §v0.6.0 schema sprint.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Pubchem_Client {
 

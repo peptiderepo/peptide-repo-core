@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Creates the per-country legal status table (1:many with peptide)
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Migration 0002: Create the pr_legal_cells table.
  *
  * What: Creates the per-country legal status table (1:many with peptide).
@@ -11,7 +17,6 @@ declare(strict_types=1);
  * Uniqueness: only one active cell per peptide x country (superseded_by_id NULL).
  *
  * @see ARCHITECTURE.md — Table schema specification.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_0002_Legal_Cells {
 

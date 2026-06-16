@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Immutable value object wrapping a row from pr_ai_candidate_queue
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Typed data-transfer object for an AI candidate queue entry.
  *
  * What: Immutable value object wrapping a row from pr_ai_candidate_queue.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0003-candidate-queue.php — Table schema.
  * @see repositories/class-pr-core-candidate-queue-repository.php   — Creates these.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Candidate_DTO {
 

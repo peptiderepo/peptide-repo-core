@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Exposes peptides, dosing rows, and legal cells via REST endpoints
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * REST API controller for peptide data (read-only public, write requires capability).
  *
  * What: Exposes peptides, dosing rows, and legal cells via REST endpoints.
@@ -19,7 +25,6 @@ declare(strict_types=1);
  *   POST /peptides/{id}/legal               — Add legal cell (auth)
  *
  * @see ARCHITECTURE.md — REST API specification.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Rest_Controller {
 

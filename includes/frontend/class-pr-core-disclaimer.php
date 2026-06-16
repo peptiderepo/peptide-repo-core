@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Provides shortcode [pr_disclaimer surface="dosing"] and function
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Shared disclaimer component for all peptide data surfaces.
  *
  * What: Provides shortcode [pr_disclaimer surface="dosing"] and function
@@ -14,7 +20,6 @@ declare(strict_types=1);
  * not once per consumer plugin.
  *
  * @see ARCHITECTURE.md — Section 2.8 Shared Disclaimer Component.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Disclaimer {
 

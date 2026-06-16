@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Assembles a Drug (+ MolecularEntity) schema node from peptide DTO
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Builds the schema.org Drug graph piece for a peptide page.
  *
  * What: Assembles a Drug (+ MolecularEntity) schema node from peptide DTO
@@ -14,7 +20,6 @@ declare(strict_types=1);
  *
  * @see frontend/class-pr-core-jsonld.php — Orchestrator that calls this builder.
  * @see ARCHITECTURE.md                   — §2.7 JSON-LD output.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Jsonld_Drug {
 

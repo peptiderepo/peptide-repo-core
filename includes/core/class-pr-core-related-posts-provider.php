@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Interface defining the get_posts() contract for related-post providers
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Contract for any provider that retrieves posts related to a peptide.
  *
  * What: Interface defining the get_posts() contract for related-post providers.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see includes/core/class-pr-core-internal-posts-provider.php — default implementation.
  * @see includes/core/class-pr-core-related-posts-section.php   — consumer.
- * @package Peptide_Repo_Core
  */
 interface PR_Core_Related_Posts_Provider {
 

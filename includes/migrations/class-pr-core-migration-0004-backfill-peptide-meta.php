@@ -1,4 +1,5 @@
 <?php
+/** @package Peptide_Repo_Core */
 declare(strict_types=1);
 
 /**
@@ -27,7 +28,6 @@ declare(strict_types=1);
  * @see ARCHITECTURE.md     — §v0.6.0 schema sprint.
  * @see CONVENTIONS.md      — How To: Add a New Migration.
  * @see class-pr-core-pubchem-client.php — HTTP client for PubChem REST.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 

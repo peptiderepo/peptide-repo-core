@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Compares current schema version against target, runs pending migrations
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Schema migration runner.
  *
  * What: Compares current schema version against target, runs pending migrations.
@@ -13,7 +19,6 @@ declare(strict_types=1);
  *
  * @see peptide-repo-core.php — Defines PR_CORE_TARGET_SCHEMA_VERSION.
  * @see CONVENTIONS.md        — "How To: Add a New Migration".
- * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_Runner {
 

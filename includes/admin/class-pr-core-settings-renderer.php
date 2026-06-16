@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Static methods that output HTML for each settings field on the PR Core settings page
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Render methods for the PR Core settings admin page.
  *
  * What: Static methods that output HTML for each settings field on the PR Core settings page.
@@ -9,7 +15,6 @@ declare(strict_types=1);
  * Dependencies: PR_Core_Settings (for option key constants).
  *
  * @see admin/class-pr-core-settings.php — Settings registration and sanitization.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Settings_Renderer {
 

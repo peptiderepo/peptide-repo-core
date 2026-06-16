@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Static admin settings class
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Settings page for PR Core plugin configuration.
  *
  * What: Static admin settings class. Registers and renders the PR Core settings
@@ -10,7 +16,6 @@ declare(strict_types=1);
  * Dependencies: PR_Core_Peptide_CPT (for CAPABILITY constant).
  *
  * @see class-pr-core.php — Registers admin_menu + admin_init hooks pointing here.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Settings {
 

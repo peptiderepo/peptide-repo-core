@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Static sanitizer methods for _pr_molecular_formula, _pr_molecular_weight,
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Sanitizers for v0.6.0 schema-input meta fields.
  *
  * What: Static sanitizer methods for _pr_molecular_formula, _pr_molecular_weight,
@@ -14,7 +20,6 @@ declare(strict_types=1);
  *
  * @see cpt/class-pr-core-peptide-cpt.php — Meta field registration.
  * @see ARCHITECTURE.md                   — §v0.6.0 schema sprint.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Schema_Sanitizers {
 

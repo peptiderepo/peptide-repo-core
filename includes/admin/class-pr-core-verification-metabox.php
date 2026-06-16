@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Renders and saves verification status sidebar meta box
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Verification status meta box for peptide edit screen.
  *
  * What: Renders and saves verification status sidebar meta box.
@@ -9,7 +15,6 @@ declare(strict_types=1);
  * Dependencies: None.
  *
  * @see admin/class-pr-core-peptide-metaboxes.php — Other edit-screen meta boxes.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Metabox {
 

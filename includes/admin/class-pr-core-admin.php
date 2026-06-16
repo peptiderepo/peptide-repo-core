@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Registers admin menu pages, meta boxes, and custom columns for peptides
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Admin initialization and hook registration.
  *
  * What: Registers admin menu pages, meta boxes, and custom columns for peptides.
@@ -13,7 +19,6 @@ declare(strict_types=1);
  * @see admin/class-pr-core-verification-metabox.php — Verification sidebar meta box.
  * @see admin/class-pr-core-candidate-queue-page.php — Candidate review screen.
  * @see admin/class-pr-core-admin-columns.php        — Custom list-table columns.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Admin {
 

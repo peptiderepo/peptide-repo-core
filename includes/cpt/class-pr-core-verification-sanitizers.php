@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Standalone sanitization functions for verification_velocity and verification_status fields
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Sanitizers for verification meta fields.
  *
  * What: Standalone sanitization functions for verification_velocity and verification_status fields.
@@ -9,7 +15,6 @@ declare(strict_types=1);
  * Dependencies: None.
  *
  * @see cpt/class-pr-core-peptide-cpt.php — Calls these from meta field registration.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Sanitizers {
 

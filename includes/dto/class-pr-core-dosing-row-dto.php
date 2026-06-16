@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Immutable value object wrapping a row from pr_dosing_rows
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Typed data-transfer object for a dosing row.
  *
  * What: Immutable value object wrapping a row from pr_dosing_rows.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0001-dosing-rows.php — Table schema.
  * @see repositories/class-pr-core-dosing-repository.php        — Creates these from DB rows.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Dosing_Row_DTO {
 

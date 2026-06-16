@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * CRUD for AI-extracted dosing candidates awaiting human review
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Repository for AI candidate queue (pr_ai_candidate_queue table).
  *
  * What: CRUD for AI-extracted dosing candidates awaiting human review.
@@ -13,7 +19,6 @@ declare(strict_types=1);
  * @see migrations/class-pr-core-migration-0003-candidate-queue.php — Table schema.
  * @see dto/class-pr-core-candidate-dto.php                         — Return type.
  * @see admin/class-pr-core-candidate-queue-page.php                — Admin UI.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Candidate_Queue_Repository {
 

@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Immutable value object wrapping a row from pr_legal_cells
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Typed data-transfer object for a legal status cell.
  *
  * What: Immutable value object wrapping a row from pr_legal_cells.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0002-legal-cells.php — Table schema.
  * @see repositories/class-pr-core-legal-repository.php         — Creates these from DB rows.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Legal_Cell_DTO {
 

@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * CRUD operations for per-country legal status data, returning typed DTOs
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Repository for legal status cells (pr_legal_cells table).
  *
  * What: CRUD operations for per-country legal status data, returning typed DTOs.
@@ -13,7 +19,6 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0002-legal-cells.php — Table schema.
  * @see dto/class-pr-core-legal-cell-dto.php                    — Return type.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Legal_Repository {
 

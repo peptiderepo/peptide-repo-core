@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * Creates the AI-extracted dosing candidate queue table
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Migration 0003: Create the pr_ai_candidate_queue table.
  *
  * What: Creates the AI-extracted dosing candidate queue table.
@@ -12,7 +18,6 @@ declare(strict_types=1);
  * and ai_candidate_id set; queue row marked 'merged'.
  *
  * @see ARCHITECTURE.md — AI-assist candidate-extraction pipeline.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_0003_Candidate_Queue {
 

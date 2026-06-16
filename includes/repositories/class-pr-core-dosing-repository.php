@@ -2,6 +2,12 @@
 declare(strict_types=1);
 
 /**
+ * CRUD operations for dosing data, returning typed DTOs
+ *
+ * @package Peptide_Repo_Core
+ */
+
+/**
  * Repository for dosing rows (pr_dosing_rows table).
  *
  * What: CRUD operations for dosing data, returning typed DTOs.
@@ -10,7 +16,6 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0001-dosing-rows.php — Table schema.
  * @see dto/class-pr-core-dosing-row-dto.php                    — Return type.
- * @package Peptide_Repo_Core
  */
 class PR_Core_Dosing_Repository {
 
