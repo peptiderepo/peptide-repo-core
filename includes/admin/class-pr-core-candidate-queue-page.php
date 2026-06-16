@@ -71,11 +71,21 @@ class PR_Core_Candidate_Queue_Page {
 
 			$confidence_pct = number_format( $c->extraction_confidence * 100, 0 ) . '%';
 			$approve_url    = wp_nonce_url(
-				add_query_arg( [ 'action' => 'pr_core_approve', 'candidate_id' => $c->id ] ),
+				add_query_arg(
+					array(
+						'action'       => 'pr_core_approve',
+						'candidate_id' => $c->id,
+					)
+				),
 				'pr_core_queue_action'
 			);
 			$reject_url     = wp_nonce_url(
-				add_query_arg( [ 'action' => 'pr_core_reject', 'candidate_id' => $c->id ] ),
+				add_query_arg(
+					array(
+						'action'       => 'pr_core_reject',
+						'candidate_id' => $c->id,
+					)
+				),
 				'pr_core_queue_action'
 			);
 
@@ -109,7 +119,7 @@ class PR_Core_Candidate_Queue_Page {
 	private function handle_actions(): void {
 		$action = sanitize_text_field( $_GET['action'] ?? '' );
 
-		if ( ! in_array( $action, [ 'pr_core_approve', 'pr_core_reject' ], true ) ) {
+		if ( ! in_array( $action, array( 'pr_core_approve', 'pr_core_reject' ), true ) ) {
 			return;
 		}
 
@@ -128,15 +138,21 @@ class PR_Core_Candidate_Queue_Page {
 		if ( 'pr_core_approve' === $action ) {
 			$dosing_id = $repo->approve( $candidate_id, $reviewer_id );
 			if ( $dosing_id > 0 ) {
-				add_action( 'admin_notices', static function () {
-					echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Candidate approved and added to dosing data.', 'peptide-repo-core' ) . '</p></div>';
-				} );
+				add_action(
+					'admin_notices',
+					static function () {
+						echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Candidate approved and added to dosing data.', 'peptide-repo-core' ) . '</p></div>';
+					}
+				);
 			}
 		} else {
 			$repo->reject( $candidate_id, $reviewer_id );
-			add_action( 'admin_notices', static function () {
-				echo '<div class="notice notice-warning is-dismissible"><p>' . esc_html__( 'Candidate rejected.', 'peptide-repo-core' ) . '</p></div>';
-			} );
+			add_action(
+				'admin_notices',
+				static function () {
+					echo '<div class="notice notice-warning is-dismissible"><p>' . esc_html__( 'Candidate rejected.', 'peptide-repo-core' ) . '</p></div>';
+				}
+			);
 		}
 	}
 }

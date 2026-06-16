@@ -77,7 +77,7 @@ class PR_Core_Jsonld_Webpage {
 			// Yoast may set @type as a plain string OR an array of strings.
 			// Normalise to array so in_array() works regardless of shape.
 			$raw_type = $piece['@type'] ?? '';
-			$types    = is_array( $raw_type ) ? $raw_type : [ $raw_type ];
+			$types    = is_array( $raw_type ) ? $raw_type : array( $raw_type );
 
 			if ( in_array( 'WebPage', $types, true ) || in_array( 'MedicalWebPage', $types, true ) ) {
 				foreach ( $enrichments as $key => $value ) {
@@ -97,7 +97,7 @@ class PR_Core_Jsonld_Webpage {
 	 * @return array<string, mixed> Enrichment fields to merge into the WebPage node.
 	 */
 	private function build_webpage_enrichments( int $post_id ): array {
-		$enrichments = [];
+		$enrichments = array();
 
 		// lastReviewed: prefer _pr_last_reviewed, fall back to _pr_last_source_verified,
 		// then post modified date.
@@ -118,27 +118,27 @@ class PR_Core_Jsonld_Webpage {
 		if ( $editor_id > 0 ) {
 			$editor = get_userdata( $editor_id );
 			if ( $editor ) {
-				$enrichments['reviewedBy'] = [
+				$enrichments['reviewedBy'] = array(
 					'@type' => 'Person',
 					'name'  => sanitize_text_field( $editor->display_name ),
 					'url'   => get_author_posts_url( $editor_id ),
-				];
+				);
 			}
 		}
 
 		if ( ! isset( $enrichments['reviewedBy'] ) ) {
-			$enrichments['reviewedBy'] = [
+			$enrichments['reviewedBy'] = array(
 				'@type' => 'Organization',
 				'name'  => 'Peptide Repo',
 				'url'   => home_url(),
-			];
+			);
 		}
 
 		// audience: MedicalAudience for researchers.
-		$enrichments['audience'] = [
+		$enrichments['audience'] = array(
 			'@type'        => 'MedicalAudience',
 			'audienceType' => 'Researcher',
-		];
+		);
 
 		return $enrichments;
 	}

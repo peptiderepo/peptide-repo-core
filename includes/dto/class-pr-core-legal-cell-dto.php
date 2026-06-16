@@ -59,7 +59,7 @@ class PR_Core_Legal_Cell_DTO {
 	 * @return array<string, mixed>
 	 */
 	public function to_array(): array {
-		return [
+		return array(
 			'id'                    => $this->id,
 			'peptide_id'            => $this->peptide_id,
 			'country_code'          => $this->country_code,
@@ -70,6 +70,6 @@ class PR_Core_Legal_Cell_DTO {
 			'notes'                 => $this->notes,
 			'last_verified_at'      => $this->last_verified_at,
 			'is_active'             => $this->is_active(),
-		];
+		);
 	}
 }

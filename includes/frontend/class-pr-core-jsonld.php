@@ -6,6 +6,7 @@ declare(strict_types=1);
  *
  * What: Integrates Drug, MedicalWebPage, and FAQPage schema into Yoast's graph
  *       on single peptide pages. When Yoast is inactive, emits a standalone
+ *
  *       @graph block via wp_head as a fallback.
  *
  * Who calls it: PR_Core::init() calls register_hooks(). Yoast hooks fire on
@@ -67,19 +68,19 @@ class PR_Core_Jsonld {
 	 */
 	public function register_hooks(): void {
 		// wpseo_schema_webpage_type: retype WebPage -> MedicalWebPage on peptide singles.
-		add_filter( 'wpseo_schema_webpage_type', [ $this->webpage_enricher, 'retype_to_medical_webpage' ] );
+		add_filter( 'wpseo_schema_webpage_type', array( $this->webpage_enricher, 'retype_to_medical_webpage' ) );
 
 		// wpseo_schema_graph: two callbacks at different priorities.
 		// Priority 11 -- enrich_webpage_piece: merge lastReviewed/reviewedBy/audience into the
-		//               existing WebPage node that Yoast already emitted.
+		// existing WebPage node that Yoast already emitted.
 		// Priority 12 -- inject_graph_nodes: append Drug + FAQPage arrays to the graph.
-		//               Must run after enrich_webpage_piece so the WebPage node is already
-		//               enriched before Drug/FAQ are appended.
-		add_filter( 'wpseo_schema_graph', [ $this->webpage_enricher, 'enrich_webpage_piece' ], 11, 2 );
-		add_filter( 'wpseo_schema_graph', [ $this, 'inject_graph_nodes' ], 12, 2 );
+		// Must run after enrich_webpage_piece so the WebPage node is already
+		// enriched before Drug/FAQ are appended.
+		add_filter( 'wpseo_schema_graph', array( $this->webpage_enricher, 'enrich_webpage_piece' ), 11, 2 );
+		add_filter( 'wpseo_schema_graph', array( $this, 'inject_graph_nodes' ), 12, 2 );
 
 		// Standalone fallback: emits only when Yoast is not producing output.
-		add_action( 'wp_head', [ $this, 'emit_standalone_fallback' ], 99 );
+		add_action( 'wp_head', array( $this, 'emit_standalone_fallback' ), 99 );
 	}
 
 	/**
@@ -90,8 +91,8 @@ class PR_Core_Jsonld {
 	 * Appending plain Drug/FAQ arrays here is safe -- unlike wpseo_schema_graph_pieces
 	 * which calls get_class() and is_needed() on each item expecting objects.
 	 *
-	 * @param array<int, array<string, mixed>>                        $graph   Assembled Yoast graph.
-	 * @param \Yoast\WP\SEO\Context\Meta_Tags_Context|null            $context Yoast schema context.
+	 * @param array<int, array<string, mixed>>             $graph   Assembled Yoast graph.
+	 * @param \Yoast\WP\SEO\Context\Meta_Tags_Context|null $context Yoast schema context.
 	 * @return array<int, array<string, mixed>> Graph with Drug (and optionally FAQ) appended.
 	 */
 	public function inject_graph_nodes( array $graph, $context ): array {
@@ -150,7 +151,7 @@ class PR_Core_Jsonld {
 		}
 
 		$permalink = get_permalink( (int) $post_id );
-		$graph     = [ $this->drug_builder->build( $peptide ) ];
+		$graph     = array( $this->drug_builder->build( $peptide ) );
 
 		$faq_node = $this->faq_builder->build( (int) $post_id, $permalink );
 		if ( null !== $faq_node ) {
@@ -160,7 +161,10 @@ class PR_Core_Jsonld {
 		printf(
 			'<script type="application/ld+json">%s</script>' . "\n",
 			wp_json_encode(
-				[ '@context' => 'https://schema.org', '@graph' => $graph ],
+				array(
+					'@context' => 'https://schema.org',
+					'@graph'   => $graph,
+				),
 				JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
 			)
 		);

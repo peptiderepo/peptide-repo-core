@@ -22,7 +22,7 @@ class PR_Core_Peptide_Metaboxes {
 		add_meta_box(
 			'pr-core-identifiers',
 			__( 'Scientific Identifiers', 'peptide-repo-core' ),
-			[ $this, 'render_identifiers_box' ],
+			array( $this, 'render_identifiers_box' ),
 			PR_Core_Peptide_CPT::POST_TYPE,
 			'normal',
 			'high'
@@ -31,7 +31,7 @@ class PR_Core_Peptide_Metaboxes {
 		add_meta_box(
 			'pr-core-dosing',
 			__( 'Dosing Data', 'peptide-repo-core' ),
-			[ $this, 'render_dosing_box' ],
+			array( $this, 'render_dosing_box' ),
 			PR_Core_Peptide_CPT::POST_TYPE,
 			'normal',
 			'default'
@@ -40,7 +40,7 @@ class PR_Core_Peptide_Metaboxes {
 		add_meta_box(
 			'pr-core-legal',
 			__( 'Legal Status by Country', 'peptide-repo-core' ),
-			[ $this, 'render_legal_box' ],
+			array( $this, 'render_legal_box' ),
 			PR_Core_Peptide_CPT::POST_TYPE,
 			'normal',
 			'default'
@@ -56,7 +56,7 @@ class PR_Core_Peptide_Metaboxes {
 	public function render_identifiers_box( \WP_Post $post ): void {
 		wp_nonce_field( 'pr_core_save_meta', 'pr_core_meta_nonce' );
 
-		$fields = [
+		$fields = array(
 			'display_name'      => __( 'Display Name', 'peptide-repo-core' ),
 			'aliases'           => __( 'Aliases (JSON array)', 'peptide-repo-core' ),
 			'molecular_formula' => __( 'Molecular Formula', 'peptide-repo-core' ),
@@ -64,7 +64,7 @@ class PR_Core_Peptide_Metaboxes {
 			'cas_number'        => __( 'CAS Number', 'peptide-repo-core' ),
 			'drugbank_id'       => __( 'DrugBank ID', 'peptide-repo-core' ),
 			'chembl_id'         => __( 'ChEMBL ID', 'peptide-repo-core' ),
-		];
+		);
 
 		echo '<table class="form-table pr-core-meta-table">';
 		foreach ( $fields as $key => $label ) {

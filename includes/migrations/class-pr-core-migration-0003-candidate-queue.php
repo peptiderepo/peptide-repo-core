@@ -16,12 +16,12 @@ declare(strict_types=1);
 class PR_Core_Migration_0003_Candidate_Queue {
 
 	/** @var string[] Valid queue status enum values. */
-	public const STATUSES = [
+	public const STATUSES = array(
 		'pending',
 		'approved',
 		'rejected',
 		'merged',
-	];
+	);
 
 	/**
 	 * Create the pr_ai_candidate_queue table.

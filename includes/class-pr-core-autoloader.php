@@ -16,7 +16,7 @@ declare(strict_types=1);
 class PR_Core_Autoloader {
 
 	/** @var string[] Directories to scan for class files. */
-	private static array $dirs = [];
+	private static array $dirs = array();
 
 	/**
 	 * Register the autoloader with SPL.
@@ -35,7 +35,7 @@ class PR_Core_Autoloader {
 			self::$dirs[] = trailingslashit( $dir );
 		}
 
-		spl_autoload_register( [ __CLASS__, 'load' ] );
+		spl_autoload_register( array( __CLASS__, 'load' ) );
 	}
 
 	/**

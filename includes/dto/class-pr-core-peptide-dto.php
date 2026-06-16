@@ -47,7 +47,7 @@ class PR_Core_Peptide_DTO {
 		$this->excerpt                  = (string) ( $data['excerpt'] ?? '' );
 		$this->status                   = (string) ( $data['status'] ?? 'draft' );
 		$this->display_name             = (string) ( $data['display_name'] ?? '' );
-		$this->aliases                  = (array) ( $data['aliases'] ?? [] );
+		$this->aliases                  = (array) ( $data['aliases'] ?? array() );
 		$this->molecular_formula        = (string) ( $data['molecular_formula'] ?? '' );
 		$this->molecular_weight         = (float) ( $data['molecular_weight'] ?? 0 );
 		$this->cas_number               = (string) ( $data['cas_number'] ?? '' );
@@ -57,8 +57,8 @@ class PR_Core_Peptide_DTO {
 		$this->editorial_review_status  = (string) ( $data['editorial_review_status'] ?? 'draft' );
 		$this->last_editorial_review_at = (string) ( $data['last_editorial_review_at'] ?? '' );
 		$this->medical_editor_id        = (int) ( $data['medical_editor_id'] ?? 0 );
-		$this->categories               = (array) ( $data['categories'] ?? [] );
-		$this->families                 = (array) ( $data['families'] ?? [] );
+		$this->categories               = (array) ( $data['categories'] ?? array() );
+		$this->families                 = (array) ( $data['families'] ?? array() );
 	}
 
 	/**
@@ -67,7 +67,7 @@ class PR_Core_Peptide_DTO {
 	 * @return array<string, mixed>
 	 */
 	public function to_array(): array {
-		return [
+		return array(
 			'id'                       => $this->id,
 			'title'                    => $this->title,
 			'slug'                     => $this->slug,
@@ -86,6 +86,6 @@ class PR_Core_Peptide_DTO {
 			'categories'               => $this->categories,
 			'families'                 => $this->families,
 			'url'                      => get_permalink( $this->id ),
-		];
+		);
 	}
 }

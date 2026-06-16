@@ -18,11 +18,11 @@ global $wpdb;
 
 /* ── 1. Drop custom tables ────────────────────────────────────────────── */
 
-$tables = [
+$tables = array(
 	$wpdb->prefix . 'pr_dosing_rows',
 	$wpdb->prefix . 'pr_legal_cells',
 	$wpdb->prefix . 'pr_ai_candidate_queue',
-];
+);
 
 foreach ( $tables as $table ) {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
@@ -85,19 +85,19 @@ $wpdb->query(
  *
  * @see ARCHITECTURE.md — §2.9 Uninstall specification.
  */
-$schema_meta_keys = [
+$schema_meta_keys = array(
 	'_pr_molecular_formula',
 	'_pr_molecular_weight',
 	'_pr_aliases',
 	'_pr_faq_items',
-];
+);
 
 foreach ( $schema_meta_keys as $meta_key ) {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 	$wpdb->delete(
 		$wpdb->postmeta,
-		[ 'meta_key' => $meta_key ],
-		[ '%s' ]
+		array( 'meta_key' => $meta_key ),
+		array( '%s' )
 	);
 }
 

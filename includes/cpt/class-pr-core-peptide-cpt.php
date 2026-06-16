@@ -31,26 +31,26 @@ class PR_Core_Peptide_CPT {
 	 *
 	 * @var string[]
 	 */
-	public const EVIDENCE_STRENGTHS = [
+	public const EVIDENCE_STRENGTHS = array(
 		'preclinical',
 		'case-series',
 		'observational',
 		'rct-small',
 		'rct-large',
 		'meta-analysis',
-	];
+	);
 
 	/**
 	 * Editorial review status enum values.
 	 *
 	 * @var string[]
 	 */
-	public const REVIEW_STATUSES = [
+	public const REVIEW_STATUSES = array(
 		'draft',
 		'in-review',
 		'published',
 		'retired',
-	];
+	);
 
 	/**
 	 * Post-meta field definitions (1:1 with peptide).
@@ -59,115 +59,115 @@ class PR_Core_Peptide_CPT {
 	 * @return array<string, array<string, mixed>>
 	 */
 	public static function get_meta_fields(): array {
-		return [
-			'display_name'            => [
+		return array(
+			'display_name'              => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'aliases'                 => [
+			),
+			'aliases'                   => array(
 				'type'     => 'string',
 				'default'  => '[]',
-				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_json_array' ],
-			],
-			'molecular_formula'       => [
+				'sanitize' => array( PR_Core_Schema_Sanitizers::class, 'sanitize_json_array' ),
+			),
+			'molecular_formula'         => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'molecular_weight'        => [
+			),
+			'molecular_weight'          => array(
 				'type'     => 'number',
 				'default'  => 0,
 				'sanitize' => 'floatval',
-			],
-			'cas_number'              => [
+			),
+			'cas_number'                => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'drugbank_id'             => [
+			),
+			'drugbank_id'               => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'chembl_id'               => [
+			),
+			'chembl_id'                 => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'evidence_strength'       => [
+			),
+			'evidence_strength'         => array(
 				'type'     => 'string',
 				'default'  => 'preclinical',
-				'sanitize' => [ __CLASS__, 'sanitize_evidence_strength' ],
-			],
-			'editorial_review_status' => [
+				'sanitize' => array( __CLASS__, 'sanitize_evidence_strength' ),
+			),
+			'editorial_review_status'   => array(
 				'type'     => 'string',
 				'default'  => 'draft',
-				'sanitize' => [ __CLASS__, 'sanitize_review_status' ],
-			],
-			'last_editorial_review_at' => [
+				'sanitize' => array( __CLASS__, 'sanitize_review_status' ),
+			),
+			'last_editorial_review_at'  => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'medical_editor_id'       => [
+			),
+			'medical_editor_id'         => array(
 				'type'     => 'integer',
 				'default'  => 0,
 				'sanitize' => 'absint',
-			],
-			'_pr_last_source_verified' => [
+			),
+			'_pr_last_source_verified'  => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'_pr_last_reviewed'        => [
+			),
+			'_pr_last_reviewed'         => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'_pr_next_review_by'       => [
+			),
+			'_pr_next_review_by'        => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
-			],
-			'_pr_verification_velocity' => [
+			),
+			'_pr_verification_velocity' => array(
 				'type'     => 'string',
 				'default'  => 'medium',
-				'sanitize' => [ PR_Core_Verification_Sanitizers::class, 'sanitize_velocity' ],
-			],
-			'_pr_verification_notes'    => [
+				'sanitize' => array( PR_Core_Verification_Sanitizers::class, 'sanitize_velocity' ),
+			),
+			'_pr_verification_notes'    => array(
 				'type'     => 'string',
 				'default'  => '',
 				'sanitize' => 'sanitize_textarea_field',
-			],
-			'_pr_verification_status'   => [
+			),
+			'_pr_verification_status'   => array(
 				'type'     => 'string',
 				'default'  => 'current',
-				'sanitize' => [ PR_Core_Verification_Sanitizers::class, 'sanitize_status' ],
-			],
+				'sanitize' => array( PR_Core_Verification_Sanitizers::class, 'sanitize_status' ),
+			),
 			// Schema-input meta (v0.6.0): molecular data sourced from PSA psa_* keys via migration 0004.
-			'_pr_molecular_formula'     => [
+			'_pr_molecular_formula'     => array(
 				'type'     => 'string',
 				'default'  => '',
-				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_molecular_formula' ],
-			],
-			'_pr_molecular_weight'      => [
+				'sanitize' => array( PR_Core_Schema_Sanitizers::class, 'sanitize_molecular_formula' ),
+			),
+			'_pr_molecular_weight'      => array(
 				'type'     => 'string',
 				'default'  => '',
-				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_molecular_weight_string' ],
-			],
-			'_pr_aliases'               => [
+				'sanitize' => array( PR_Core_Schema_Sanitizers::class, 'sanitize_molecular_weight_string' ),
+			),
+			'_pr_aliases'               => array(
 				'type'     => 'string',
 				'default'  => '[]',
-				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_json_array' ],
-			],
+				'sanitize' => array( PR_Core_Schema_Sanitizers::class, 'sanitize_json_array' ),
+			),
 			// FAQ items (v0.6.0): [{question, answer}] JSON for FAQPage schema. Populated by CMO content sprint.
-			'_pr_faq_items'             => [
+			'_pr_faq_items'             => array(
 				'type'     => 'string',
 				'default'  => '[]',
-				'sanitize' => [ PR_Core_Schema_Sanitizers::class, 'sanitize_faq_items' ],
-			],
-		];
+				'sanitize' => array( PR_Core_Schema_Sanitizers::class, 'sanitize_faq_items' ),
+			),
+		);
 	}
 
 	/**
@@ -176,9 +176,9 @@ class PR_Core_Peptide_CPT {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'init', [ __CLASS__, 'register_peptide_post_type' ] );
-		add_action( 'init', [ __CLASS__, 'register_taxonomies' ] );
-		add_action( 'init', [ __CLASS__, 'register_meta_fields' ] );
+		add_action( 'init', array( __CLASS__, 'register_peptide_post_type' ) );
+		add_action( 'init', array( __CLASS__, 'register_taxonomies' ) );
+		add_action( 'init', array( __CLASS__, 'register_meta_fields' ) );
 	}
 
 	/**
@@ -193,7 +193,7 @@ class PR_Core_Peptide_CPT {
 			return;
 		}
 
-		$labels = [
+		$labels = array(
 			'name'               => __( 'Peptides', 'peptide-repo-core' ),
 			'singular_name'      => __( 'Peptide', 'peptide-repo-core' ),
 			'add_new_item'       => __( 'Add New Peptide', 'peptide-repo-core' ),
@@ -205,11 +205,11 @@ class PR_Core_Peptide_CPT {
 			'not_found_in_trash' => __( 'No peptides found in trash', 'peptide-repo-core' ),
 			'all_items'          => __( 'All Peptides', 'peptide-repo-core' ),
 			'menu_name'          => __( 'Peptides', 'peptide-repo-core' ),
-		];
+		);
 
 		// Args harmonized superset of PR Core + PSA for 89 existing posts.
 		// Supports union, capability/role perms preserved, slugs unchanged.
-		$args = [
+		$args = array(
 			'labels'             => $labels,
 			'public'             => true,
 			'publicly_queryable' => true,
@@ -228,9 +228,12 @@ class PR_Core_Peptide_CPT {
 			'map_meta_cap'       => true,
 			'hierarchical'       => false,
 			'has_archive'        => true,
-			'rewrite'            => [ 'slug' => 'peptides', 'with_front' => false ],
-			'supports'           => [ 'title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'custom-fields' ],
-		];
+			'rewrite'            => array(
+				'slug'       => 'peptides',
+				'with_front' => false,
+			),
+			'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'custom-fields' ),
+		);
 		register_post_type( self::POST_TYPE, $args );
 	}
 
@@ -246,19 +249,26 @@ class PR_Core_Peptide_CPT {
 			return;
 		}
 
-		register_taxonomy( self::TAX_CATEGORY, self::POST_TYPE, [
-			'labels'             => [
-				'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
-				'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
-			],
-			'public'             => true,
-			'publicly_queryable' => true,
-			'show_in_rest'       => true,
-			'show_ui'            => true,
-			'show_admin_column'  => true,
-			'hierarchical'       => true,
-			'rewrite'            => [ 'slug' => 'peptide-category', 'with_front' => false ],
-		] );
+		register_taxonomy(
+			self::TAX_CATEGORY,
+			self::POST_TYPE,
+			array(
+				'labels'             => array(
+					'name'          => __( 'Peptide Categories', 'peptide-repo-core' ),
+					'singular_name' => __( 'Peptide Category', 'peptide-repo-core' ),
+				),
+				'public'             => true,
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
+				'show_ui'            => true,
+				'show_admin_column'  => true,
+				'hierarchical'       => true,
+				'rewrite'            => array(
+					'slug'       => 'peptide-category',
+					'with_front' => false,
+				),
+			)
+		);
 	}
 
 	/**
@@ -268,16 +278,20 @@ class PR_Core_Peptide_CPT {
 	 */
 	public static function register_meta_fields(): void {
 		foreach ( self::get_meta_fields() as $key => $config ) {
-			register_post_meta( self::POST_TYPE, $key, [
-				'type'              => $config['type'],
-				'single'            => true,
-				'default'           => $config['default'],
-				'show_in_rest'      => true,
-				'sanitize_callback' => $config['sanitize'],
-				'auth_callback'     => static function () {
-					return current_user_can( self::CAPABILITY );
-				},
-			] );
+			register_post_meta(
+				self::POST_TYPE,
+				$key,
+				array(
+					'type'              => $config['type'],
+					'single'            => true,
+					'default'           => $config['default'],
+					'show_in_rest'      => true,
+					'sanitize_callback' => $config['sanitize'],
+					'auth_callback'     => static function () {
+						return current_user_can( self::CAPABILITY );
+					},
+				)
+			);
 		}
 	}
 

@@ -19,7 +19,7 @@ class PR_Core_Verification_Sanitizers {
 	 * @return string Valid enum value (low, medium, high).
 	 */
 	public static function sanitize_velocity( string $value ): string {
-		return in_array( $value, [ 'low', 'medium', 'high' ], true ) ? $value : 'medium';
+		return in_array( $value, array( 'low', 'medium', 'high' ), true ) ? $value : 'medium';
 	}
 
 	/**
@@ -29,6 +29,6 @@ class PR_Core_Verification_Sanitizers {
 	 * @return string Valid enum value (current, due, overdue).
 	 */
 	public static function sanitize_status( string $value ): string {
-		return in_array( $value, [ 'current', 'due', 'overdue' ], true ) ? $value : 'current';
+		return in_array( $value, array( 'current', 'due', 'overdue' ), true ) ? $value : 'current';
 	}
 }

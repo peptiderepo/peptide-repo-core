@@ -47,15 +47,15 @@ class PR_Core_Candidate_Queue_Repository {
 		global $wpdb;
 		$table = $wpdb->prefix . 'pr_ai_candidate_queue';
 
-		$where  = [ 'queue_status = %s' ];
-		$params = [ sanitize_text_field( $status ) ];
+		$where  = array( 'queue_status = %s' );
+		$params = array( sanitize_text_field( $status ) );
 
 		if ( $peptide_id > 0 ) {
 			$where[]  = 'peptide_id = %d';
 			$params[] = $peptide_id;
 		}
 
-		$params[] = $limit;
+		$params[]  = $limit;
 		$where_sql = implode( ' AND ', $where );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -65,7 +65,7 @@ class PR_Core_Candidate_Queue_Repository {
 				...$params
 			),
 			ARRAY_A
-		) ?: [];
+		) ?: array();
 
 		return array_map(
 			static fn( array $row ) => new PR_Core_Candidate_DTO( $row ),
@@ -85,7 +85,7 @@ class PR_Core_Candidate_Queue_Repository {
 		global $wpdb;
 		$table = $wpdb->prefix . 'pr_ai_candidate_queue';
 
-		$row = [
+		$row = array(
 			'peptide_id'            => absint( $data['peptide_id'] ?? 0 ),
 			'dose_min'              => isset( $data['dose_min'] ) ? (float) $data['dose_min'] : null,
 			'dose_max'              => isset( $data['dose_max'] ) ? (float) $data['dose_max'] : null,
@@ -106,7 +106,7 @@ class PR_Core_Candidate_Queue_Repository {
 			'extraction_confidence' => (float) ( $data['extraction_confidence'] ?? 0 ),
 			'queue_status'          => 'pending',
 			'extracted_at'          => current_time( 'mysql' ),
-		];
+		);
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $wpdb->insert( $table, $row );
@@ -134,30 +134,32 @@ class PR_Core_Candidate_Queue_Repository {
 
 		// Copy candidate data into a dosing row.
 		$dosing_repo = new PR_Core_Dosing_Repository();
-		$dosing_id   = $dosing_repo->insert( [
-			'peptide_id'         => $candidate->peptide_id,
-			'dose_min'           => $candidate->dose_min,
-			'dose_max'           => $candidate->dose_max,
-			'dose_unit'          => $candidate->dose_unit,
-			'route'              => $candidate->route,
-			'frequency'          => $candidate->frequency,
-			'duration_value'     => $candidate->duration_value,
-			'duration_unit'      => $candidate->duration_unit,
-			'population'         => $candidate->population,
-			'indication'         => $candidate->indication,
-			'evidence_strength'  => $candidate->evidence_strength,
-			'study_title'        => $candidate->study_title,
-			'study_year'         => $candidate->study_year,
-			'citation_pubmed_id' => $candidate->citation_pubmed_id,
-			'citation_doi'       => $candidate->citation_doi,
-			'citation_url'       => $candidate->citation_url,
-			'notes'              => $candidate->notes,
-			'source'             => 'ai-candidate-approved',
-			'ai_candidate_id'    => $candidate_id,
-			'added_by'           => $reviewer_id,
-			'reviewed_by'        => $reviewer_id,
-			'reviewed_at'        => current_time( 'mysql' ),
-		] );
+		$dosing_id   = $dosing_repo->insert(
+			array(
+				'peptide_id'         => $candidate->peptide_id,
+				'dose_min'           => $candidate->dose_min,
+				'dose_max'           => $candidate->dose_max,
+				'dose_unit'          => $candidate->dose_unit,
+				'route'              => $candidate->route,
+				'frequency'          => $candidate->frequency,
+				'duration_value'     => $candidate->duration_value,
+				'duration_unit'      => $candidate->duration_unit,
+				'population'         => $candidate->population,
+				'indication'         => $candidate->indication,
+				'evidence_strength'  => $candidate->evidence_strength,
+				'study_title'        => $candidate->study_title,
+				'study_year'         => $candidate->study_year,
+				'citation_pubmed_id' => $candidate->citation_pubmed_id,
+				'citation_doi'       => $candidate->citation_doi,
+				'citation_url'       => $candidate->citation_url,
+				'notes'              => $candidate->notes,
+				'source'             => 'ai-candidate-approved',
+				'ai_candidate_id'    => $candidate_id,
+				'added_by'           => $reviewer_id,
+				'reviewed_by'        => $reviewer_id,
+				'reviewed_at'        => current_time( 'mysql' ),
+			)
+		);
 
 		if ( 0 === $dosing_id ) {
 			return 0;
@@ -224,15 +226,15 @@ class PR_Core_Candidate_Queue_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $wpdb->update(
 			$table,
-			[
+			array(
 				'queue_status'   => sanitize_text_field( $status ),
 				'reviewed_by'    => $reviewer_id,
 				'reviewed_at'    => current_time( 'mysql' ),
 				'reviewer_notes' => sanitize_textarea_field( $notes ),
-			],
-			[ 'id' => $id ],
-			[ '%s', '%d', '%s', '%s' ],
-			[ '%d' ]
+			),
+			array( 'id' => $id ),
+			array( '%s', '%d', '%s', '%s' ),
+			array( '%d' )
 		);
 
 		return false !== $result;

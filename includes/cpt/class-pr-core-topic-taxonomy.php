@@ -27,7 +27,7 @@ class PR_Core_Topic_Taxonomy {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'init', [ __CLASS__, 'register_topic_taxonomy' ] );
+		add_action( 'init', array( __CLASS__, 'register_topic_taxonomy' ) );
 	}
 
 	/**
@@ -45,18 +45,25 @@ class PR_Core_Topic_Taxonomy {
 			return;
 		}
 
-		register_taxonomy( self::TAX_TOPIC, 'post', [
-			'labels'             => [
-				'name'          => __( 'Peptide Topics', 'peptide-repo-core' ),
-				'singular_name' => __( 'Peptide Topic', 'peptide-repo-core' ),
-			],
-			'public'             => true,
-			'publicly_queryable' => true,
-			'show_in_rest'       => true,
-			'show_ui'            => true,
-			'show_admin_column'  => true,
-			'hierarchical'       => false,
-			'rewrite'            => [ 'slug' => 'peptide-topic', 'with_front' => false ],
-		] );
+		register_taxonomy(
+			self::TAX_TOPIC,
+			'post',
+			array(
+				'labels'             => array(
+					'name'          => __( 'Peptide Topics', 'peptide-repo-core' ),
+					'singular_name' => __( 'Peptide Topic', 'peptide-repo-core' ),
+				),
+				'public'             => true,
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
+				'show_ui'            => true,
+				'show_admin_column'  => true,
+				'hierarchical'       => false,
+				'rewrite'            => array(
+					'slug'       => 'peptide-topic',
+					'with_front' => false,
+				),
+			)
+		);
 	}
 }

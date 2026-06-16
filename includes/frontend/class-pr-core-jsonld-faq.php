@@ -34,11 +34,11 @@ class PR_Core_Jsonld_Faq {
 			return null;
 		}
 
-		return [
+		return array(
 			'@type'      => 'FAQPage',
 			'@id'        => $permalink . '#faq',
-			'mainEntity' => array_map( [ $this, 'build_question' ], $items ),
-		];
+			'mainEntity' => array_map( array( $this, 'build_question' ), $items ),
+		);
 	}
 
 	/**
@@ -48,14 +48,14 @@ class PR_Core_Jsonld_Faq {
 	 * @return array<string, mixed> Schema.org Question node.
 	 */
 	private function build_question( array $item ): array {
-		return [
-			'@type' => 'Question',
-			'name'  => esc_html( $item['question'] ),
-			'acceptedAnswer' => [
+		return array(
+			'@type'          => 'Question',
+			'name'           => esc_html( $item['question'] ),
+			'acceptedAnswer' => array(
 				'@type' => 'Answer',
 				'text'  => esc_html( $item['answer'] ),
-			],
-		];
+			),
+		);
 	}
 
 	/**
@@ -71,16 +71,16 @@ class PR_Core_Jsonld_Faq {
 		$raw = get_post_meta( $post_id, self::META_FAQ_ITEMS, true );
 
 		if ( ! is_string( $raw ) || '' === $raw ) {
-			return [];
+			return array();
 		}
 
 		$decoded = json_decode( $raw, true );
 
 		if ( ! is_array( $decoded ) || empty( $decoded ) ) {
-			return [];
+			return array();
 		}
 
-		$valid = [];
+		$valid = array();
 		foreach ( $decoded as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -88,10 +88,10 @@ class PR_Core_Jsonld_Faq {
 			$question = sanitize_text_field( (string) ( $item['question'] ?? '' ) );
 			$answer   = sanitize_textarea_field( (string) ( $item['answer'] ?? '' ) );
 			if ( '' !== $question && '' !== $answer ) {
-				$valid[] = [
+				$valid[] = array(
 					'question' => $question,
 					'answer'   => $answer,
-				];
+				);
 			}
 		}
 

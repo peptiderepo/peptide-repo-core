@@ -29,7 +29,7 @@ class PR_Core_Repo_Daily_Metaboxes {
 		add_meta_box(
 			'pr-core-repo-daily-meta',
 			__( 'Article Settings', 'peptide-repo-core' ),
-			[ $this, 'render_meta_box' ],
+			array( $this, 'render_meta_box' ),
 			PR_Core_Repo_Daily_CPT::POST_TYPE,
 			'normal',
 			'default'
@@ -45,7 +45,7 @@ class PR_Core_Repo_Daily_Metaboxes {
 	public function render_meta_box( \WP_Post $post ): void {
 		wp_nonce_field( 'pr_core_repo_daily_meta', 'pr_core_repo_daily_nonce' );
 
-		$author = sanitize_text_field(
+		$author          = sanitize_text_field(
 			get_post_meta( $post->ID, '_repo_daily_author', true ) ?: self::DEFAULT_AUTHOR
 		);
 		$requires_review = get_post_meta( $post->ID, '_repo_daily_clinical_review_required', true );

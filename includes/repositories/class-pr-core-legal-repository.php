@@ -52,7 +52,7 @@ class PR_Core_Legal_Repository {
 				$peptide_id
 			),
 			ARRAY_A
-		) ?: [];
+		) ?: array();
 
 		return array_map(
 			static fn( array $row ) => new PR_Core_Legal_Cell_DTO( $row ),
@@ -101,7 +101,7 @@ class PR_Core_Legal_Repository {
 				strtoupper( sanitize_text_field( $country_code ) )
 			),
 			ARRAY_A
-		) ?: [];
+		) ?: array();
 
 		return array_map(
 			static fn( array $row ) => new PR_Core_Legal_Cell_DTO( $row ),
@@ -161,10 +161,10 @@ class PR_Core_Legal_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->update(
 			$table,
-			[ 'superseded_by_id' => $new_id ],
-			[ 'id' => $old_id ],
-			[ '%d' ],
-			[ '%d' ]
+			array( 'superseded_by_id' => $new_id ),
+			array( 'id' => $old_id ),
+			array( '%d' ),
+			array( '%d' )
 		);
 
 		return $new_id;
@@ -184,7 +184,7 @@ class PR_Core_Legal_Repository {
 			$status = 'unclear';
 		}
 
-		return [
+		return array(
 			'peptide_id'            => absint( $data['peptide_id'] ?? 0 ),
 			'country_code'          => strtoupper( sanitize_text_field( $data['country_code'] ?? '' ) ),
 			'status'                => $status,
@@ -195,6 +195,6 @@ class PR_Core_Legal_Repository {
 			'last_verified_at'      => sanitize_text_field( $data['last_verified_at'] ?? current_time( 'mysql' ) ),
 			'schema_version'        => 1,
 			'reviewer_id'           => absint( $data['reviewer_id'] ?? get_current_user_id() ),
-		];
+		);
 	}
 }

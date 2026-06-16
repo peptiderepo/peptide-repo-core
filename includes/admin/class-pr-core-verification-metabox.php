@@ -21,7 +21,7 @@ class PR_Core_Verification_Metabox {
 		add_meta_box(
 			'pr-core-verification',
 			__( 'Verification Status', 'peptide-repo-core' ),
-			[ __CLASS__, 'render' ],
+			array( __CLASS__, 'render' ),
 			PR_Core_Peptide_CPT::POST_TYPE,
 			'side',
 			'default'
@@ -47,7 +47,11 @@ class PR_Core_Verification_Metabox {
 
 		echo '<p><strong>' . esc_html__( 'Verification Velocity', 'peptide-repo-core' ) . ':</strong><br />';
 		echo '<select name="pr_core__pr_verification_velocity" style="width:100%;">';
-		foreach ( [ 'low' => 'Low', 'medium' => 'Medium', 'high' => 'High' ] as $val => $label ) {
+		foreach ( array(
+			'low'    => 'Low',
+			'medium' => 'Medium',
+			'high'   => 'High',
+		) as $val => $label ) {
 			printf(
 				'<option value="%s"%s>%s</option>',
 				esc_attr( $val ),
@@ -58,7 +62,7 @@ class PR_Core_Verification_Metabox {
 		echo '</select></p>';
 
 		echo '<p><strong>' . esc_html__( 'Status', 'peptide-repo-core' ) . ':</strong><br />';
-		$badge_class = match( $status ) {
+		$badge_class = match ( $status ) {
 			'due' => 'style="background:#ff9800;color:white;padding:4px 8px;border-radius:3px;"',
 			'overdue' => 'style="background:#f44336;color:white;padding:4px 8px;border-radius:3px;"',
 			default => 'style="background:#4caf50;color:white;padding:4px 8px;border-radius:3px;"',

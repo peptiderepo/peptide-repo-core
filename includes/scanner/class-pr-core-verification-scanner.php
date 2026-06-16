@@ -28,11 +28,11 @@ class PR_Core_Verification_Scanner {
 	 * @return void
 	 */
 	public static function run_scan(): void {
-		$repo = new PR_Core_Peptide_Repository();
-		$peptides = $repo->find_all( [ 'status' => 'publish' ] );
+		$repo     = new PR_Core_Peptide_Repository();
+		$peptides = $repo->find_all( array( 'status' => 'publish' ) );
 
-		$due_peptides = [];
-		$overdue_peptides = [];
+		$due_peptides     = array();
+		$overdue_peptides = array();
 
 		foreach ( $peptides as $dto ) {
 			$last_verified = get_post_meta( $dto->id, '_pr_last_source_verified', true );
@@ -102,17 +102,17 @@ class PR_Core_Verification_Scanner {
 	 * @return void
 	 */
 	private static function log_scan( int $total, int $due, int $overdue ): void {
-		$log = get_option( self::SCAN_LOG_OPTION_KEY, [] );
+		$log = get_option( self::SCAN_LOG_OPTION_KEY, array() );
 		if ( ! is_array( $log ) ) {
-			$log = [];
+			$log = array();
 		}
 
-		$log[] = [
+		$log[] = array(
 			'timestamp' => current_time( 'mysql' ),
 			'total'     => $total,
 			'due'       => $due,
 			'overdue'   => $overdue,
-		];
+		);
 
 		// Keep only the last MAX_LOG_ENTRIES.
 		if ( count( $log ) > self::MAX_LOG_ENTRIES ) {
@@ -137,9 +137,12 @@ class PR_Core_Verification_Scanner {
 
 		// Parse comma-separated emails.
 		$emails = array_map( 'trim', explode( ',', $recipients ) );
-		$emails = array_filter( $emails, static function ( $email ) {
-			return is_email( $email );
-		} );
+		$emails = array_filter(
+			$emails,
+			static function ( $email ) {
+				return is_email( $email );
+			}
+		);
 
 		if ( empty( $emails ) ) {
 			return;
@@ -153,7 +156,7 @@ class PR_Core_Verification_Scanner {
 
 		$body = self::build_email_body( $due_peptides, $overdue_peptides );
 
-		wp_mail( $emails, $subject, $body, [ 'Content-Type: text/html; charset=UTF-8' ] );
+		wp_mail( $emails, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
 	}
 
 	/**
@@ -170,7 +173,7 @@ class PR_Core_Verification_Scanner {
 			$body .= '<h3>Overdue for review (' . count( $overdue_peptides ) . ')</h3><ul>';
 			foreach ( $overdue_peptides as $dto ) {
 				$edit_url = get_edit_post_link( $dto->id );
-				$body .= sprintf(
+				$body    .= sprintf(
 					'<li><a href="%s">%s</a></li>',
 					esc_url( $edit_url ),
 					esc_html( $dto->title )
@@ -183,7 +186,7 @@ class PR_Core_Verification_Scanner {
 			$body .= '<h3>Due for review (' . count( $due_peptides ) . ')</h3><ul>';
 			foreach ( $due_peptides as $dto ) {
 				$edit_url = get_edit_post_link( $dto->id );
-				$body .= sprintf(
+				$body    .= sprintf(
 					'<li><a href="%s">%s</a></li>',
 					esc_url( $edit_url ),
 					esc_html( $dto->title )

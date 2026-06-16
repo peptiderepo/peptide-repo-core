@@ -33,8 +33,8 @@ class PR_Core_Related_Posts_Section {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'pr_core_after_peptide_content', [ $this, 'render' ] );
-		add_action( 'save_post_post', [ $this, 'invalidate_caches' ] );
+		add_action( 'pr_core_after_peptide_content', array( $this, 'render' ) );
+		add_action( 'save_post_post', array( $this, 'invalidate_caches' ) );
 	}
 
 	/**
@@ -72,7 +72,7 @@ class PR_Core_Related_Posts_Section {
 						break;
 					}
 					setup_postdata( $post );
-					get_template_part( 'template-parts/related-posts/card', null, [ 'post' => $post ] );
+					get_template_part( 'template-parts/related-posts/card', null, array( 'post' => $post ) );
 					++$count;
 				}
 				wp_reset_postdata();

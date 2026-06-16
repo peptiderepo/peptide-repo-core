@@ -39,12 +39,12 @@ class PR_Core_Dosing_Repository {
 	 * @param array<string, mixed> $filters    Optional: route, population, evidence_strength.
 	 * @return PR_Core_Dosing_Row_DTO[]
 	 */
-	public function find_by_peptide( int $peptide_id, array $filters = [] ): array {
+	public function find_by_peptide( int $peptide_id, array $filters = array() ): array {
 		global $wpdb;
 		$table = $wpdb->prefix . 'pr_dosing_rows';
 
-		$where  = [ 'peptide_id = %d', 'superseded_by_id IS NULL' ];
-		$params = [ $peptide_id ];
+		$where  = array( 'peptide_id = %d', 'superseded_by_id IS NULL' );
+		$params = array( $peptide_id );
 
 		if ( ! empty( $filters['route'] ) ) {
 			$where[]  = 'route = %s';
@@ -70,7 +70,7 @@ class PR_Core_Dosing_Repository {
 				...$params
 			),
 			ARRAY_A
-		) ?: [];
+		) ?: array();
 
 		return array_map(
 			static fn( array $row ) => new PR_Core_Dosing_Row_DTO( $row ),
@@ -92,7 +92,7 @@ class PR_Core_Dosing_Repository {
 		global $wpdb;
 		$table = $wpdb->prefix . 'pr_dosing_rows';
 
-		$row = $this->sanitize_row( $data );
+		$row                   = $this->sanitize_row( $data );
 		$row['added_at']       = current_time( 'mysql' );
 		$row['schema_version'] = 1;
 
@@ -137,10 +137,10 @@ class PR_Core_Dosing_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->update(
 			$table,
-			[ 'superseded_by_id' => $new_id ],
-			[ 'id' => $old_id ],
-			[ '%d' ],
-			[ '%d' ]
+			array( 'superseded_by_id' => $new_id ),
+			array( 'id' => $old_id ),
+			array( '%d' ),
+			array( '%d' )
 		);
 
 		return $new_id;
@@ -172,7 +172,7 @@ class PR_Core_Dosing_Repository {
 	 * @return array<string, mixed> Sanitized row.
 	 */
 	private function sanitize_row( array $data ): array {
-		return [
+		return array(
 			'peptide_id'         => absint( $data['peptide_id'] ?? 0 ),
 			'dose_min'           => isset( $data['dose_min'] ) ? (float) $data['dose_min'] : null,
 			'dose_max'           => isset( $data['dose_max'] ) ? (float) $data['dose_max'] : null,
@@ -195,6 +195,6 @@ class PR_Core_Dosing_Repository {
 			'added_by'           => absint( $data['added_by'] ?? get_current_user_id() ),
 			'reviewed_by'        => isset( $data['reviewed_by'] ) ? absint( $data['reviewed_by'] ) : null,
 			'reviewed_at'        => $data['reviewed_at'] ?? null,
-		];
+		);
 	}
 }

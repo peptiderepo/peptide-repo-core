@@ -34,7 +34,7 @@ class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 	public const META_FORMULA = '_pr_molecular_formula';
 
 	/** @var string Meta key: molecular weight as float string (PR Core namespace). */
-	public const META_WEIGHT  = '_pr_molecular_weight';
+	public const META_WEIGHT = '_pr_molecular_weight';
 
 	/** @var string Meta key: aliases JSON array (PR Core namespace). */
 	public const META_ALIASES = '_pr_aliases';
@@ -66,20 +66,27 @@ class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 			return;
 		}
 
-		$counts = [ 'skipped' => 0, 'copied_psa' => 0, 'pubchem_ok' => 0, 'pubchem_skip' => 0 ];
+		$counts = array(
+			'skipped'      => 0,
+			'copied_psa'   => 0,
+			'pubchem_ok'   => 0,
+			'pubchem_skip' => 0,
+		);
 
 		foreach ( $peptide_ids as $post_id ) {
 			$result             = $this->backfill_post( $post_id );
 			$counts[ $result ] += 1;
 		}
 
-		error_log( sprintf(
-			'[PR Core Migration 0004] Complete. Skipped: %d, PSA-copied: %d, PubChem-ok: %d, PubChem-skip: %d',
-			$counts['skipped'],
-			$counts['copied_psa'],
-			$counts['pubchem_ok'],
-			$counts['pubchem_skip']
-		) );
+		error_log(
+			sprintf(
+				'[PR Core Migration 0004] Complete. Skipped: %d, PSA-copied: %d, PubChem-ok: %d, PubChem-skip: %d',
+				$counts['skipped'],
+				$counts['copied_psa'],
+				$counts['pubchem_ok'],
+				$counts['pubchem_skip']
+			)
+		);
 	}
 
 	/**
@@ -125,26 +132,30 @@ class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 		}
 
 		if ( null === $data ) {
-			error_log( sprintf(
-				'[PR Core Migration 0004] Post ID %d (%s): PubChem returned no data — leaving meta empty.',
-				$post_id,
-				esc_html( $name )
-			) );
+			error_log(
+				sprintf(
+					'[PR Core Migration 0004] Post ID %d (%s): PubChem returned no data — leaving meta empty.',
+					$post_id,
+					esc_html( $name )
+				)
+			);
 			return 'pubchem_skip';
 		}
 
 		$formula      = PR_Core_Schema_Sanitizers::sanitize_molecular_formula( $data['formula'] );
 		$weight       = (float) $data['weight'];
-		$aliases_json = $this->synonyms_to_json( $data['synonyms'] ?? [] );
+		$aliases_json = $this->synonyms_to_json( $data['synonyms'] ?? array() );
 		$this->write_pr_meta( $post_id, $formula, $weight, $aliases_json );
 
-		error_log( sprintf(
-			'[PR Core Migration 0004] Post ID %d (%s): PubChem-sourced formula=%s weight=%s',
-			$post_id,
-			esc_html( $name ),
-			$formula,
-			(string) $weight
-		) );
+		error_log(
+			sprintf(
+				'[PR Core Migration 0004] Post ID %d (%s): PubChem-sourced formula=%s weight=%s',
+				$post_id,
+				esc_html( $name ),
+				$formula,
+				(string) $weight
+			)
+		);
 
 		return 'pubchem_ok';
 	}
@@ -223,7 +234,7 @@ class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 			return '[]';
 		}
 
-		$clean = [];
+		$clean = array();
 		foreach ( explode( ',', $value ) as $part ) {
 			$alias = sanitize_text_field( trim( $part ) );
 			if ( '' !== $alias ) {
@@ -243,7 +254,7 @@ class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 	 * @return string JSON array of sanitized strings.
 	 */
 	private function synonyms_to_json( array $synonyms ): string {
-		$clean = [];
+		$clean = array();
 		foreach ( $synonyms as $syn ) {
 			$alias = sanitize_text_field( (string) $syn );
 			if ( '' !== $alias ) {
@@ -259,12 +270,14 @@ class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 	 * @return int[]
 	 */
 	private function get_all_peptide_ids(): array {
-		$posts = get_posts( [
-			'post_type'      => PR_Core_Peptide_CPT::POST_TYPE,
-			'post_status'    => 'publish',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-		] );
-		return array_map( 'intval', is_array( $posts ) ? $posts : [] );
+		$posts = get_posts(
+			array(
+				'post_type'      => PR_Core_Peptide_CPT::POST_TYPE,
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+			)
+		);
+		return array_map( 'intval', is_array( $posts ) ? $posts : array() );
 	}
 }

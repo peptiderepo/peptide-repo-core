@@ -93,7 +93,7 @@ class PR_Core_Activator {
 	 */
 	private static function add_capabilities(): void {
 		$cap   = 'manage_peptide_content';
-		$roles = [ 'administrator', 'editor' ];
+		$roles = array( 'administrator', 'editor' );
 
 		foreach ( $roles as $role_name ) {
 			$role = get_role( $role_name );
@@ -156,4 +156,3 @@ class PR_Core_Activator {
 		}
 	}
 }
-

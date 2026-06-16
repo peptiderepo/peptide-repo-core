@@ -40,12 +40,15 @@ require_once PR_CORE_PLUGIN_DIR . 'includes/class-pr-core.php';
 
 /* ── Activation / Deactivation ────────────────────────────────────────── */
 
-register_activation_hook( __FILE__, [ 'PR_Core_Activator', 'activate' ] );
-register_deactivation_hook( __FILE__, [ 'PR_Core_Deactivator', 'deactivate' ] );
+register_activation_hook( __FILE__, array( 'PR_Core_Activator', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'PR_Core_Deactivator', 'deactivate' ) );
 
 /* ── Boot ──────────────────────────────────────────────────────────────── */
 
-add_action( 'plugins_loaded', static function (): void {
-	$plugin = new PR_Core();
-	$plugin->init();
-} );
+add_action(
+	'plugins_loaded',
+	static function (): void {
+		$plugin = new PR_Core();
+		$plugin->init();
+	}
+);

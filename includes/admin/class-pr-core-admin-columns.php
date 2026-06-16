@@ -19,7 +19,7 @@ class PR_Core_Admin_Columns {
 	 * @return array<string, string> Modified columns.
 	 */
 	public function add_columns( array $columns ): array {
-		$new = [];
+		$new = array();
 		foreach ( $columns as $key => $label ) {
 			$new[ $key ] = $label;
 

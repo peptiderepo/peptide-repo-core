@@ -74,7 +74,7 @@ class PR_Core_Candidate_DTO {
 	 * @return array<string, mixed>
 	 */
 	public function to_array(): array {
-		return [
+		return array(
 			'id'                    => $this->id,
 			'peptide_id'            => $this->peptide_id,
 			'dose_min'              => $this->dose_min,
@@ -90,6 +90,6 @@ class PR_Core_Candidate_DTO {
 			'extraction_confidence' => $this->extraction_confidence,
 			'queue_status'          => $this->queue_status,
 			'extracted_at'          => $this->extracted_at,
-		];
+		);
 	}
 }

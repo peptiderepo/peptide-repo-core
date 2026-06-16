@@ -25,12 +25,12 @@ class PR_Core_Migration_Runner {
 	 *
 	 * @var string[]
 	 */
-	private const MIGRATIONS = [
+	private const MIGRATIONS = array(
 		'PR_Core_Migration_0001_Dosing_Rows',
 		'PR_Core_Migration_0002_Legal_Cells',
 		'PR_Core_Migration_0003_Candidate_Queue',
 		'PR_Core_Migration_0004_Backfill_Peptide_Meta',
-	];
+	);
 
 	/**
 	 * Run all pending migrations up to PR_CORE_TARGET_SCHEMA_VERSION.
@@ -90,7 +90,7 @@ class PR_Core_Migration_Runner {
 	 * @return string Absolute file path.
 	 */
 	private function class_to_file( string $class ): string {
-		$suffix = substr( $class, 8 ); // Strip 'PR_Core_'.
+		$suffix   = substr( $class, 8 ); // Strip 'PR_Core_'.
 		$filename = 'class-pr-core-' . str_replace( '_', '-', strtolower( $suffix ) ) . '.php';
 
 		return PR_CORE_PLUGIN_DIR . 'includes/migrations/' . $filename;

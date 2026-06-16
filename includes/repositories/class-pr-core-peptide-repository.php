@@ -36,12 +36,14 @@ class PR_Core_Peptide_Repository {
 	 * @return PR_Core_Peptide_DTO|null
 	 */
 	public function find_by_slug( string $slug ): ?PR_Core_Peptide_DTO {
-		$posts = get_posts( [
-			'post_type'      => PR_Core_Peptide_CPT::POST_TYPE,
-			'name'           => sanitize_title( $slug ),
-			'posts_per_page' => 1,
-			'post_status'    => 'any',
-		] );
+		$posts = get_posts(
+			array(
+				'post_type'      => PR_Core_Peptide_CPT::POST_TYPE,
+				'name'           => sanitize_title( $slug ),
+				'posts_per_page' => 1,
+				'post_status'    => 'any',
+			)
+		);
 
 		return ! empty( $posts ) ? $this->post_to_dto( $posts[0] ) : null;
 	}
@@ -56,14 +58,16 @@ class PR_Core_Peptide_Repository {
 	public function search( string $query, int $limit = 20 ): array {
 		$query = sanitize_text_field( $query );
 
-		$posts = get_posts( [
-			'post_type'      => PR_Core_Peptide_CPT::POST_TYPE,
-			's'              => $query,
-			'posts_per_page' => $limit,
-			'post_status'    => 'publish',
-		] );
+		$posts = get_posts(
+			array(
+				'post_type'      => PR_Core_Peptide_CPT::POST_TYPE,
+				's'              => $query,
+				'posts_per_page' => $limit,
+				'post_status'    => 'publish',
+			)
+		);
 
-		return array_map( [ $this, 'post_to_dto' ], $posts );
+		return array_map( array( $this, 'post_to_dto' ), $posts );
 	}
 
 	/**
@@ -73,23 +77,25 @@ class PR_Core_Peptide_Repository {
 	 *                                      evidence_strength, per_page, page.
 	 * @return PR_Core_Peptide_DTO[]
 	 */
-	public function find_all( array $filters = [] ): array {
-		$args = [
+	public function find_all( array $filters = array() ): array {
+		$args = array(
 			'post_type'      => PR_Core_Peptide_CPT::POST_TYPE,
 			'posts_per_page' => (int) ( $filters['per_page'] ?? 100 ),
 			'paged'          => (int) ( $filters['page'] ?? 1 ),
 			'orderby'        => 'title',
 			'order'          => 'ASC',
-		];
+		);
 
 		$args['post_status'] = $filters['status'] ?? 'publish';
 
 		if ( ! empty( $filters['category'] ) ) {
-			$args['tax_query'] = [ [
-				'taxonomy' => PR_Core_Peptide_CPT::TAX_CATEGORY,
-				'field'    => 'slug',
-				'terms'    => sanitize_text_field( $filters['category'] ),
-			] ];
+			$args['tax_query'] = array(
+				array(
+					'taxonomy' => PR_Core_Peptide_CPT::TAX_CATEGORY,
+					'field'    => 'slug',
+					'terms'    => sanitize_text_field( $filters['category'] ),
+				),
+			);
 		}
 
 		// v0.2.0: `family` filter silently ignored — `pr_peptide_family` taxonomy
@@ -98,15 +104,17 @@ class PR_Core_Peptide_Repository {
 		// REST schema in a future minor bump.
 
 		if ( ! empty( $filters['evidence_strength'] ) ) {
-			$args['meta_query'] = [ [
-				'key'   => 'evidence_strength',
-				'value' => sanitize_text_field( $filters['evidence_strength'] ),
-			] ];
+			$args['meta_query'] = array(
+				array(
+					'key'   => 'evidence_strength',
+					'value' => sanitize_text_field( $filters['evidence_strength'] ),
+				),
+			);
 		}
 
 		$posts = get_posts( $args );
 
-		return array_map( [ $this, 'post_to_dto' ], $posts );
+		return array_map( array( $this, 'post_to_dto' ), $posts );
 	}
 
 	/**
@@ -128,34 +136,36 @@ class PR_Core_Peptide_Repository {
 	 */
 	private function post_to_dto( \WP_Post $post ): PR_Core_Peptide_DTO {
 		$aliases_raw = get_post_meta( $post->ID, 'aliases', true );
-		$aliases     = json_decode( $aliases_raw ?: '[]', true ) ?: [];
+		$aliases     = json_decode( $aliases_raw ?: '[]', true ) ?: array();
 
-		$categories = wp_get_post_terms( $post->ID, PR_Core_Peptide_CPT::TAX_CATEGORY, [ 'fields' => 'names' ] );
+		$categories = wp_get_post_terms( $post->ID, PR_Core_Peptide_CPT::TAX_CATEGORY, array( 'fields' => 'names' ) );
 		// v0.2.0: `pr_peptide_family` taxonomy removed. DTO `families` field
 		// preserved as empty array to keep the REST response shape stable for
 		// clients; will be dropped in a future minor bump with a release note.
-		$families   = [];
+		$families = array();
 
-		return new PR_Core_Peptide_DTO( [
-			'id'                       => $post->ID,
-			'title'                    => $post->post_title,
-			'slug'                     => $post->post_name,
-			'content'                  => $post->post_content,
-			'excerpt'                  => $post->post_excerpt,
-			'status'                   => $post->post_status,
-			'display_name'             => get_post_meta( $post->ID, 'display_name', true ) ?: '',
-			'aliases'                  => $aliases,
-			'molecular_formula'        => get_post_meta( $post->ID, 'molecular_formula', true ) ?: '',
-			'molecular_weight'         => (float) get_post_meta( $post->ID, 'molecular_weight', true ),
-			'cas_number'               => get_post_meta( $post->ID, 'cas_number', true ) ?: '',
-			'drugbank_id'              => get_post_meta( $post->ID, 'drugbank_id', true ) ?: '',
-			'chembl_id'                => get_post_meta( $post->ID, 'chembl_id', true ) ?: '',
-			'evidence_strength'        => get_post_meta( $post->ID, 'evidence_strength', true ) ?: 'preclinical',
-			'editorial_review_status'  => get_post_meta( $post->ID, 'editorial_review_status', true ) ?: 'draft',
-			'last_editorial_review_at' => get_post_meta( $post->ID, 'last_editorial_review_at', true ) ?: '',
-			'medical_editor_id'        => (int) get_post_meta( $post->ID, 'medical_editor_id', true ),
-			'categories'               => is_array( $categories ) ? $categories : [],
-			'families'                 => $families,
-		] );
+		return new PR_Core_Peptide_DTO(
+			array(
+				'id'                       => $post->ID,
+				'title'                    => $post->post_title,
+				'slug'                     => $post->post_name,
+				'content'                  => $post->post_content,
+				'excerpt'                  => $post->post_excerpt,
+				'status'                   => $post->post_status,
+				'display_name'             => get_post_meta( $post->ID, 'display_name', true ) ?: '',
+				'aliases'                  => $aliases,
+				'molecular_formula'        => get_post_meta( $post->ID, 'molecular_formula', true ) ?: '',
+				'molecular_weight'         => (float) get_post_meta( $post->ID, 'molecular_weight', true ),
+				'cas_number'               => get_post_meta( $post->ID, 'cas_number', true ) ?: '',
+				'drugbank_id'              => get_post_meta( $post->ID, 'drugbank_id', true ) ?: '',
+				'chembl_id'                => get_post_meta( $post->ID, 'chembl_id', true ) ?: '',
+				'evidence_strength'        => get_post_meta( $post->ID, 'evidence_strength', true ) ?: 'preclinical',
+				'editorial_review_status'  => get_post_meta( $post->ID, 'editorial_review_status', true ) ?: 'draft',
+				'last_editorial_review_at' => get_post_meta( $post->ID, 'last_editorial_review_at', true ) ?: '',
+				'medical_editor_id'        => (int) get_post_meta( $post->ID, 'medical_editor_id', true ),
+				'categories'               => is_array( $categories ) ? $categories : array(),
+				'families'                 => $families,
+			)
+		);
 	}
 }

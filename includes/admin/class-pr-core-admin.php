@@ -25,22 +25,22 @@ class PR_Core_Admin {
 	 */
 	public function register_hooks(): void {
 		$metaboxes = new PR_Core_Peptide_Metaboxes();
-		add_action( 'add_meta_boxes', [ $metaboxes, 'add_meta_boxes' ] );
-		add_action( 'save_post_' . PR_Core_Peptide_CPT::POST_TYPE, [ $metaboxes, 'save_meta' ], 10, 2 );
+		add_action( 'add_meta_boxes', array( $metaboxes, 'add_meta_boxes' ) );
+		add_action( 'save_post_' . PR_Core_Peptide_CPT::POST_TYPE, array( $metaboxes, 'save_meta' ), 10, 2 );
 
-		add_action( 'add_meta_boxes', [ PR_Core_Verification_Metabox::class, 'register' ] );
+		add_action( 'add_meta_boxes', array( PR_Core_Verification_Metabox::class, 'register' ) );
 
 		$columns = new PR_Core_Admin_Columns();
-		add_filter( 'manage_' . PR_Core_Peptide_CPT::POST_TYPE . '_posts_columns', [ $columns, 'add_columns' ] );
-		add_action( 'manage_' . PR_Core_Peptide_CPT::POST_TYPE . '_posts_custom_column', [ $columns, 'render_column' ], 10, 2 );
+		add_filter( 'manage_' . PR_Core_Peptide_CPT::POST_TYPE . '_posts_columns', array( $columns, 'add_columns' ) );
+		add_action( 'manage_' . PR_Core_Peptide_CPT::POST_TYPE . '_posts_custom_column', array( $columns, 'render_column' ), 10, 2 );
 
 		// Repo Daily meta boxes.
 		$repo_daily_metaboxes = new PR_Core_Repo_Daily_Metaboxes();
-		add_action( 'add_meta_boxes', [ $repo_daily_metaboxes, 'add_meta_boxes' ] );
-		add_action( 'save_post_' . PR_Core_Repo_Daily_CPT::POST_TYPE, [ $repo_daily_metaboxes, 'save_meta' ], 10, 2 );
+		add_action( 'add_meta_boxes', array( $repo_daily_metaboxes, 'add_meta_boxes' ) );
+		add_action( 'save_post_' . PR_Core_Repo_Daily_CPT::POST_TYPE, array( $repo_daily_metaboxes, 'save_meta' ), 10, 2 );
 
-		add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_styles' ] );
+		add_action( 'admin_menu', array( $this, 'add_admin_pages' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
 	}
 
 	/**
@@ -60,7 +60,7 @@ class PR_Core_Admin {
 			__( 'Candidate Queue', 'peptide-repo-core' ) . $badge,
 			PR_Core_Peptide_CPT::CAPABILITY,
 			'pr-core-candidates',
-			[ new PR_Core_Candidate_Queue_Page(), 'render' ]
+			array( new PR_Core_Candidate_Queue_Page(), 'render' )
 		);
 	}
 
@@ -79,7 +79,7 @@ class PR_Core_Admin {
 		wp_enqueue_style(
 			'pr-core-admin',
 			PR_CORE_PLUGIN_URL . 'assets/css/admin.css',
-			[],
+			array(),
 			PR_CORE_VERSION
 		);
 	}
