@@ -18,7 +18,6 @@ declare(strict_types=1);
  * Settings read:
  * - pr_core_related_posts_enabled (bool, default true)
  * - pr_core_related_posts_limit (int, default 3, range 1-6)
- *
  */
 class PR_Core_Related_Posts_Section {
 
