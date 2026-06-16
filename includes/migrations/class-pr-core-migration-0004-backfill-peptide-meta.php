@@ -45,7 +45,10 @@ class PR_Core_Migration_0004_Backfill_Peptide_Meta {
 	/** @var string Meta key: aliases JSON array (PR Core namespace). */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	public const META_ALIASES = '_pr_aliases';
 
-	/** @var PR_Core_Pubchem_Client HTTP client for PubChem REST API. */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+	/**
+	 * HTTP client for PubChem REST API.
+	 * @var PR_Core_Pubchem_Client
+	 */
 	private PR_Core_Pubchem_Client $pubchem;
 
 	/**
