@@ -60,6 +60,7 @@ class PR_Core_Settings {
 
 	/**
 	 * Render the settings page HTML. Delegates to PR_Core_Settings_Renderer.
+	 *
 	 * @return void
 	 */
 	public static function render_page(): void {
@@ -114,6 +115,7 @@ class PR_Core_Settings {
 
 	/**
 	 * Render the enable/disable checkbox field. Delegates to PR_Core_Settings_Renderer.
+	 *
 	 * @return void
 	 */
 	public static function render_enabled_field(): void {
@@ -122,6 +124,7 @@ class PR_Core_Settings {
 
 	/**
 	 * Render the article count limit field. Delegates to PR_Core_Settings_Renderer.
+	 *
 	 * @return void
 	 */
 	public static function render_limit_field(): void {
@@ -192,6 +195,7 @@ class PR_Core_Settings {
 
 	/**
 	 * Render the verification section header. Delegates to PR_Core_Settings_Renderer.
+	 *
 	 * @return void
 	 */
 	public static function render_verification_section(): void {
@@ -200,6 +204,7 @@ class PR_Core_Settings {
 
 	/**
 	 * Render the scan cadence select field. Delegates to PR_Core_Settings_Renderer.
+	 *
 	 * @return void
 	 */
 	public static function render_cadence_field(): void {
@@ -208,6 +213,7 @@ class PR_Core_Settings {
 
 	/**
 	 * Render the score threshold input field. Delegates to PR_Core_Settings_Renderer.
+	 *
 	 * @return void
 	 */
 	public static function render_threshold_field(): void {
@@ -216,6 +222,7 @@ class PR_Core_Settings {
 
 	/**
 	 * Render the high-velocity scan toggle field. Delegates to PR_Core_Settings_Renderer.
+	 *
 	 * @return void
 	 */
 	public static function render_high_velocity_field(): void {
@@ -224,6 +231,7 @@ class PR_Core_Settings {
 
 	/**
 	 * Render the alert email input field. Delegates to PR_Core_Settings_Renderer.
+	 *
 	 * @return void
 	 */
 	public static function render_email_field(): void {

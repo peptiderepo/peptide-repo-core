@@ -1,6 +1,7 @@
 <?php
 /**
  * Migration 0004: Backfill peptide schema meta.
+ *
  * @package Peptide_Repo_Core
  */
 
