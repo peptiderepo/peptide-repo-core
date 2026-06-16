@@ -1,10 +1,10 @@
 <?php
-
 /**
  * Part of the Peptide Repo Core plugin.
  *
  * @package Peptide_Repo_Core
  */
+
 /**
  * Plugin Name: Peptide Repo Core
  * Plugin URI:  https://peptiderepo.com

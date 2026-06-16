@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Peptide_Repo_Core
+ */
+
 declare(strict_types=1);
 
 /**
