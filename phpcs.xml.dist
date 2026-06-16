@@ -31,15 +31,11 @@
 		<exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed"/>
 		<!-- Error log calls used for debug fallback in migration code; acceptable -->
 		<exclude name="WordPress.PHP.DevelopmentFunctions.error_log_error_log"/>
-		<!-- file_get_contents used for local file reads, not HTTP (migration-0004) -->
+		<!-- file_get_contents used for local file reads, not HTTP -->
 		<exclude name="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents"/>
 		<!-- @ silencing used only in PubChem HTTP client for network errors -->
 		<exclude name="WordPress.PHP.NoSilencedErrors.Discouraged"/>
-		<!-- Duplicate interface name from PHPCS scanning both definition sites -->
+		<!-- Duplicate interface name: PHPCS false-positive scanning both interface definition sites -->
 		<exclude name="Generic.Classes.DuplicateClassName.Found"/>
-		<!-- Prepared SQL placeholder warning: false positive on dynamic table names -->
-		<exclude name="WordPress.DB.PreparedSQLPlaceholders.ReplacementsFound"/>
-		<!-- Reserved keyword 'class' in string context (PHP 8.x ::class syntax) -->
-		<exclude name="WordPress.WP.ReservedKeyword.class"/>
 	</rule>
 </ruleset>

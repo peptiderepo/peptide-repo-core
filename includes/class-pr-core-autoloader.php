@@ -57,16 +57,16 @@ class PR_Core_Autoloader {
 	/**
 	 * Autoload callback. Only handles PR_Core_ prefixed classes.
 	 *
-	 * @param string $class Fully-qualified class name.
+	 * @param string $class_name Fully-qualified class name.
 	 * @return void
 	 */
-	public static function load( string $class ): void {
-		if ( 0 !== strpos( $class, 'PR_Core_' ) ) {
+	public static function load( string $class_name ): void {
+		if ( 0 !== strpos( $class_name, 'PR_Core_' ) ) {
 			return;
 		}
 
 		// PR_Core_Foo_Bar => foo-bar => class-pr-core-foo-bar.php.
-		$suffix   = substr( $class, 8 ); // Strip 'PR_Core_'.
+		$suffix   = substr( $class_name, 8 ); // Strip 'PR_Core_'.
 		$filename = 'class-pr-core-' . str_replace( '_', '-', strtolower( $suffix ) ) . '.php';
 
 		foreach ( self::$dirs as $dir ) {

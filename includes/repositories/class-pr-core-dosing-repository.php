@@ -77,7 +77,7 @@ class PR_Core_Dosing_Repository {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$rows = $wpdb->get_results(
-			$wpdb->prepare(
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- dynamic {$where_sql} is builder-constructed, not a placeholder
 				"SELECT * FROM {$table} WHERE {$where_sql} ORDER BY evidence_strength DESC, study_year DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				...$params
 			),

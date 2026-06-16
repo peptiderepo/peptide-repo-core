@@ -102,11 +102,11 @@ class PR_Core_Migration_Runner {
 	 *
 	 * PR_Core_Migration_0001_Dosing_Rows => migrations/class-pr-core-migration-0001-dosing-rows.php
 	 *
-	 * @param string $class Fully-qualified class name.
+	 * @param string $class_name Fully-qualified class name.
 	 * @return string Absolute file path.
 	 */
-	private function class_to_file( string $class ): string {
-		$suffix   = substr( $class, 8 ); // Strip 'PR_Core_'.
+	private function class_to_file( string $class_name ): string {
+		$suffix   = substr( $class_name, 8 ); // Strip 'PR_Core_'.
 		$filename = 'class-pr-core-' . str_replace( '_', '-', strtolower( $suffix ) ) . '.php';
 
 		return PR_CORE_PLUGIN_DIR . 'includes/migrations/' . $filename;
