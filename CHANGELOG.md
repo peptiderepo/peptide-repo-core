@@ -3,6 +3,16 @@
 All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
+
+## [0.7.0] - 2026-06-16
+
+### Changed
+- CI: adopt estate reusable workflow (thin caller, tests: stubs, has_js: false).
+- PHPUnit test suite: 7 hand-rolled test scripts converted to 7 TestCase classes.
+- Added phpunit/phpunit ^9.6, yoast/phpunit-polyfills ^2.0 to require-dev.
+- Added phpunit.xml.dist and composer test script.
+- deploy.yml: added permissions: contents: write.
+
 ## [0.6.2] — 2026-06-13
 
 ### Fixed

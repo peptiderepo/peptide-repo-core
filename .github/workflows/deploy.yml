@@ -4,8 +4,10 @@ on:
   push:
     branches: [ main ]
 
+# contents: write required so the ci.yml caller can pass write permission
+# through to the phpcbf auto-commit step in the reusable workflow.
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: deploy-peptide-repo-core
