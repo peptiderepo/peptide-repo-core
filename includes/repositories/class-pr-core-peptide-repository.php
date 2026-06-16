@@ -11,6 +11,7 @@ declare(strict_types=1);
  * @see dto/class-pr-core-peptide-dto.php         — Return type.
  * @see cpt/class-pr-core-peptide-cpt.php         — CPT and meta registration.
  * @see repositories/class-pr-core-dosing-repository.php — Related dosing data.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Peptide_Repository {
 
@@ -98,9 +99,9 @@ class PR_Core_Peptide_Repository {
 			);
 		}
 
-		// v0.2.0: `family` filter silently ignored — `pr_peptide_family` taxonomy
-		// was removed with the CPT consolidation. Callers passing `family` get
-		// all-category results rather than a fatal. Remove this key from the
+		// v0.2.0: `family` filter silently ignored — `pr_peptide_family` taxonomy.
+		// was removed with the CPT consolidation. Callers passing `family` get.
+		// all-category results rather than a fatal. Remove this key from the.
 		// REST schema in a future minor bump.
 
 		if ( ! empty( $filters['evidence_strength'] ) ) {
@@ -136,11 +137,11 @@ class PR_Core_Peptide_Repository {
 	 */
 	private function post_to_dto( \WP_Post $post ): PR_Core_Peptide_DTO {
 		$aliases_raw = get_post_meta( $post->ID, 'aliases', true );
-		$aliases     = json_decode( $aliases_raw ?: '[]', true ) ?: array();
+		$aliases     = json_decode( $aliases_raw ?: '[]', true ) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		$categories = wp_get_post_terms( $post->ID, PR_Core_Peptide_CPT::TAX_CATEGORY, array( 'fields' => 'names' ) );
-		// v0.2.0: `pr_peptide_family` taxonomy removed. DTO `families` field
-		// preserved as empty array to keep the REST response shape stable for
+		// v0.2.0: `pr_peptide_family` taxonomy removed. DTO `families` field.
+		// preserved as empty array to keep the REST response shape stable for.
 		// clients; will be dropped in a future minor bump with a release note.
 		$families = array();
 
@@ -152,16 +153,16 @@ class PR_Core_Peptide_Repository {
 				'content'                  => $post->post_content,
 				'excerpt'                  => $post->post_excerpt,
 				'status'                   => $post->post_status,
-				'display_name'             => get_post_meta( $post->ID, 'display_name', true ) ?: '',
+				'display_name'             => get_post_meta( $post->ID, 'display_name', true ) ?: '', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 				'aliases'                  => $aliases,
-				'molecular_formula'        => get_post_meta( $post->ID, 'molecular_formula', true ) ?: '',
+				'molecular_formula'        => get_post_meta( $post->ID, 'molecular_formula', true ) ?: '', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 				'molecular_weight'         => (float) get_post_meta( $post->ID, 'molecular_weight', true ),
-				'cas_number'               => get_post_meta( $post->ID, 'cas_number', true ) ?: '',
-				'drugbank_id'              => get_post_meta( $post->ID, 'drugbank_id', true ) ?: '',
-				'chembl_id'                => get_post_meta( $post->ID, 'chembl_id', true ) ?: '',
-				'evidence_strength'        => get_post_meta( $post->ID, 'evidence_strength', true ) ?: 'preclinical',
-				'editorial_review_status'  => get_post_meta( $post->ID, 'editorial_review_status', true ) ?: 'draft',
-				'last_editorial_review_at' => get_post_meta( $post->ID, 'last_editorial_review_at', true ) ?: '',
+				'cas_number'               => get_post_meta( $post->ID, 'cas_number', true ) ?: '', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+				'drugbank_id'              => get_post_meta( $post->ID, 'drugbank_id', true ) ?: '', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+				'chembl_id'                => get_post_meta( $post->ID, 'chembl_id', true ) ?: '', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+				'evidence_strength'        => get_post_meta( $post->ID, 'evidence_strength', true ) ?: 'preclinical', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+				'editorial_review_status'  => get_post_meta( $post->ID, 'editorial_review_status', true ) ?: 'draft', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+				'last_editorial_review_at' => get_post_meta( $post->ID, 'last_editorial_review_at', true ) ?: '', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 				'medical_editor_id'        => (int) get_post_meta( $post->ID, 'medical_editor_id', true ),
 				'categories'               => is_array( $categories ) ? $categories : array(),
 				'families'                 => $families,

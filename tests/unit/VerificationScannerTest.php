@@ -30,13 +30,13 @@ class VerificationScannerTest extends TestCase {
 		require_once PR_CORE_PLUGIN_DIR . 'includes/scanner/class-pr-core-verification-scanner.php';
 	}
 
-	// ── Helper ────────────────────────────────────────────────────────
+	// ── Helper ────────────────────────────────────────────────────────.
 
 	private function days_ago( int $days ): string {
 		return gmdate( 'Y-m-d', time() - ( $days * DAY_IN_SECONDS ) );
 	}
 
-	// ── Empty last_verified ───────────────────────────────────────────
+	// ── Empty last_verified ───────────────────────────────────────────.
 
 	public function test_empty_last_verified_returns_overdue(): void {
 		$this->assertSame(
@@ -45,7 +45,7 @@ class VerificationScannerTest extends TestCase {
 		);
 	}
 
-	// ── Medium velocity (default 180-day threshold) ───────────────────
+	// ── Medium velocity (default 180-day threshold) ───────────────────.
 
 	public function test_medium_160_days_is_current(): void {
 		$this->assertSame( 'current', PR_Core_Verification_Scanner::compute_status( $this->days_ago( 160 ), 'medium' ) );
@@ -63,7 +63,7 @@ class VerificationScannerTest extends TestCase {
 		$this->assertSame( 'overdue', PR_Core_Verification_Scanner::compute_status( $this->days_ago( 200 ), 'medium' ) );
 	}
 
-	// ── 90% boundary exactness ────────────────────────────────────────
+	// ── 90% boundary exactness ────────────────────────────────────────.
 
 	public function test_boundary_89_days_threshold_100_is_current(): void {
 		$GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 100 ];
@@ -80,7 +80,7 @@ class VerificationScannerTest extends TestCase {
 		$this->assertSame( 'overdue', PR_Core_Verification_Scanner::compute_status( $this->days_ago( 100 ), 'medium' ) );
 	}
 
-	// ── High velocity (60-day threshold from option) ──────────────────
+	// ── High velocity (60-day threshold from option) ──────────────────.
 
 	public function test_high_50_days_is_current(): void {
 		$GLOBALS['pr_core_options'] = [ 'pr_core_high_velocity_threshold' => 60 ];
@@ -97,7 +97,7 @@ class VerificationScannerTest extends TestCase {
 		$this->assertSame( 'overdue', PR_Core_Verification_Scanner::compute_status( $this->days_ago( 61 ), 'high' ) );
 	}
 
-	// ── Low velocity (365-day constant — ignores option) ──────────────
+	// ── Low velocity (365-day constant — ignores option) ──────────────.
 
 	public function test_low_300_days_is_current(): void {
 		$GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 999 ];
@@ -114,7 +114,7 @@ class VerificationScannerTest extends TestCase {
 		$this->assertSame( 'overdue', PR_Core_Verification_Scanner::compute_status( $this->days_ago( 366 ), 'low' ) );
 	}
 
-	// ── Unknown velocity falls to medium/default ──────────────────────
+	// ── Unknown velocity falls to medium/default ──────────────────────.
 
 	public function test_unknown_velocity_uses_default_threshold(): void {
 		$GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 180 ];

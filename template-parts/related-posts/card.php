@@ -12,7 +12,7 @@ if ( ! isset( $args['post'] ) ) {
 	return;
 }
 
-$post = $args['post'];
+$post = $args['post']; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 ?>
 <article class="pr-related-posts__card">
 	<?php

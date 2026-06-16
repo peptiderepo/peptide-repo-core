@@ -12,6 +12,7 @@
  *
  * @see ARCHITECTURE.md — Full data flow and file tree.
  * @see CONVENTIONS.md  — Naming patterns and extension guides.
+ * @package Peptide_Repo_Core
  */
 
 declare(strict_types=1);
@@ -33,8 +34,8 @@ define( 'PR_CORE_TARGET_SCHEMA_VERSION', 4 );
 require_once PR_CORE_PLUGIN_DIR . 'includes/class-pr-core-autoloader.php';
 PR_Core_Autoloader::register();
 
-// The main orchestrator class is loaded explicitly because its name (PR_Core)
-// equals the autoloader prefix exactly — stripping "PR_Core_" yields an empty
+// The main orchestrator class is loaded explicitly because its name (PR_Core).
+// equals the autoloader prefix exactly — stripping "PR_Core_" yields an empty.
 // suffix, producing "class-pr-core-.php" instead of "class-pr-core.php".
 require_once PR_CORE_PLUGIN_DIR . 'includes/class-pr-core.php';
 

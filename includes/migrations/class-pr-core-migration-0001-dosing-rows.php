@@ -9,6 +9,7 @@ declare(strict_types=1);
  * Dependencies: WordPress $wpdb, dbDelta().
  *
  * @see ARCHITECTURE.md — Table schema specification.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_0001_Dosing_Rows {
 

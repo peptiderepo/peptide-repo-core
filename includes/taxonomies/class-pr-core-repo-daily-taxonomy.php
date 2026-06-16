@@ -14,10 +14,15 @@ declare(strict_types=1);
  *
  * @see ARCHITECTURE.md — Content type taxonomy specification.
  * @see CONVENTIONS.md — Taxonomy ownership pattern.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Repo_Daily_Taxonomy {
 
-	/** @var string Taxonomy: repo_daily_category. */
+	/**
+	 * Taxonomy: repo_daily_category.
+	 *
+	 * @var string Taxonomy: repo_daily_category.
+	 */
 	public const TAX_CATEGORY = 'repo_daily_category';
 
 	/**

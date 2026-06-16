@@ -15,10 +15,15 @@ declare(strict_types=1);
  *
  * @see ARCHITECTURE.md — Taxonomy specification.
  * @see CONVENTIONS.md — Taxonomy ownership rule.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Topic_Taxonomy {
 
-	/** @var string Taxonomy: topic (links blog posts to peptides by slug). */
+	/**
+	 * Taxonomy: topic (links blog posts to peptides by slug).
+	 *
+	 * @var string Taxonomy: topic (links blog posts to peptides by slug).
+	 */
 	public const TAX_TOPIC = 'peptide_topic';
 
 	/**

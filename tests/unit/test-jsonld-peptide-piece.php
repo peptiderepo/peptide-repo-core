@@ -31,7 +31,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../bootstrap.php';
 
-// ── Additional stubs ─────────────────────────────────────────────────────
+// ── Additional stubs ─────────────────────────────────────────────────────.
 
 if ( ! defined( 'PR_CORE_TARGET_SCHEMA_VERSION' ) ) {
 	define( 'PR_CORE_TARGET_SCHEMA_VERSION', 4 );
@@ -129,7 +129,7 @@ if ( ! function_exists( 'sanitize_textarea_field' ) ) {
 	}
 }
 
-// ── Stub PR_Core_Peptide_Repository ──────────────────────────────────────
+// ── Stub PR_Core_Peptide_Repository ──────────────────────────────────────.
 
 /**
  * Minimal repository stub — returns whatever is in $GLOBALS['pr_test_peptide_dto'].
@@ -140,7 +140,7 @@ class PR_Core_Peptide_Repository {
 	}
 }
 
-// ── Load classes under test ───────────────────────────────────────────────
+// ── Load classes under test ───────────────────────────────────────────────.
 
 require_once PR_CORE_PLUGIN_DIR . 'includes/cpt/class-pr-core-schema-sanitizers.php';
 require_once PR_CORE_PLUGIN_DIR . 'includes/cpt/class-pr-core-peptide-cpt.php';
@@ -150,7 +150,7 @@ require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld-faq.ph
 require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld-webpage.php';
 require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld.php';
 
-// ── Helper ────────────────────────────────────────────────────────────────
+// ── Helper ────────────────────────────────────────────────────────────────.
 
 /**
  * Create a minimal PR_Core_Peptide_DTO for testing.
@@ -184,7 +184,7 @@ function make_peptide_piece_dto( array $overrides = [] ): PR_Core_Peptide_DTO {
 
 echo "== JSON-LD peptide-piece regression tests (v0.6.2) ==\n\n";
 
-// ── Setup ─────────────────────────────────────────────────────────────────
+// ── Setup ─────────────────────────────────────────────────────────────────.
 
 $GLOBALS['pr_test_the_id']        = 36;
 $GLOBALS['pr_test_is_singular']   = true;
@@ -198,11 +198,11 @@ $GLOBALS['pr_test_peptide_dto']   = make_peptide_piece_dto();
 
 $jsonld = new PR_Core_Jsonld();
 
-// ── Regression: inject_graph_pieces fatal reproduced against old contract ─
+// ── Regression: inject_graph_pieces fatal reproduced against old contract ─.
 
 echo "Regression: inject_graph_pieces (OLD hook) with plain array fatal:\n";
 
-// Simulate what Yoast's filter_graph_pieces_to_generate does:
+// Simulate what Yoast's filter_graph_pieces_to_generate does:.
 // it calls get_class($piece) on every item. A plain array causes a fatal.
 $drug_builder = new PR_Core_Jsonld_Drug();
 $drug_array   = $drug_builder->build( $GLOBALS['pr_test_peptide_dto'] );
@@ -210,8 +210,8 @@ $drug_array   = $drug_builder->build( $GLOBALS['pr_test_peptide_dto'] );
 $caught_fatal = false;
 try {
 	// This is the exact operation Yoast does in filter_graph_pieces_to_generate().
-	// Against the old v0.6.1 code (inject via wpseo_schema_graph_pieces), this would
-	// produce: "get_class(): Argument #1 ($object) must be of type object, array given"
+	// Against the old v0.6.1 code (inject via wpseo_schema_graph_pieces), this would.
+	// produce: "get_class(): Argument #1 ($object) must be of type object, array given".
 	$class_result = get_class( $drug_array );
 } catch ( TypeError $e ) {
 	$caught_fatal = true;
@@ -220,7 +220,7 @@ try {
 }
 pr_assert( $caught_fatal, 'get_class(array) throws TypeError/Error — confirms the v0.6.1 fatal' );
 
-// ── Fix: inject_graph_nodes (NEW hook) works without fatal ────────────────
+// ── Fix: inject_graph_nodes (NEW hook) works without fatal ────────────────.
 
 echo "\nFix: inject_graph_nodes via wpseo_schema_graph (plain array graph):\n";
 
@@ -279,7 +279,7 @@ pr_assert( count( $webpage_nodes ) === 1, 'MedicalWebPage node preserved (no dup
 $breadcrumb_nodes = array_filter( $result_graph, static fn( $n ) => ( $n['@type'] ?? '' ) === 'BreadcrumbList' );
 pr_assert( count( $breadcrumb_nodes ) === 1, 'BreadcrumbList node preserved (no duplicate)' );
 
-// ── FAQ: present when _pr_faq_items has items ─────────────────────────────
+// ── FAQ: present when _pr_faq_items has items ─────────────────────────────.
 
 echo "\nFAQ injection via inject_graph_nodes:\n";
 
@@ -301,7 +301,7 @@ pr_assert_equals( 'https://peptiderepo.com/peptides/bpc-157/#faq', $faq_node['@i
 pr_assert( isset( $faq_node['mainEntity'] ), 'FAQPage has mainEntity' );
 pr_assert_equals( 2, count( $faq_node['mainEntity'] ), 'FAQPage has 2 questions' );
 
-// ── FAQ: absent when _pr_faq_items empty ─────────────────────────────────
+// ── FAQ: absent when _pr_faq_items empty ─────────────────────────────────.
 
 $GLOBALS['pr_test_postmeta'][36]['_pr_faq_items'] = '[]';
 
@@ -312,7 +312,7 @@ $faq_nodes_empty = array_filter(
 );
 pr_assert( count( $faq_nodes_empty ) === 0, 'FAQPage NOT injected when _pr_faq_items is empty array' );
 
-// ── Non-peptide page: no injection ───────────────────────────────────────
+// ── Non-peptide page: no injection ───────────────────────────────────────.
 
 echo "\nNon-peptide page: no injection:\n";
 
@@ -332,7 +332,7 @@ pr_assert( count( $result_non_peptide ) === 1, 'inject_graph_nodes no-ops on non
 $drug_nodes_np = array_filter( $result_non_peptide, static fn( $n ) => ( is_array( $n['@type'] ?? null ) ? in_array( 'Drug', $n['@type'], true ) : ( $n['@type'] ?? '' ) === 'Drug' ) );
 pr_assert( count( $drug_nodes_np ) === 0, 'Drug NOT injected on non-peptide page' );
 
-// ── register_hooks: does NOT hook wpseo_schema_graph_pieces ──────────────
+// ── register_hooks: does NOT hook wpseo_schema_graph_pieces ──────────────.
 
 echo "\nregister_hooks: wpseo_schema_graph_pieces must NOT be hooked:\n";
 
@@ -341,11 +341,11 @@ $GLOBALS['pr_core_test_state']['added_filters'] = [];
 $filters_added = [];
 
 // Override add_filter in the bootstrap to capture calls.
-// (bootstrap only stubs add_action; we check via a fresh parse of register_hooks.)
+// (bootstrap only stubs add_action; we check via a fresh parse of register_hooks.).
 $jsonld2 = new PR_Core_Jsonld();
 
 // Use Reflection to inspect what hooks register_hooks would call.
-// Instead: inspect the class source for the string — if inject_graph_pieces is
+// Instead: inspect the class source for the string — if inject_graph_pieces is.
 // still registered on wpseo_schema_graph_pieces, the bug is NOT fixed.
 $src = file_get_contents( PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld.php' );
 pr_assert(
@@ -361,6 +361,6 @@ pr_assert(
 	'class-pr-core-jsonld.php hooks wpseo_schema_graph for injection'
 );
 
-// ── Summary ───────────────────────────────────────────────────────────────
+// ── Summary ───────────────────────────────────────────────────────────────.
 
 exit( pr_test_summary() );

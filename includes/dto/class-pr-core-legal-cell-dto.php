@@ -10,23 +10,86 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0002-legal-cells.php — Table schema.
  * @see repositories/class-pr-core-legal-repository.php         — Creates these from DB rows.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Legal_Cell_DTO {
 
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $id;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $peptide_id;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $country_code;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $status;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $regulatory_framework;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $regulatory_text_url;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $regulatory_text_quote;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $notes;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $last_verified_at;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $schema_version;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $reviewer_id;
+	/**
+	 * ?int.
+	 *
+	 * @var ?int
+	 */
 	public readonly ?int $superseded_by_id;
 
 	/**
+	 *   Construct.
+	 *
 	 * @param array<string, mixed> $data Associative array from database row.
 	 */
 	public function __construct( array $data ) {

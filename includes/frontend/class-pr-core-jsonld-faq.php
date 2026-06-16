@@ -14,10 +14,15 @@ declare(strict_types=1);
  * @see frontend/class-pr-core-jsonld.php       — Orchestrator that calls this builder.
  * @see cpt/class-pr-core-schema-sanitizers.php — sanitize_faq_items() used on save.
  * @see ARCHITECTURE.md                         — §2.7 JSON-LD output.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Jsonld_Faq {
 
-	/** @var string Meta key holding the FAQ items JSON array. */
+	/**
+	 * Meta key holding the FAQ items JSON array.
+	 *
+	 * @var string Meta key holding the FAQ items JSON array.
+	 */
 	public const META_FAQ_ITEMS = '_pr_faq_items';
 
 	/**

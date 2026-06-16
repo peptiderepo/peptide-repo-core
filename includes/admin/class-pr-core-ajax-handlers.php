@@ -10,6 +10,7 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-peptide-metaboxes.php — "Mark verified today" button in sidebar.
  * @see admin/class-pr-core-verification-widget.php — "Scan now" button in dashboard widget.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Ajax_Handlers {
 

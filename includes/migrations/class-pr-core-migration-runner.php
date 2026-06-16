@@ -13,10 +13,15 @@ declare(strict_types=1);
  *
  * @see peptide-repo-core.php — Defines PR_CORE_TARGET_SCHEMA_VERSION.
  * @see CONVENTIONS.md        — "How To: Add a New Migration".
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_Runner {
 
-	/** @var string Option key storing current schema version. */
+	/**
+	 * Option key storing current schema version.
+	 *
+	 * @var string Option key storing current schema version.
+	 */
 	private const VERSION_OPTION = 'pr_core_schema_version';
 
 	/**

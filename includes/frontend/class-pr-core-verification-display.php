@@ -9,6 +9,7 @@ declare(strict_types=1);
  * Dependencies: None (hooked via the_content).
  *
  * @see includes/class-pr-core.php — Registers the_content hook.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Display {
 

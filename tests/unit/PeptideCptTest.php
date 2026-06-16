@@ -40,7 +40,7 @@ class PeptideCptTest extends TestCase {
 		require_once PR_CORE_PLUGIN_DIR . 'includes/cpt/class-pr-core-peptide-cpt.php';
 	}
 
-	// ── Constants ─────────────────────────────────────────────────────
+	// ── Constants ─────────────────────────────────────────────────────.
 
 	public function test_post_type_constant(): void {
 		$this->assertSame( 'peptide', PR_Core_Peptide_CPT::POST_TYPE );
@@ -62,7 +62,7 @@ class PeptideCptTest extends TestCase {
 		);
 	}
 
-	// ── CPT registration guard ────────────────────────────────────────
+	// ── CPT registration guard ────────────────────────────────────────.
 
 	public function test_register_post_type_noop_when_already_exists(): void {
 		$GLOBALS['pr_core_test_state']['existing_post_types'] = [ 'peptide' ];
@@ -73,7 +73,7 @@ class PeptideCptTest extends TestCase {
 		);
 	}
 
-	// ── CPT registration payload ──────────────────────────────────────
+	// ── CPT registration payload ──────────────────────────────────────.
 
 	public function test_register_post_type_registers_peptide_slug(): void {
 		PR_Core_Peptide_CPT::register_peptide_post_type();
@@ -177,7 +177,7 @@ class PeptideCptTest extends TestCase {
 		];
 	}
 
-	// ── Taxonomy guard ────────────────────────────────────────────────
+	// ── Taxonomy guard ────────────────────────────────────────────────.
 
 	public function test_register_taxonomies_noop_when_already_exists(): void {
 		$GLOBALS['pr_core_test_state']['existing_taxonomies'] = [ 'peptide_category' ];
@@ -185,7 +185,7 @@ class PeptideCptTest extends TestCase {
 		$this->assertEmpty( $GLOBALS['pr_core_test_state']['registered_taxonomies'] );
 	}
 
-	// ── Taxonomy registration payload ─────────────────────────────────
+	// ── Taxonomy registration payload ─────────────────────────────────.
 
 	public function test_register_taxonomies_registers_peptide_category(): void {
 		PR_Core_Peptide_CPT::register_taxonomies();
@@ -236,7 +236,7 @@ class PeptideCptTest extends TestCase {
 		$this->assertSame( 'peptide-category', $tax['args']['rewrite']['slug'] ?? null );
 	}
 
-	// ── Hook registration ─────────────────────────────────────────────
+	// ── Hook registration ─────────────────────────────────────────────.
 
 	public function test_register_hooks_adds_init_action(): void {
 		$cpt = new PR_Core_Peptide_CPT();

@@ -47,7 +47,7 @@ class Migration0004Test extends TestCase {
 		$this->migration = new PR_Core_Migration_0004_Backfill_Peptide_Meta();
 	}
 
-	// ── Helper: call private method via reflection ────────────────────
+	// ── Helper: call private method via reflection ────────────────────.
 
 	/**
 	 * @param mixed[] $args
@@ -59,7 +59,7 @@ class Migration0004Test extends TestCase {
 		return $ref->invokeArgs( $obj, $args );
 	}
 
-	// ── parse_weight() ────────────────────────────────────────────────
+	// ── parse_weight() ────────────────────────────────────────────────.
 
 	public function test_parse_weight_strips_da_suffix(): void {
 		$this->assertSame( 1419.5, $this->call_private( $this->migration, 'parse_weight', [ '1419.5 Da' ] ) );
@@ -85,7 +85,7 @@ class Migration0004Test extends TestCase {
 		$this->assertSame( 800.123, $this->call_private( $this->migration, 'parse_weight', [ '  800.123 da  ' ] ) );
 	}
 
-	// ── parse_aliases_string() ────────────────────────────────────────
+	// ── parse_aliases_string() ────────────────────────────────────────.
 
 	public function test_parse_aliases_string_splits_csv(): void {
 		$result = json_decode(
@@ -111,7 +111,7 @@ class Migration0004Test extends TestCase {
 		$this->assertCount( 1, $result );
 	}
 
-	// ── sanitize_molecular_formula() ──────────────────────────────────
+	// ── sanitize_molecular_formula() ──────────────────────────────────.
 
 	public function test_sanitize_formula_valid_passes_unchanged(): void {
 		$this->assertSame( 'C62H98N16O22', PR_Core_Schema_Sanitizers::sanitize_molecular_formula( 'C62H98N16O22' ) );
@@ -141,7 +141,7 @@ class Migration0004Test extends TestCase {
 		$this->assertSame( '', PR_Core_Schema_Sanitizers::sanitize_molecular_formula( '   ' ) );
 	}
 
-	// ── Idempotency ───────────────────────────────────────────────────
+	// ── Idempotency ───────────────────────────────────────────────────.
 
 	public function test_backfill_post_skipped_when_all_keys_populated(): void {
 		$GLOBALS['pr_test_postmeta'][1] = [
@@ -154,7 +154,7 @@ class Migration0004Test extends TestCase {
 		$this->assertEmpty( $GLOBALS['pr_test_updated_meta'] );
 	}
 
-	// ── PSA source path ───────────────────────────────────────────────
+	// ── PSA source path ───────────────────────────────────────────────.
 
 	public function test_backfill_post_copies_psa_data(): void {
 		$GLOBALS['pr_test_postmeta'][2] = [
@@ -220,7 +220,7 @@ class Migration0004Test extends TestCase {
 		$this->assertCount( 2, $aliases );
 	}
 
-	// ── PubChem skip path ─────────────────────────────────────────────
+	// ── PubChem skip path ─────────────────────────────────────────────.
 
 	public function test_backfill_post_returns_pubchem_skip_when_network_fails(): void {
 		$mock_pubchem = new class extends PR_Core_Pubchem_Client {

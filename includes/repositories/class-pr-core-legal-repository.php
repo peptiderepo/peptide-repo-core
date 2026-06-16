@@ -13,6 +13,7 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0002-legal-cells.php — Table schema.
  * @see dto/class-pr-core-legal-cell-dto.php                    — Return type.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Legal_Repository {
 
@@ -28,7 +29,7 @@ class PR_Core_Legal_Repository {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ),
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			ARRAY_A
 		);
 
@@ -48,11 +49,11 @@ class PR_Core_Legal_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE peptide_id = %d AND superseded_by_id IS NULL ORDER BY country_code ASC",
+				"SELECT * FROM {$table} WHERE peptide_id = %d AND superseded_by_id IS NULL ORDER BY country_code ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$peptide_id
 			),
 			ARRAY_A
-		) ?: array();
+		) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		return array_map(
 			static fn( array $row ) => new PR_Core_Legal_Cell_DTO( $row ),
@@ -74,7 +75,7 @@ class PR_Core_Legal_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE peptide_id = %d AND country_code = %s AND superseded_by_id IS NULL",
+				"SELECT * FROM {$table} WHERE peptide_id = %d AND country_code = %s AND superseded_by_id IS NULL", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$peptide_id,
 				strtoupper( sanitize_text_field( $country_code ) )
 			),
@@ -97,11 +98,11 @@ class PR_Core_Legal_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE country_code = %s AND superseded_by_id IS NULL ORDER BY peptide_id ASC",
+				"SELECT * FROM {$table} WHERE country_code = %s AND superseded_by_id IS NULL ORDER BY peptide_id ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				strtoupper( sanitize_text_field( $country_code ) )
 			),
 			ARRAY_A
-		) ?: array();
+		) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		return array_map(
 			static fn( array $row ) => new PR_Core_Legal_Cell_DTO( $row ),

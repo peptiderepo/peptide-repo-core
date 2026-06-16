@@ -9,6 +9,7 @@ declare(strict_types=1);
  * Dependencies: None.
  *
  * @see admin/class-pr-core-peptide-metaboxes.php — Other edit-screen meta boxes.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Metabox {
 
@@ -38,12 +39,12 @@ class PR_Core_Verification_Metabox {
 		wp_nonce_field( 'pr_core_verification_nonce', 'pr_core_verification_nonce' );
 
 		$last_verified = get_post_meta( $post->ID, '_pr_last_source_verified', true );
-		$velocity      = get_post_meta( $post->ID, '_pr_verification_velocity', true ) ?: 'medium';
-		$status        = get_post_meta( $post->ID, '_pr_verification_status', true ) ?: 'current';
-		$notes         = get_post_meta( $post->ID, '_pr_verification_notes', true ) ?: '';
+		$velocity      = get_post_meta( $post->ID, '_pr_verification_velocity', true ) ?: 'medium'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+		$status        = get_post_meta( $post->ID, '_pr_verification_status', true ) ?: 'current'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+		$notes         = get_post_meta( $post->ID, '_pr_verification_notes', true ) ?: ''; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		echo '<p><strong>' . esc_html__( 'Last Verified', 'peptide-repo-core' ) . ':</strong><br />';
-		echo '<code style="color: #666;">' . esc_html( $last_verified ?: '—' ) . '</code></p>';
+		echo '<code style="color: #666;">' . esc_html( $last_verified ?: '—' ) . '</code></p>'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		echo '<p><strong>' . esc_html__( 'Verification Velocity', 'peptide-repo-core' ) . ':</strong><br />';
 		echo '<select name="pr_core__pr_verification_velocity" style="width:100%;">';

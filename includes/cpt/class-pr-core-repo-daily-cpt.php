@@ -15,10 +15,15 @@ declare(strict_types=1);
  *
  * @see ARCHITECTURE.md — Repo Daily type specification.
  * @see CONVENTIONS.md — CPT ownership and extension patterns.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Repo_Daily_CPT {
 
-	/** @var string Post type slug (repo_daily). */
+	/**
+	 * Post type slug (repo_daily).
+	 *
+	 * @var string Post type slug (repo_daily).
+	 */
 	public const POST_TYPE = 'repo_daily';
 
 	/**

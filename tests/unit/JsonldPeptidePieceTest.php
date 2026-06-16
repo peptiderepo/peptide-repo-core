@@ -45,7 +45,7 @@ class JsonldPeptidePieceTest extends TestCase {
 		require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld.php';
 	}
 
-	// ── Helpers ───────────────────────────────────────────────────────
+	// ── Helpers ───────────────────────────────────────────────────────.
 
 	/**
 	 * @param array<string, mixed> $overrides
@@ -97,8 +97,8 @@ class JsonldPeptidePieceTest extends TestCase {
 		$GLOBALS['pr_test_singular_type'] = PR_Core_Peptide_CPT::POST_TYPE;
 		$GLOBALS['pr_test_postmeta'][ $post_id ] = $meta;
 		$GLOBALS['pr_test_peptide_dto']   = $this->make_dto( [ 'id' => $post_id ] );
-		// Supply a WP_Post object so PR_Core_Peptide_Repository::find_by_id() passes
-		// the post_type check and post_to_dto() type hint (our get_post() stub reads
+		// Supply a WP_Post object so PR_Core_Peptide_Repository::find_by_id() passes.
+		// the post_type check and post_to_dto() type hint (our get_post() stub reads.
 		// from pr_test_posts).
 		$post                                = new WP_Post();
 		$post->ID                            = $post_id;
@@ -111,7 +111,7 @@ class JsonldPeptidePieceTest extends TestCase {
 		$GLOBALS['pr_test_posts'][ $post_id ] = $post;
 	}
 
-	// ── Regression: get_class(array) throws ───────────────────────────
+	// ── Regression: get_class(array) throws ───────────────────────────.
 
 	public function test_get_class_on_plain_array_throws(): void {
 		$GLOBALS['pr_test_postmeta'][36] = [];
@@ -127,7 +127,7 @@ class JsonldPeptidePieceTest extends TestCase {
 		$this->assertTrue( $caught, 'get_class(array) must throw — confirms the v0.6.1 fatal' );
 	}
 
-	// ── inject_graph_nodes does not throw ─────────────────────────────
+	// ── inject_graph_nodes does not throw ─────────────────────────────.
 
 	public function test_inject_graph_nodes_does_not_throw(): void {
 		$this->set_peptide_context( 36, [
@@ -224,7 +224,7 @@ class JsonldPeptidePieceTest extends TestCase {
 		$this->assertCount( 1, $breadcrumb );
 	}
 
-	// ── FAQ injection via inject_graph_nodes ──────────────────────────
+	// ── FAQ injection via inject_graph_nodes ──────────────────────────.
 
 	public function test_inject_graph_nodes_faq_present_when_items_exist(): void {
 		$this->set_peptide_context( 36, [
@@ -250,7 +250,7 @@ class JsonldPeptidePieceTest extends TestCase {
 		$this->assertCount( 0, $faq_nodes );
 	}
 
-	// ── Non-peptide page: no injection ────────────────────────────────
+	// ── Non-peptide page: no injection ────────────────────────────────.
 
 	public function test_inject_graph_nodes_noop_on_non_peptide_page(): void {
 		$GLOBALS['pr_test_is_singular']   = false;
@@ -262,7 +262,7 @@ class JsonldPeptidePieceTest extends TestCase {
 		$this->assertCount( 1, $result );
 	}
 
-	// ── register_hooks: wpseo_schema_graph_pieces must NOT be hooked ──
+	// ── register_hooks: wpseo_schema_graph_pieces must NOT be hooked ──.
 
 	public function test_jsonld_does_not_hook_wpseo_schema_graph_pieces(): void {
 		$src = file_get_contents( PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld.php' );

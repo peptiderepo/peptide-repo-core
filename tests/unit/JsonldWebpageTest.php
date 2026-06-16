@@ -28,7 +28,7 @@ class JsonldWebpageTest extends TestCase {
 		require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld-webpage.php';
 	}
 
-	// ── retype_to_medical_webpage: array input ────────────────────────
+	// ── retype_to_medical_webpage: array input ────────────────────────.
 
 	public function test_retype_non_peptide_singular_array_unchanged(): void {
 		$GLOBALS['pr_test_is_singular']   = true;
@@ -51,7 +51,7 @@ class JsonldWebpageTest extends TestCase {
 		$this->assertSame( 'CollectionPage', $result );
 	}
 
-	// ── enrich_webpage_piece: @type as array injects enrichments ──────
+	// ── enrich_webpage_piece: @type as array injects enrichments ──────.
 
 	public function test_enrich_webpage_piece_array_type_injects_last_reviewed(): void {
 		$GLOBALS['pr_test_is_singular']   = true;

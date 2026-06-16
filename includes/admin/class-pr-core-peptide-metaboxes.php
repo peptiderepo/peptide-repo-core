@@ -10,6 +10,7 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-admin.php — Registers these hooks.
  * @see cpt/class-pr-core-peptide-cpt.php — Meta field definitions.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Peptide_Metaboxes {
 
@@ -78,7 +79,7 @@ class PR_Core_Peptide_Metaboxes {
 		}
 
 		// Evidence strength dropdown.
-		$current_strength = get_post_meta( $post->ID, 'evidence_strength', true ) ?: 'preclinical';
+		$current_strength = get_post_meta( $post->ID, 'evidence_strength', true ) ?: 'preclinical'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		echo '<tr><th><label for="pr_core_evidence_strength">' . esc_html__( 'Evidence Strength', 'peptide-repo-core' ) . '</label></th><td><select id="pr_core_evidence_strength" name="pr_core_evidence_strength">';
 		foreach ( PR_Core_Peptide_CPT::EVIDENCE_STRENGTHS as $strength ) {
 			$label = apply_filters( 'pr_core_evidence_strength_label', $strength, $strength );
@@ -92,7 +93,7 @@ class PR_Core_Peptide_Metaboxes {
 		echo '</select></td></tr>';
 
 		// Editorial review status.
-		$current_review = get_post_meta( $post->ID, 'editorial_review_status', true ) ?: 'draft';
+		$current_review = get_post_meta( $post->ID, 'editorial_review_status', true ) ?: 'draft'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		echo '<tr><th><label for="pr_core_editorial_review_status">' . esc_html__( 'Editorial Status', 'peptide-repo-core' ) . '</label></th><td><select id="pr_core_editorial_review_status" name="pr_core_editorial_review_status">';
 		foreach ( PR_Core_Peptide_CPT::REVIEW_STATUSES as $status ) {
 			printf(

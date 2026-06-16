@@ -13,7 +13,7 @@ declare(strict_types=1);
 // Composer autoloader.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
-// ── WordPress constants ───────────────────────────────────────────────
+// ── WordPress constants ───────────────────────────────────────────────.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', '/tmp/wordpress/' );
@@ -46,7 +46,7 @@ if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
 	define( 'MINUTE_IN_SECONDS', 60 );
 }
 
-// ── Global harness state (reset between test cases via setUp) ─────────
+// ── Global harness state (reset between test cases via setUp) ─────────.
 
 $GLOBALS['pr_core_test_state'] = [
 	'existing_post_types'   => [],
@@ -67,7 +67,7 @@ $GLOBALS['pr_test_singular_type'] = '';
 $GLOBALS['pr_test_the_id']        = 0;
 $GLOBALS['pr_test_peptide_dto']   = null;
 
-// ── WordPress function stubs ──────────────────────────────────────────
+// ── WordPress function stubs ──────────────────────────────────────────.
 
 if ( ! function_exists( 'trailingslashit' ) ) {
 	function trailingslashit( string $path ): string {
@@ -170,7 +170,7 @@ if ( ! function_exists( 'is_email' ) ) {
 	}
 }
 
-// ── Option / cron stubs ───────────────────────────────────────────────
+// ── Option / cron stubs ───────────────────────────────────────────────.
 
 if ( ! function_exists( 'get_option' ) ) {
 	function get_option( string $key, $default = false ) {
@@ -210,7 +210,7 @@ if ( ! function_exists( 'add_settings_field' ) ) {
 	function add_settings_field( string $id, string $title, $cb, string $page, string $section = '' ): void {}
 }
 
-// ── Post meta stubs ───────────────────────────────────────────────────
+// ── Post meta stubs ───────────────────────────────────────────────────.
 
 if ( ! function_exists( 'get_post_meta' ) ) {
 	function get_post_meta( $post_id, string $key = '', bool $single = false ) {
@@ -242,7 +242,7 @@ if ( ! function_exists( 'get_posts' ) ) {
 	}
 }
 
-// ── CPT / taxonomy stubs ──────────────────────────────────────────────
+// ── CPT / taxonomy stubs ──────────────────────────────────────────────.
 
 if ( ! function_exists( 'post_type_exists' ) ) {
 	function post_type_exists( string $post_type ): bool {
@@ -297,7 +297,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 	}
 }
 
-// ── Singular / permalink stubs ────────────────────────────────────────
+// ── Singular / permalink stubs ────────────────────────────────────────.
 
 if ( ! function_exists( 'is_singular' ) ) {
 	function is_singular( $type = '' ): bool {
@@ -334,7 +334,7 @@ if ( ! function_exists( 'get_author_posts_url' ) ) {
 	}
 }
 
-// ── WP_Error stub ─────────────────────────────────────────────────────
+// ── WP_Error stub ─────────────────────────────────────────────────────.
 
 if ( ! class_exists( 'WP_Error' ) ) {
 	class WP_Error {
@@ -367,7 +367,7 @@ if ( ! class_exists( 'WP_Error' ) ) {
 }
 
 
-// ── WP_Post stub ──────────────────────────────────────────────────────
+// ── WP_Post stub ──────────────────────────────────────────────────────.
 
 if ( ! class_exists( 'WP_Post' ) ) {
 	class WP_Post {
@@ -411,7 +411,7 @@ if ( ! function_exists( 'wp_count_posts' ) ) {
 	}
 }
 
-// ── Load the plugin's autoloader ──────────────────────────────────────
+// ── Load the plugin's autoloader ──────────────────────────────────────.
 
 require_once PR_CORE_PLUGIN_DIR . 'includes/class-pr-core-autoloader.php';
 PR_Core_Autoloader::register();

@@ -12,10 +12,15 @@ declare(strict_types=1);
  * Settings read:
  * - pr_core_related_posts_enabled (bool, default true)
  * - pr_core_related_posts_limit (int, default 3, range 1-6)
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Related_Posts_Section {
 
-	/** @var PR_Core_Related_Posts_Provider */
+	/**
+	 * PR_Core_Related_Posts_Provider.
+	 *
+	 * @var PR_Core_Related_Posts_Provider
+	 */
 	private $provider;
 
 	/**
@@ -90,6 +95,7 @@ class PR_Core_Related_Posts_Section {
 								<?php
 								echo wp_kses_post(
 									sprintf(
+										// translators: %s: peptide display name.
 										__( 'View all %s articles &rarr;', 'peptide-repo-core' ),
 										esc_html( $peptide->post_title )
 									)

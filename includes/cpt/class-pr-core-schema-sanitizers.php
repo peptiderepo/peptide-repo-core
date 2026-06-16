@@ -14,6 +14,7 @@ declare(strict_types=1);
  *
  * @see cpt/class-pr-core-peptide-cpt.php — Meta field registration.
  * @see ARCHITECTURE.md                   — §v0.6.0 schema sprint.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Schema_Sanitizers {
 
@@ -68,7 +69,7 @@ class PR_Core_Schema_Sanitizers {
 		}
 		// 3. Extract the maximal leading run of valid element tokens and separators.
 		// A valid run must start with an element token ([A-Z][a-z]?\d*), not a separator.
-		$pattern = '/^((?:' . self::FORMULA_TOKEN . '|' . self::FORMULA_SEP . ')+)/u';
+		$pattern = '/^((?:' . self::FORMULA_TOKEN . '|' . self::FORMULA_SEP . ')+)/u'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		if ( preg_match( $pattern, $value, $m ) ) {
 			return $m[1];
 		}
@@ -147,6 +148,6 @@ class PR_Core_Schema_Sanitizers {
 			}
 		}
 
-		return wp_json_encode( $clean, JSON_UNESCAPED_UNICODE ) ?: '[]';
+		return wp_json_encode( $clean, JSON_UNESCAPED_UNICODE ) ?: '[]'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 	}
 }

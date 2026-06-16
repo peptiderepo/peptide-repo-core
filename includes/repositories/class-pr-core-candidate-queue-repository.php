@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @see migrations/class-pr-core-migration-0003-candidate-queue.php — Table schema.
  * @see dto/class-pr-core-candidate-dto.php                         — Return type.
  * @see admin/class-pr-core-candidate-queue-page.php                — Admin UI.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Candidate_Queue_Repository {
 
@@ -28,7 +29,7 @@ class PR_Core_Candidate_Queue_Repository {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ),
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			ARRAY_A
 		);
 
@@ -61,11 +62,11 @@ class PR_Core_Candidate_Queue_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE {$where_sql} ORDER BY extraction_confidence DESC LIMIT %d",
+				"SELECT * FROM {$table} WHERE {$where_sql} ORDER BY extraction_confidence DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				...$params
 			),
 			ARRAY_A
-		) ?: array();
+		) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		return array_map(
 			static fn( array $row ) => new PR_Core_Candidate_DTO( $row ),
@@ -206,7 +207,7 @@ class PR_Core_Candidate_Queue_Repository {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		return (int) $wpdb->get_var(
-			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE queue_status = %s", $status )
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE queue_status = %s", $status ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		);
 	}
 

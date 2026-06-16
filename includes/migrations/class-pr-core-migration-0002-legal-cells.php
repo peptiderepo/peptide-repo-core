@@ -11,10 +11,15 @@ declare(strict_types=1);
  * Uniqueness: only one active cell per peptide x country (superseded_by_id NULL).
  *
  * @see ARCHITECTURE.md — Table schema specification.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_0002_Legal_Cells {
 
-	/** @var string[] Valid legal status enum values. */
+	/**
+	 * Valid legal status enum values.
+	 *
+	 * @var string[] Valid legal status enum values.
+	 */
 	public const STATUSES = array(
 		'prescription',
 		'ruo',
@@ -36,7 +41,7 @@ class PR_Core_Migration_0002_Legal_Cells {
 		$table   = $wpdb->prefix . 'pr_legal_cells';
 		$charset = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE {$table} (
+		$sql = "CREATE TABLE {$table} ( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			id                     BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 			peptide_id             BIGINT UNSIGNED NOT NULL,
 			country_code           CHAR(2) NOT NULL,
@@ -71,7 +76,7 @@ class PR_Core_Migration_0002_Legal_Cells {
 		if ( '0' === $index_exists ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->query(
-				"ALTER TABLE {$table} ADD UNIQUE KEY uq_peptide_country_active (peptide_id, country_code, superseded_by_id)"
+				"ALTER TABLE {$table} ADD UNIQUE KEY uq_peptide_country_active (peptide_id, country_code, superseded_by_id)" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			);
 		}
 	}

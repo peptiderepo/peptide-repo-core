@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../bootstrap.php';
 
-// ── Additional stubs needed by the scanner ──────────────────────────────
+// ── Additional stubs needed by the scanner ──────────────────────────────.
 
 if ( ! defined( 'DAY_IN_SECONDS' ) ) {
 	define( 'DAY_IN_SECONDS', 86400 );
@@ -37,11 +37,11 @@ if ( ! function_exists( 'get_option' ) ) {
 	}
 }
 
-// ── Load the scanner class ──────────────────────────────────────────────
+// ── Load the scanner class ──────────────────────────────────────────────.
 
 require_once __DIR__ . '/../../includes/scanner/class-pr-core-verification-scanner.php';
 
-// ── Helper: build a date N days ago ────────────────────────────────────
+// ── Helper: build a date N days ago ────────────────────────────────────.
 
 function days_ago( int $days ): string {
 	return gmdate( 'Y-m-d', time() - ( $days * DAY_IN_SECONDS ) );
@@ -49,7 +49,7 @@ function days_ago( int $days ): string {
 
 echo "== PR_Core_Verification_Scanner::compute_status() unit tests ==\n\n";
 
-// ── Empty last_verified ─────────────────────────────────────────────────
+// ── Empty last_verified ─────────────────────────────────────────────────.
 
 echo "Empty last_verified:\n";
 pr_assert_equals(
@@ -58,7 +58,7 @@ pr_assert_equals(
 	'empty string → overdue'
 );
 
-// ── Medium velocity (default 180-day threshold) ─────────────────────────
+// ── Medium velocity (default 180-day threshold) ─────────────────────────.
 
 echo "\nMedium velocity (threshold=180, option default):\n";
 $GLOBALS['pr_core_options'] = [];
@@ -75,7 +75,7 @@ pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_
 // 200 days ago → overdue.
 pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 200 ), 'medium' ), '200 days → overdue' );
 
-// ── 90% boundary exactness ──────────────────────────────────────────────
+// ── 90% boundary exactness ──────────────────────────────────────────────.
 
 echo "\n90% boundary (threshold=100):\n";
 $GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 100 ];
@@ -89,7 +89,7 @@ pr_assert_equals( 'due', PR_Core_Verification_Scanner::compute_status( days_ago(
 // 100 days → 100 >= 100 → overdue.
 pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 100 ), 'medium' ), '100 days (threshold 100) → overdue' );
 
-// ── High velocity (60-day threshold from option) ────────────────────────
+// ── High velocity (60-day threshold from option) ────────────────────────.
 
 echo "\nHigh velocity (threshold=60 from option):\n";
 $GLOBALS['pr_core_options'] = [ 'pr_core_high_velocity_threshold' => 60 ];
@@ -103,7 +103,7 @@ pr_assert_equals( 'due', PR_Core_Verification_Scanner::compute_status( days_ago(
 // 61 days → overdue.
 pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 61 ), 'high' ), 'high: 61 days → overdue' );
 
-// ── Low velocity (365-day constant — ignores option) ────────────────────
+// ── Low velocity (365-day constant — ignores option) ────────────────────.
 
 echo "\nLow velocity (threshold=365, constant, ignores option):\n";
 $GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 999 ]; // Should be ignored for low.
@@ -117,12 +117,12 @@ pr_assert_equals( 'due', PR_Core_Verification_Scanner::compute_status( days_ago(
 // 366 days → overdue.
 pr_assert_equals( 'overdue', PR_Core_Verification_Scanner::compute_status( days_ago( 366 ), 'low' ), 'low: 366 days → overdue' );
 
-// ── Unknown velocity falls through to medium/default ────────────────────
+// ── Unknown velocity falls through to medium/default ────────────────────.
 
 echo "\nUnknown velocity (falls to default/medium):\n";
 $GLOBALS['pr_core_options'] = [ 'pr_core_default_threshold' => 180 ];
 pr_assert_equals( 'current', PR_Core_Verification_Scanner::compute_status( days_ago( 100 ), 'unknown' ), 'unknown velocity: 100 days → current (uses default 180)' );
 
-// ── Summary ─────────────────────────────────────────────────────────────
+// ── Summary ─────────────────────────────────────────────────────────────.
 
 exit( pr_test_summary() );

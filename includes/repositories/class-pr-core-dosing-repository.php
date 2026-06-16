@@ -10,6 +10,7 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0001-dosing-rows.php — Table schema.
  * @see dto/class-pr-core-dosing-row-dto.php                    — Return type.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Dosing_Repository {
 
@@ -25,7 +26,7 @@ class PR_Core_Dosing_Repository {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ),
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			ARRAY_A
 		);
 
@@ -66,11 +67,11 @@ class PR_Core_Dosing_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE {$where_sql} ORDER BY evidence_strength DESC, study_year DESC",
+				"SELECT * FROM {$table} WHERE {$where_sql} ORDER BY evidence_strength DESC, study_year DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				...$params
 			),
 			ARRAY_A
-		) ?: array();
+		) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		return array_map(
 			static fn( array $row ) => new PR_Core_Dosing_Row_DTO( $row ),
@@ -96,7 +97,11 @@ class PR_Core_Dosing_Repository {
 		$row['added_at']       = current_time( 'mysql' );
 		$row['schema_version'] = 1;
 
-		/** @see PR_Core::register_public_filters() — Documented lifecycle hook. */
+		/**
+		 * Property.
+		 *
+		 * @see PR_Core::register_public_filters() — Documented lifecycle hook.
+		 */
 		do_action( 'pr_core_before_dosing_row_publish', $row );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -159,7 +164,7 @@ class PR_Core_Dosing_Repository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		return (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table} WHERE peptide_id = %d AND superseded_by_id IS NULL",
+				"SELECT COUNT(*) FROM {$table} WHERE peptide_id = %d AND superseded_by_id IS NULL", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$peptide_id
 			)
 		);

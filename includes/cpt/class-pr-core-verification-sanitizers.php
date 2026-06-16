@@ -9,6 +9,7 @@ declare(strict_types=1);
  * Dependencies: None.
  *
  * @see cpt/class-pr-core-peptide-cpt.php — Calls these from meta field registration.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Sanitizers {
 

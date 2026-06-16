@@ -14,10 +14,15 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-admin.php — Registers these hooks.
  * @see cpt/class-pr-core-repo-daily-cpt.php — CPT definition.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Repo_Daily_Metaboxes {
 
-	/** @var string Default author byline for Repo Daily articles. */
+	/**
+	 * Default author byline for Repo Daily articles.
+	 *
+	 * @var string Default author byline for Repo Daily articles.
+	 */
 	private const DEFAULT_AUTHOR = 'Boo Sheeran';
 
 	/**
@@ -46,7 +51,7 @@ class PR_Core_Repo_Daily_Metaboxes {
 		wp_nonce_field( 'pr_core_repo_daily_meta', 'pr_core_repo_daily_nonce' );
 
 		$author          = sanitize_text_field(
-			get_post_meta( $post->ID, '_repo_daily_author', true ) ?: self::DEFAULT_AUTHOR
+			get_post_meta( $post->ID, '_repo_daily_author', true ) ?: self::DEFAULT_AUTHOR // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		);
 		$requires_review = get_post_meta( $post->ID, '_repo_daily_clinical_review_required', true );
 

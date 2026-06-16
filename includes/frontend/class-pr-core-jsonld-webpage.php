@@ -13,13 +13,22 @@ declare(strict_types=1);
  *
  * @see frontend/class-pr-core-jsonld.php — Parent orchestrator.
  * @see ARCHITECTURE.md                   — §2.7 JSON-LD output, Yoast integration contract.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Jsonld_Webpage {
 
-	/** @var string Meta key for last editorial review date (ISO date string). */
+	/**
+	 * Meta key for last editorial review date (ISO date string).
+	 *
+	 * @var string Meta key for last editorial review date (ISO date string).
+	 */
 	private const META_LAST_REVIEWED = '_pr_last_reviewed';
 
-	/** @var string Meta key for last source verification date (ISO date string). */
+	/**
+	 * Meta key for last source verification date (ISO date string).
+	 *
+	 * @var string Meta key for last source verification date (ISO date string).
+	 */
 	private const META_LAST_VERIFIED = '_pr_last_source_verified';
 
 	/**
@@ -99,14 +108,14 @@ class PR_Core_Jsonld_Webpage {
 	private function build_webpage_enrichments( int $post_id ): array {
 		$enrichments = array();
 
-		// lastReviewed: prefer _pr_last_reviewed, fall back to _pr_last_source_verified,
+		// lastReviewed: prefer _pr_last_reviewed, fall back to _pr_last_source_verified,.
 		// then post modified date.
 		$last_reviewed = (string) get_post_meta( $post_id, self::META_LAST_REVIEWED, true );
 		if ( '' === $last_reviewed ) {
 			$last_reviewed = (string) get_post_meta( $post_id, self::META_LAST_VERIFIED, true );
 		}
 		if ( '' === $last_reviewed ) {
-			$last_reviewed = get_post_modified_time( 'Y-m-d', false, $post_id ) ?: '';
+			$last_reviewed = get_post_modified_time( 'Y-m-d', false, $post_id ) ?: ''; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		}
 
 		if ( '' !== $last_reviewed ) {

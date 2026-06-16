@@ -12,6 +12,7 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-admin.php                              — Menu registration.
  * @see repositories/class-pr-core-candidate-queue-repository.php  — Data layer.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Candidate_Queue_Page {
 

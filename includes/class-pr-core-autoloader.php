@@ -12,10 +12,15 @@ declare(strict_types=1);
  * Scans includes/ and all immediate subdirectories.
  *
  * @see peptide-repo-core.php — Registers this autoloader at boot.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Autoloader {
 
-	/** @var string[] Directories to scan for class files. */
+	/**
+	 * Directories to scan for class files.
+	 *
+	 * @var string[] Directories to scan for class files.
+	 */
 	private static array $dirs = array();
 
 	/**

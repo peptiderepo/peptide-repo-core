@@ -19,10 +19,15 @@ declare(strict_types=1);
  *   POST /peptides/{id}/legal               — Add legal cell (auth)
  *
  * @see ARCHITECTURE.md — REST API specification.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Rest_Controller {
 
-	/** @var string REST namespace. */
+	/**
+	 * REST namespace.
+	 *
+	 * @var string REST namespace.
+	 */
 	private const REST_NAMESPACE = 'pr-core/v1';
 
 	/**
@@ -42,7 +47,7 @@ class PR_Core_Rest_Controller {
 	 * @return void
 	 */
 	public function register_routes(): void {
-		// GET /peptides
+		// GET /peptides.
 		register_rest_route(
 			self::REST_NAMESPACE,
 			'/peptides',
@@ -78,7 +83,7 @@ class PR_Core_Rest_Controller {
 			)
 		);
 
-		// GET /peptides/{id}
+		// GET /peptides/{id}.
 		register_rest_route(
 			self::REST_NAMESPACE,
 			'/peptides/(?P<id>\d+)',
@@ -89,7 +94,7 @@ class PR_Core_Rest_Controller {
 			)
 		);
 
-		// GET /peptides/{id}/dosing
+		// GET /peptides/{id}/dosing.
 		register_rest_route(
 			self::REST_NAMESPACE,
 			'/peptides/(?P<id>\d+)/dosing',
@@ -110,7 +115,7 @@ class PR_Core_Rest_Controller {
 			)
 		);
 
-		// POST /peptides/{id}/dosing (auth required)
+		// POST /peptides/{id}/dosing (auth required).
 		register_rest_route(
 			self::REST_NAMESPACE,
 			'/peptides/(?P<id>\d+)/dosing',
@@ -121,7 +126,7 @@ class PR_Core_Rest_Controller {
 			)
 		);
 
-		// GET /peptides/{id}/legal
+		// GET /peptides/{id}/legal.
 		register_rest_route(
 			self::REST_NAMESPACE,
 			'/peptides/(?P<id>\d+)/legal',
@@ -132,7 +137,7 @@ class PR_Core_Rest_Controller {
 			)
 		);
 
-		// POST /peptides/{id}/legal (auth required)
+		// POST /peptides/{id}/legal (auth required).
 		register_rest_route(
 			self::REST_NAMESPACE,
 			'/peptides/(?P<id>\d+)/legal',

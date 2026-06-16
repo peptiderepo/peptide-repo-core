@@ -10,35 +10,158 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0003-candidate-queue.php — Table schema.
  * @see repositories/class-pr-core-candidate-queue-repository.php   — Creates these.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Candidate_DTO {
 
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $id;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $peptide_id;
+	/**
+	 * ?float.
+	 *
+	 * @var ?float
+	 */
 	public readonly ?float $dose_min;
+	/**
+	 * ?float.
+	 *
+	 * @var ?float
+	 */
 	public readonly ?float $dose_max;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $dose_unit;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $route;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $frequency;
+	/**
+	 * ?int.
+	 *
+	 * @var ?int
+	 */
 	public readonly ?int $duration_value;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $duration_unit;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $population;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $indication;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $evidence_strength;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $study_title;
+	/**
+	 * ?int.
+	 *
+	 * @var ?int
+	 */
 	public readonly ?int $study_year;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $citation_pubmed_id;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $citation_doi;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $citation_url;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $notes;
+	/**
+	 * Float.
+	 *
+	 * @var float
+	 */
 	public readonly float $extraction_confidence;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $queue_status;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $extracted_at;
+	/**
+	 * ?int.
+	 *
+	 * @var ?int
+	 */
 	public readonly ?int $reviewed_by;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $reviewed_at;
+	/**
+	 * ?string.
+	 *
+	 * @var ?string
+	 */
 	public readonly ?string $reviewer_notes;
 
 	/**
+	 *   Construct.
+	 *
 	 * @param array<string, mixed> $data Associative array from database row.
 	 */
 	public function __construct( array $data ) {

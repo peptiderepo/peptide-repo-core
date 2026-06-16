@@ -32,16 +32,29 @@ declare(strict_types=1);
  * @see frontend/class-pr-core-jsonld-webpage.php — MedicalWebPage enrichment.
  * @see frontend/class-pr-core-jsonld-faq.php     — FAQPage piece builder.
  * @see ARCHITECTURE.md                           — §2.7 JSON-LD output.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Jsonld {
 
-	/** @var PR_Core_Jsonld_Drug Drug piece builder. */
+	/**
+	 * Drug piece builder.
+	 *
+	 * @var PR_Core_Jsonld_Drug Drug piece builder.
+	 */
 	private PR_Core_Jsonld_Drug $drug_builder;
 
-	/** @var PR_Core_Jsonld_Webpage MedicalWebPage enricher. */
+	/**
+	 * MedicalWebPage enricher.
+	 *
+	 * @var PR_Core_Jsonld_Webpage MedicalWebPage enricher.
+	 */
 	private PR_Core_Jsonld_Webpage $webpage_enricher;
 
-	/** @var PR_Core_Jsonld_Faq FAQ piece builder. */
+	/**
+	 * FAQ piece builder.
+	 *
+	 * @var PR_Core_Jsonld_Faq FAQ piece builder.
+	 */
 	private PR_Core_Jsonld_Faq $faq_builder;
 
 	/**
@@ -71,10 +84,10 @@ class PR_Core_Jsonld {
 		add_filter( 'wpseo_schema_webpage_type', array( $this->webpage_enricher, 'retype_to_medical_webpage' ) );
 
 		// wpseo_schema_graph: two callbacks at different priorities.
-		// Priority 11 -- enrich_webpage_piece: merge lastReviewed/reviewedBy/audience into the
+		// Priority 11 -- enrich_webpage_piece: merge lastReviewed/reviewedBy/audience into the.
 		// existing WebPage node that Yoast already emitted.
 		// Priority 12 -- inject_graph_nodes: append Drug + FAQPage arrays to the graph.
-		// Must run after enrich_webpage_piece so the WebPage node is already
+		// Must run after enrich_webpage_piece so the WebPage node is already.
 		// enriched before Drug/FAQ are appended.
 		add_filter( 'wpseo_schema_graph', array( $this->webpage_enricher, 'enrich_webpage_piece' ), 11, 2 );
 		add_filter( 'wpseo_schema_graph', array( $this, 'inject_graph_nodes' ), 12, 2 );

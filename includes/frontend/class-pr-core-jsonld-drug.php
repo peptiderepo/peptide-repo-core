@@ -14,19 +14,36 @@ declare(strict_types=1);
  *
  * @see frontend/class-pr-core-jsonld.php — Orchestrator that calls this builder.
  * @see ARCHITECTURE.md                   — §2.7 JSON-LD output.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Jsonld_Drug {
 
-	/** @var string Meta key: molecular formula sourced by migration 0004. */
+	/**
+	 * Meta key: molecular formula sourced by migration 0004.
+	 *
+	 * @var string Meta key: molecular formula sourced by migration 0004.
+	 */
 	private const META_FORMULA = '_pr_molecular_formula';
 
-	/** @var string Meta key: molecular weight (float string) sourced by migration 0004. */
+	/**
+	 * Meta key: molecular weight (float string) sourced by migration 0004.
+	 *
+	 * @var string Meta key: molecular weight (float string) sourced by migration 0004.
+	 */
 	private const META_WEIGHT = '_pr_molecular_weight';
 
-	/** @var string Meta key: aliases JSON array sourced by migration 0004. */
+	/**
+	 * Meta key: aliases JSON array sourced by migration 0004.
+	 *
+	 * @var string Meta key: aliases JSON array sourced by migration 0004.
+	 */
 	private const META_ALIASES = '_pr_aliases';
 
-	/** @var string Unit text for molecularWeight QuantitativeValue. */
+	/**
+	 * Unit text for molecularWeight QuantitativeValue.
+	 *
+	 * @var string Unit text for molecularWeight QuantitativeValue.
+	 */
 	private const UNIT_TEXT = 'g/mol';
 
 	/**
@@ -41,7 +58,7 @@ class PR_Core_Jsonld_Drug {
 		$node = array(
 			'@type' => array( 'Drug', 'MolecularEntity' ),
 			'@id'   => $permalink . '#drug',
-			'name'  => $peptide->display_name ?: $peptide->title,
+			'name'  => $peptide->display_name ?: $peptide->title, // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 			'url'   => $permalink,
 		);
 

@@ -14,10 +14,15 @@ declare(strict_types=1);
  *
  * @see peptide-repo-core.php — Registers this class on activation.
  * @see includes/class-pr-core.php — Wires the init:999 version-change handler.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Activator {
 
-	/** @var string Option key storing the last activated/seen plugin version. */
+	/**
+	 * Option key storing the last activated/seen plugin version.
+	 *
+	 * @var string Option key storing the last activated/seen plugin version.
+	 */
 	private const VERSION_OPTION = 'pr_core_version';
 
 	/**
@@ -51,8 +56,8 @@ class PR_Core_Activator {
 		// Flush rewrite rules for the new CPT.
 		flush_rewrite_rules( false );
 
-		// Record the activated version so the init:999 drift handler can
-		// detect future in-place updates and re-flush without a manual
+		// Record the activated version so the init:999 drift handler can.
+		// detect future in-place updates and re-flush without a manual.
 		// deactivate/reactivate cycle.
 		update_option( self::VERSION_OPTION, PR_CORE_VERSION, false );
 	}

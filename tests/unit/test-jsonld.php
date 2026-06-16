@@ -29,7 +29,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../bootstrap.php';
 
-// ── Additional stubs ─────────────────────────────────────────────────────
+// ── Additional stubs ─────────────────────────────────────────────────────.
 
 if ( ! defined( 'PR_CORE_TARGET_SCHEMA_VERSION' ) ) {
 	define( 'PR_CORE_TARGET_SCHEMA_VERSION', 4 );
@@ -111,7 +111,7 @@ require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld-faq.ph
 require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld-webpage.php';
 require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld.php';
 
-// ── Helpers ──────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────.
 
 /**
  * Create a minimal PR_Core_Peptide_DTO for testing.
@@ -145,7 +145,7 @@ function make_peptide_dto( array $overrides = [] ): PR_Core_Peptide_DTO {
 
 echo "== JSON-LD v0.6.0 unit tests ==\n\n";
 
-// ── Drug @id ─────────────────────────────────────────────────────────────
+// ── Drug @id ─────────────────────────────────────────────────────────────.
 
 echo "Drug @id:\n";
 
@@ -160,14 +160,14 @@ pr_assert_equals(
 	'Drug @id = {permalink}#drug'
 );
 
-// ── Drug @type ───────────────────────────────────────────────────────────
+// ── Drug @type ───────────────────────────────────────────────────────────.
 
 echo "\nDrug @type:\n";
 pr_assert( is_array( $drug_node['@type'] ), 'Drug @type is an array' );
 pr_assert( in_array( 'Drug', $drug_node['@type'], true ), '@type includes "Drug"' );
 pr_assert( in_array( 'MolecularEntity', $drug_node['@type'], true ), '@type includes "MolecularEntity"' );
 
-// ── Fields present when meta set ─────────────────────────────────────────
+// ── Fields present when meta set ─────────────────────────────────────────.
 
 echo "\nFields present when _pr_* meta set:\n";
 
@@ -190,7 +190,7 @@ pr_assert_equals( 'g/mol', $drug_node_populated['molecularWeight']['unitText'], 
 pr_assert( isset( $drug_node_populated['alternateName'] ), 'alternateName present when _pr_aliases set' );
 pr_assert_equals( 2, count( $drug_node_populated['alternateName'] ), 'alternateName has correct count' );
 
-// ── Fields omitted when meta empty ───────────────────────────────────────
+// ── Fields omitted when meta empty ───────────────────────────────────────.
 
 echo "\nFields OMITTED when meta empty:\n";
 
@@ -201,7 +201,7 @@ pr_assert( ! isset( $drug_node_empty['molecularFormula'] ), 'molecularFormula OM
 pr_assert( ! isset( $drug_node_empty['molecularWeight'] ), 'molecularWeight OMITTED when meta empty' );
 pr_assert( ! isset( $drug_node_empty['alternateName'] ), 'alternateName OMITTED when _pr_aliases empty' );
 
-// ── FAQPage present when _pr_faq_items has items ─────────────────────────
+// ── FAQPage present when _pr_faq_items has items ─────────────────────────.
 
 echo "\nFAQPage emission:\n";
 
@@ -224,7 +224,7 @@ pr_assert_equals( 2, count( $faq_piece['mainEntity'] ), 'FAQPage has 2 questions
 pr_assert_equals( 'Question', $faq_piece['mainEntity'][0]['@type'], 'Question @type correct' );
 pr_assert( isset( $faq_piece['mainEntity'][0]['acceptedAnswer'] ), 'Question has acceptedAnswer' );
 
-// ── FAQPage absent when _pr_faq_items empty ──────────────────────────────
+// ── FAQPage absent when _pr_faq_items empty ──────────────────────────────.
 
 $GLOBALS['pr_test_postmeta'][1] = [ '_pr_faq_items' => '[]' ];
 $faq_empty = $faq_builder->build( 1, $permalink );
@@ -234,7 +234,7 @@ $GLOBALS['pr_test_postmeta'][1] = [];
 $faq_absent = $faq_builder->build( 1, $permalink );
 pr_assert( null === $faq_absent, 'FAQPage piece IS null when _pr_faq_items absent' );
 
-// ── MedicalWebPage retype ────────────────────────────────────────────────
+// ── MedicalWebPage retype ────────────────────────────────────────────────.
 
 echo "\nMedicalWebPage retype:\n";
 
@@ -250,7 +250,7 @@ $GLOBALS['pr_test_singular_type'] = '';
 $result = $webpage_enricher->retype_to_medical_webpage( 'WebPage' );
 pr_assert_equals( 'WebPage', $result, 'passes through unchanged on non-peptide pages' );
 
-// ── No duplicate WebPage / BreadcrumbList nodes ───────────────────────────
+// ── No duplicate WebPage / BreadcrumbList nodes ───────────────────────────.
 
 echo "\nNo duplicate WebPage/BreadcrumbList nodes:\n";
 
@@ -270,7 +270,7 @@ pr_assert( ! in_array( 'BreadcrumbList', $types_from_builders, true ), 'Breadcru
 pr_assert( in_array( 'Drug', $types_from_builders, true ), 'Drug IS in our emitted pieces' );
 pr_assert( in_array( 'FAQPage', $types_from_builders, true ), 'FAQPage IS in our emitted pieces when items present' );
 
-// ── PR_Core_Schema_Sanitizers::sanitize_faq_items() ──────────────────────
+// ── PR_Core_Schema_Sanitizers::sanitize_faq_items() ──────────────────────.
 
 echo "\nPR_Core_Schema_Sanitizers::sanitize_faq_items():\n";
 
@@ -294,6 +294,6 @@ $result_incomplete = PR_Core_Schema_Sanitizers::sanitize_faq_items( $incomplete_
 $decoded_incomplete = json_decode( $result_incomplete, true );
 pr_assert_equals( 0, count( $decoded_incomplete ), 'item without answer field dropped' );
 
-// ── Summary ──────────────────────────────────────────────────────────────
+// ── Summary ──────────────────────────────────────────────────────────────.
 
 exit( pr_test_summary() );

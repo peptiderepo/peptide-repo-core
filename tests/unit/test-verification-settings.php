@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../bootstrap.php';
 
-// ── Additional stubs needed by the settings class ───────────────────────
+// ── Additional stubs needed by the settings class ───────────────────────.
 
 $GLOBALS['pr_core_options']    = [];
 $GLOBALS['pr_core_cron_calls'] = [];
@@ -66,14 +66,14 @@ if ( ! function_exists( 'wp_schedule_event' ) ) {
 	}
 }
 
-// ── Load the settings class ─────────────────────────────────────────────
+// ── Load the settings class ─────────────────────────────────────────────.
 
 require_once __DIR__ . '/../../includes/cpt/class-pr-core-peptide-cpt.php';
 require_once __DIR__ . '/../../includes/admin/class-pr-core-settings.php';
 
 echo "== PR_Core_Settings verification methods unit tests ==\n\n";
 
-// ── sanitize_cadence() ──────────────────────────────────────────────────
+// ── sanitize_cadence() ──────────────────────────────────────────────────.
 
 echo "sanitize_cadence():\n";
 pr_assert_equals( 'daily',   PR_Core_Settings::sanitize_cadence( 'daily' ),   'daily → daily' );
@@ -83,7 +83,7 @@ pr_assert_equals( 'weekly',  PR_Core_Settings::sanitize_cadence( 'hourly' ),  'h
 pr_assert_equals( 'weekly',  PR_Core_Settings::sanitize_cadence( '' ),        'empty → weekly default' );
 pr_assert_equals( 'weekly',  PR_Core_Settings::sanitize_cadence( 'DAILY' ),   'uppercase → weekly (case-sensitive)' );
 
-// ── sanitize_emails() ───────────────────────────────────────────────────
+// ── sanitize_emails() ───────────────────────────────────────────────────.
 
 echo "\nsanitize_emails():\n";
 pr_assert_equals( '',                    PR_Core_Settings::sanitize_emails( '' ),                              'empty → empty' );
@@ -93,14 +93,14 @@ pr_assert_equals( 'a@test.com, b@test.com', PR_Core_Settings::sanitize_emails( '
 pr_assert_equals( 'good@test.com',       PR_Core_Settings::sanitize_emails( 'good@test.com, bad-email' ),     'mixed → only valid kept' );
 pr_assert_equals( 'trimmed@test.com',    PR_Core_Settings::sanitize_emails( '  trimmed@test.com  ' ),         'whitespace trimmed around valid email' );
 
-// ── reschedule_cron(): no-op when same value ────────────────────────────
+// ── reschedule_cron(): no-op when same value ────────────────────────────.
 
 echo "\nreschedule_cron() — no-op when value unchanged:\n";
 $GLOBALS['pr_core_cron_calls'] = [];
 PR_Core_Settings::reschedule_cron( 'weekly', 'weekly' );
 pr_assert( empty( $GLOBALS['pr_core_cron_calls'] ), 'no cron calls when old === new' );
 
-// ── reschedule_cron(): clears + reschedules on change ───────────────────
+// ── reschedule_cron(): clears + reschedules on change ───────────────────.
 
 echo "\nreschedule_cron() — reschedules when value changes:\n";
 $GLOBALS['pr_core_cron_calls'] = [];
@@ -126,6 +126,6 @@ $clear_idx    = array_search( 'clear', $actions, true );
 $schedule_idx = array_search( 'schedule', $actions, true );
 pr_assert( $clear_idx < $schedule_idx, 'clear fires before schedule' );
 
-// ── Summary ─────────────────────────────────────────────────────────────
+// ── Summary ─────────────────────────────────────────────────────────────.
 
 exit( pr_test_summary() );

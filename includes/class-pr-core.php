@@ -12,6 +12,7 @@ declare(strict_types=1);
  *
  * @see peptide-repo-core.php — Bootstrap that instantiates this class.
  * @see ARCHITECTURE.md    — Full data flow diagram.
+ * @package Peptide_Repo_Core
  */
 class PR_Core {
 
@@ -43,9 +44,9 @@ class PR_Core {
 		$repo_daily_tax = new PR_Core_Repo_Daily_Taxonomy();
 		$repo_daily_tax->register_hooks();
 
-		// One-shot rewrite flush on in-place version bumps. Runs at the very
-		// end of init (priority 999) so all CPTs/taxonomies — ours and
-		// anyone else's — are registered first. Handles updates deployed
+		// One-shot rewrite flush on in-place version bumps. Runs at the very.
+		// end of init (priority 999) so all CPTs/taxonomies — ours and.
+		// anyone else's — are registered first. Handles updates deployed.
 		// without a deactivate/reactivate cycle (e.g., SCP/rsync pushes).
 		add_action( 'init', array( PR_Core_Activator::class, 'maybe_flush_on_version_change' ), 999 );
 
@@ -55,7 +56,7 @@ class PR_Core {
 		}
 		add_action( 'pr_core_verification_scan', array( PR_Core_Verification_Scanner::class, 'run_scan' ) );
 
-		// Ajax handlers must be registered outside is_admin() — admin-ajax.php
+		// Ajax handlers must be registered outside is_admin() — admin-ajax.php.
 		// does not define WP_ADMIN, so is_admin() returns false for ajax requests.
 		add_action( 'wp_ajax_pr_core_mark_verified', array( PR_Core_Ajax_Handlers::class, 'handle_mark_verified' ) );
 		add_action( 'wp_ajax_pr_core_scan_now', array( PR_Core_Ajax_Handlers::class, 'handle_scan_now' ) );

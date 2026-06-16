@@ -44,7 +44,7 @@ class JsonldTest extends TestCase {
 		require_once PR_CORE_PLUGIN_DIR . 'includes/frontend/class-pr-core-jsonld.php';
 	}
 
-	// ── Helper ────────────────────────────────────────────────────────
+	// ── Helper ────────────────────────────────────────────────────────.
 
 	/**
 	 * @param array<string, mixed> $overrides
@@ -73,7 +73,7 @@ class JsonldTest extends TestCase {
 		], $overrides ) );
 	}
 
-	// ── Drug @id ─────────────────────────────────────────────────────
+	// ── Drug @id ─────────────────────────────────────────────────────.
 
 	public function test_drug_node_has_id(): void {
 		$GLOBALS['pr_test_postmeta'][1] = [];
@@ -89,7 +89,7 @@ class JsonldTest extends TestCase {
 		$this->assertSame( 'https://peptiderepo.com/peptides/bpc-157/#drug', $drug_node['@id'] );
 	}
 
-	// ── Drug @type ────────────────────────────────────────────────────
+	// ── Drug @type ────────────────────────────────────────────────────.
 
 	public function test_drug_type_is_array(): void {
 		$GLOBALS['pr_test_postmeta'][1] = [];
@@ -112,7 +112,7 @@ class JsonldTest extends TestCase {
 		$this->assertContains( 'MolecularEntity', $drug_node['@type'] );
 	}
 
-	// ── Drug fields present when meta set ────────────────────────────
+	// ── Drug fields present when meta set ────────────────────────────.
 
 	public function test_molecular_formula_present_when_meta_set(): void {
 		$GLOBALS['pr_test_postmeta'][1] = [ '_pr_molecular_formula' => 'C62H98N16O22', '_pr_molecular_weight' => '1419.5', '_pr_aliases' => '[]' ];
@@ -140,7 +140,7 @@ class JsonldTest extends TestCase {
 		$this->assertCount( 2, $drug_node['alternateName'] );
 	}
 
-	// ── Drug fields omitted when meta empty ──────────────────────────
+	// ── Drug fields omitted when meta empty ──────────────────────────.
 
 	public function test_molecular_formula_omitted_when_meta_empty(): void {
 		$GLOBALS['pr_test_postmeta'][1] = [];
@@ -163,7 +163,7 @@ class JsonldTest extends TestCase {
 		$this->assertArrayNotHasKey( 'alternateName', $drug_node );
 	}
 
-	// ── FAQPage emission ──────────────────────────────────────────────
+	// ── FAQPage emission ──────────────────────────────────────────────.
 
 	public function test_faq_piece_not_null_when_items_present(): void {
 		$GLOBALS['pr_test_postmeta'][1] = [
@@ -233,7 +233,7 @@ class JsonldTest extends TestCase {
 		$this->assertNull( $faq_piece );
 	}
 
-	// ── MedicalWebPage retype ─────────────────────────────────────────
+	// ── MedicalWebPage retype ─────────────────────────────────────────.
 
 	public function test_retype_returns_medical_webpage_on_peptide_singular(): void {
 		$GLOBALS['pr_test_is_singular']   = true;
@@ -249,7 +249,7 @@ class JsonldTest extends TestCase {
 		$this->assertSame( 'WebPage', $result );
 	}
 
-	// ── No duplicate nodes from our builders ──────────────────────────
+	// ── No duplicate nodes from our builders ──────────────────────────.
 
 	public function test_builders_do_not_emit_webpage_type(): void {
 		$GLOBALS['pr_test_postmeta'][1] = [
@@ -272,7 +272,7 @@ class JsonldTest extends TestCase {
 		$this->assertNotContains( 'BreadcrumbList', $types );
 	}
 
-	// ── sanitize_faq_items() ──────────────────────────────────────────
+	// ── sanitize_faq_items() ──────────────────────────────────────────.
 
 	public function test_sanitize_faq_items_valid_input(): void {
 		$result  = PR_Core_Schema_Sanitizers::sanitize_faq_items( wp_json_encode( [ [ 'question' => 'Q?', 'answer' => 'A.' ] ] ) );

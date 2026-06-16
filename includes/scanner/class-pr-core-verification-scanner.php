@@ -11,6 +11,7 @@ declare(strict_types=1);
  *
  * @see admin/class-pr-core-settings.php — Cadence and threshold settings.
  * @see cpt/class-pr-core-peptide-cpt.php — Verification meta field specs.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Scanner {
 
@@ -36,7 +37,7 @@ class PR_Core_Verification_Scanner {
 
 		foreach ( $peptides as $dto ) {
 			$last_verified = get_post_meta( $dto->id, '_pr_last_source_verified', true );
-			$velocity      = get_post_meta( $dto->id, '_pr_verification_velocity', true ) ?: 'medium';
+			$velocity      = get_post_meta( $dto->id, '_pr_verification_velocity', true ) ?: 'medium'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 			// Empty verified date = treat as overdue.
 			if ( empty( $last_verified ) ) {

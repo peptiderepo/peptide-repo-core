@@ -36,7 +36,7 @@ class VerificationSettingsTest extends TestCase {
 		require_once PR_CORE_PLUGIN_DIR . 'includes/admin/class-pr-core-settings.php';
 	}
 
-	// ── sanitize_cadence() ────────────────────────────────────────────
+	// ── sanitize_cadence() ────────────────────────────────────────────.
 
 	public function test_sanitize_cadence_daily(): void {
 		$this->assertSame( 'daily', PR_Core_Settings::sanitize_cadence( 'daily' ) );
@@ -62,7 +62,7 @@ class VerificationSettingsTest extends TestCase {
 		$this->assertSame( 'weekly', PR_Core_Settings::sanitize_cadence( 'DAILY' ) );
 	}
 
-	// ── sanitize_emails() ─────────────────────────────────────────────
+	// ── sanitize_emails() ─────────────────────────────────────────────.
 
 	public function test_sanitize_emails_empty_returns_empty(): void {
 		$this->assertSame( '', PR_Core_Settings::sanitize_emails( '' ) );
@@ -88,14 +88,14 @@ class VerificationSettingsTest extends TestCase {
 		$this->assertSame( 'trimmed@test.com', PR_Core_Settings::sanitize_emails( '  trimmed@test.com  ' ) );
 	}
 
-	// ── reschedule_cron(): no-op when same value ──────────────────────
+	// ── reschedule_cron(): no-op when same value ──────────────────────.
 
 	public function test_reschedule_cron_noop_when_value_unchanged(): void {
 		PR_Core_Settings::reschedule_cron( 'weekly', 'weekly' );
 		$this->assertEmpty( $GLOBALS['pr_core_cron_calls'] );
 	}
 
-	// ── reschedule_cron(): clears + reschedules on change ─────────────
+	// ── reschedule_cron(): clears + reschedules on change ─────────────.
 
 	public function test_reschedule_cron_calls_clear_when_changed(): void {
 		PR_Core_Settings::reschedule_cron( 'weekly', 'daily' );

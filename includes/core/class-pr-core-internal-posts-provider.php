@@ -13,6 +13,7 @@ declare(strict_types=1);
  *
  * @see includes/interfaces/interface-related-posts-provider.php
  * @see includes/core/class-related-posts-section.php
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Internal_Posts_Provider implements PR_Core_Related_Posts_Provider {
 
@@ -80,7 +81,7 @@ class PR_Core_Internal_Posts_Provider implements PR_Core_Related_Posts_Provider 
 			)
 		);
 
-		return $query->posts ?: array();
+		return $query->posts ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 	}
 
 	/**
@@ -101,6 +102,6 @@ class PR_Core_Internal_Posts_Provider implements PR_Core_Related_Posts_Provider 
 			)
 		);
 
-		return $query->posts ?: array();
+		return $query->posts ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 	}
 }

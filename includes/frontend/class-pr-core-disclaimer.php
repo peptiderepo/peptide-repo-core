@@ -14,13 +14,22 @@ declare(strict_types=1);
  * not once per consumer plugin.
  *
  * @see ARCHITECTURE.md — Section 2.8 Shared Disclaimer Component.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Disclaimer {
 
-	/** @var string Option key for disclaimer copy (JSON). */
+	/**
+	 * Option key for disclaimer copy (JSON).
+	 *
+	 * @var string Option key for disclaimer copy (JSON).
+	 */
 	private const COPY_OPTION = 'pr_core_disclaimer_copy';
 
-	/** @var string Option key for disclaimer version. */
+	/**
+	 * Option key for disclaimer version.
+	 *
+	 * @var string Option key for disclaimer version.
+	 */
 	private const VERSION_OPTION = 'pr_core_disclaimer_version';
 
 	/**
@@ -81,7 +90,7 @@ class PR_Core_Disclaimer {
 	 */
 	public static function get_disclaimer_text( string $surface ): string {
 		$custom = get_option( self::COPY_OPTION, '{}' );
-		$copy   = json_decode( $custom, true ) ?: array();
+		$copy   = json_decode( $custom, true ) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		if ( ! empty( $copy[ $surface ] ) ) {
 			return (string) $copy[ $surface ];
@@ -110,7 +119,7 @@ class PR_Core_Disclaimer {
 	 */
 	public static function update_disclaimer( string $surface, string $text ): void {
 		$custom = get_option( self::COPY_OPTION, '{}' );
-		$copy   = json_decode( $custom, true ) ?: array();
+		$copy   = json_decode( $custom, true ) ?: array(); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		$copy[ sanitize_text_field( $surface ) ] = sanitize_textarea_field( $text );
 

@@ -17,19 +17,36 @@ declare(strict_types=1);
  *
  * @see migrations/class-pr-core-migration-0004-backfill-peptide-meta.php — Caller.
  * @see ARCHITECTURE.md — §v0.6.0 schema sprint.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Pubchem_Client {
 
-	/** @var string PubChem REST base URL. */
+	/**
+	 * PubChem REST base URL.
+	 *
+	 * @var string PubChem REST base URL.
+	 */
 	private const BASE = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug';
 
-	/** @var int HTTP timeout per request (seconds). */
+	/**
+	 * HTTP timeout per request (seconds).
+	 *
+	 * @var int HTTP timeout per request (seconds).
+	 */
 	private const TIMEOUT = 8;
 
-	/** @var int Maximum retry attempts with exponential backoff. */
+	/**
+	 * Maximum retry attempts with exponential backoff.
+	 *
+	 * @var int Maximum retry attempts with exponential backoff.
+	 */
 	private const MAX_RETRIES = 3;
 
-	/** @var int Maximum synonyms to return (keeps post-meta size reasonable). */
+	/**
+	 * Maximum synonyms to return (keeps post-meta size reasonable).
+	 *
+	 * @var int Maximum synonyms to return (keeps post-meta size reasonable).
+	 */
 	private const MAX_SYNONYMS = 10;
 
 	/**

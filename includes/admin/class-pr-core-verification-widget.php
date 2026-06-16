@@ -9,6 +9,7 @@ declare(strict_types=1);
  * Dependencies: PR_Core_Peptide_Repository.
  *
  * @see scanner/class-pr-core-verification-scanner.php — Computes status via run_scan().
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Verification_Widget {
 
@@ -39,7 +40,7 @@ class PR_Core_Verification_Widget {
 		$due_overdue = array();
 
 		foreach ( $peptides as $dto ) {
-			$status = get_post_meta( $dto->id, '_pr_verification_status', true ) ?: 'current';
+			$status = get_post_meta( $dto->id, '_pr_verification_status', true ) ?: 'current'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 			if ( in_array( $status, array( 'due', 'overdue' ), true ) ) {
 				$last_verified = get_post_meta( $dto->id, '_pr_last_source_verified', true );
@@ -51,7 +52,7 @@ class PR_Core_Verification_Widget {
 					'id'            => $dto->id,
 					'title'         => $dto->title,
 					'status'        => $status,
-					'velocity'      => get_post_meta( $dto->id, '_pr_verification_velocity', true ) ?: 'medium',
+					'velocity'      => get_post_meta( $dto->id, '_pr_verification_velocity', true ) ?: 'medium', // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 					'last_verified' => $last_verified,
 					'days_since'    => $days_since,
 				);

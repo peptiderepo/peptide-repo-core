@@ -27,7 +27,7 @@ declare(strict_types=1);
 // Bootstrap the lightweight WP stubs.
 require_once __DIR__ . '/../bootstrap.php';
 
-// ── Additional stubs needed for migration 0004 ──────────────────────────
+// ── Additional stubs needed for migration 0004 ──────────────────────────.
 
 if ( ! defined( 'PR_CORE_TARGET_SCHEMA_VERSION' ) ) {
 	define( 'PR_CORE_TARGET_SCHEMA_VERSION', 4 );
@@ -85,7 +85,7 @@ require_once PR_CORE_PLUGIN_DIR . 'includes/migrations/class-pr-core-pubchem-cli
 // Load migration class under test.
 require_once PR_CORE_PLUGIN_DIR . 'includes/migrations/class-pr-core-migration-0004-backfill-peptide-meta.php';
 
-// ── Expose private methods via reflection ────────────────────────────────
+// ── Expose private methods via reflection ────────────────────────────────.
 
 /**
  * Call a private/protected method on an object via reflection.
@@ -105,7 +105,7 @@ $migration = new PR_Core_Migration_0004_Backfill_Peptide_Meta();
 
 echo "== PR_Core_Migration_0004 unit tests ==\n\n";
 
-// ── parse_weight() ───────────────────────────────────────────────────────
+// ── parse_weight() ───────────────────────────────────────────────────────.
 
 echo "parse_weight():\n";
 
@@ -145,7 +145,7 @@ pr_assert_equals(
 	'strips whitespace and lowercase "da"'
 );
 
-// ── parse_aliases_string() ───────────────────────────────────────────────
+// ── parse_aliases_string() ───────────────────────────────────────────────.
 
 echo "\nparse_aliases_string():\n";
 
@@ -167,8 +167,8 @@ pr_assert_equals( '[]', $whitespace_result, 'whitespace-only segments dropped, r
 $single = json_decode( $migration->parse_aliases_string( 'Only One' ), true );
 pr_assert_equals( 1, count( $single ), 'single alias produces array of 1' );
 
-// ── sanitize_formula() ───────────────────────────────────────────────────
-// Five required cases (Option B — validate, don't allowlist):
+// ── sanitize_formula() ───────────────────────────────────────────────────.
+// Five required cases (Option B — validate, don't allowlist):.
 //   1. Valid formula unchanged.
 //   2. Parenthesised formula preserved.
 //   3. Newline-injected payload — "injection" stripped, formula kept.
@@ -219,7 +219,7 @@ pr_assert_equals(
 	'whitespace-only returns empty string'
 );
 
-// ── Idempotency: skips when all three PR Core keys populated ─────────────
+// ── Idempotency: skips when all three PR Core keys populated ─────────────.
 
 echo "\nIdempotency (all _pr_* keys populated):\n";
 
@@ -235,7 +235,7 @@ $result = call_private( $migration, 'backfill_post', [ 1 ] );
 pr_assert_equals( 'skipped', $result, 'returns "skipped" when all three keys non-empty' );
 pr_assert( empty( $GLOBALS['pr_test_updated_meta'] ), 'no update_post_meta calls when skipped' );
 
-// ── PSA source path ──────────────────────────────────────────────────────
+// ── PSA source path ──────────────────────────────────────────────────────.
 
 echo "\nPSA source path:\n";
 
@@ -277,7 +277,7 @@ pr_assert( $formula_written, 'molecular formula meta was written' );
 pr_assert( $weight_written, 'molecular weight meta was written' );
 pr_assert( $aliases_written, 'aliases meta was written' );
 
-// ── Partial re-run: existing values preserved ────────────────────────────
+// ── Partial re-run: existing values preserved ────────────────────────────.
 
 echo "\nIdempotency: only some keys populated (partial re-run):\n";
 
@@ -297,7 +297,7 @@ $GLOBALS['pr_test_posts'][3] = (object) [ 'post_title' => 'BPC-157', 'ID' => 3 ]
 $result = call_private( $migration, 'backfill_post', [ 3 ] );
 pr_assert_equals( 'copied_psa', $result, 'runs PSA copy even when only some keys populated' );
 
-// ── PubChem skip path: no PSA data, no network ──────────────────────────
+// ── PubChem skip path: no PSA data, no network ──────────────────────────.
 
 echo "\nPubChem skip path (no PSA data, no network in unit tests):\n";
 
@@ -317,6 +317,6 @@ $result = call_private( $mock_migration, 'backfill_post', [ 10 ] );
 pr_assert_equals( 'pubchem_skip', $result, 'returns "pubchem_skip" when PubChem network fails' );
 pr_assert( empty( $GLOBALS['pr_test_updated_meta'] ), 'no meta written on pubchem_skip' );
 
-// ── Summary ──────────────────────────────────────────────────────────────
+// ── Summary ──────────────────────────────────────────────────────────────.
 
 exit( pr_test_summary() );

@@ -10,33 +10,128 @@ declare(strict_types=1);
  *
  * @see cpt/class-pr-core-peptide-cpt.php       — Meta field definitions.
  * @see repositories/class-pr-core-peptide-repository.php — Creates these from WP_Post.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Peptide_DTO {
 
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $id;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $title;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $slug;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $content;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $excerpt;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $status;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $display_name;
-	/** @var string[] */
+	/**
+	 * String[].
+	 *
+	 * @var string[]
+	 */
 	public readonly array $aliases;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $molecular_formula;
+	/**
+	 * Float.
+	 *
+	 * @var float
+	 */
 	public readonly float $molecular_weight;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $cas_number;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $drugbank_id;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $chembl_id;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $evidence_strength;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $editorial_review_status;
+	/**
+	 * String.
+	 *
+	 * @var string
+	 */
 	public readonly string $last_editorial_review_at;
+	/**
+	 * Int.
+	 *
+	 * @var int
+	 */
 	public readonly int $medical_editor_id;
-	/** @var string[] Category term names. */
+	/**
+	 * Category term names.
+	 *
+	 * @var string[] Category term names.
+	 */
 	public readonly array $categories;
-	/** @var string[] Family term names. */
+	/**
+	 * Family term names.
+	 *
+	 * @var string[] Family term names.
+	 */
 	public readonly array $families;
 
 	/**
+	 *   Construct.
+	 *
 	 * @param array<string, mixed> $data Associative array of peptide fields.
 	 */
 	public function __construct( array $data ) {

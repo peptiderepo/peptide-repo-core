@@ -9,6 +9,7 @@ declare(strict_types=1);
  * Dependencies: PR_Core_Dosing_Repository for row counts.
  *
  * @see admin/class-pr-core-admin.php — Registers column hooks.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Admin_Columns {
 
@@ -44,13 +45,13 @@ class PR_Core_Admin_Columns {
 	public function render_column( string $column, int $post_id ): void {
 		switch ( $column ) {
 			case 'pr_evidence':
-				$strength = get_post_meta( $post_id, 'evidence_strength', true ) ?: 'preclinical';
+				$strength = get_post_meta( $post_id, 'evidence_strength', true ) ?: 'preclinical'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 				$label    = apply_filters( 'pr_core_evidence_strength_label', $strength, $strength );
 				echo esc_html( $label );
 				break;
 
 			case 'pr_editorial':
-				$status = get_post_meta( $post_id, 'editorial_review_status', true ) ?: 'draft';
+				$status = get_post_meta( $post_id, 'editorial_review_status', true ) ?: 'draft'; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 				echo esc_html( ucfirst( str_replace( '-', ' ', $status ) ) );
 				break;
 

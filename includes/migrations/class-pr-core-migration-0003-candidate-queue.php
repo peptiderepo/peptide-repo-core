@@ -12,10 +12,15 @@ declare(strict_types=1);
  * and ai_candidate_id set; queue row marked 'merged'.
  *
  * @see ARCHITECTURE.md — AI-assist candidate-extraction pipeline.
+ * @package Peptide_Repo_Core
  */
 class PR_Core_Migration_0003_Candidate_Queue {
 
-	/** @var string[] Valid queue status enum values. */
+	/**
+	 * Valid queue status enum values.
+	 *
+	 * @var string[] Valid queue status enum values.
+	 */
 	public const STATUSES = array(
 		'pending',
 		'approved',
