@@ -37,5 +37,7 @@
 		<exclude name="WordPress.PHP.NoSilencedErrors.Discouraged"/>
 		<!-- Duplicate interface name: PHPCS false-positive scanning both interface definition sites -->
 		<exclude name="Generic.Classes.DuplicateClassName.Found"/>
+		<!-- Dynamic WHERE clause in dosing-repository; placeholders are builder-constructed -->
+		<exclude name="WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare"/>
 	</rule>
 </ruleset>
