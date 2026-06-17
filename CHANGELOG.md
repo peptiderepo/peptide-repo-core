@@ -4,6 +4,11 @@ All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
 
+## [0.7.1] - 2026-06-17
+
+### Fixed
+- **Critical**: Settings page PHP Fatal `Undefined constant PR_Core_Settings_Renderer::OPTION_GROUP` (and 6 other `self::CONST` references). Root cause: PR #22 split the renderer into its own class but left all constants defined only on `PR_Core_Settings`. Fix: promote the 6 option-key private constants to `public const` on `PR_Core_Settings`; update renderer to reference them via `PR_Core_Settings::*`. Regression introduced in v0.7.0.
+
 ## [0.7.0] - 2026-06-16
 
 ### Changed
