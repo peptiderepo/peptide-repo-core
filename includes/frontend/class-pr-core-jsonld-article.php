@@ -105,11 +105,11 @@ class PR_Core_Jsonld_Article {
 			return $graph;
 		}
 
-		$review_mode  = $this->reader->get_review_mode( $post_id );
-		$reviewed_at  = $this->reader->get_reviewed_at( $post_id );
-		$reviewed_by  = $this->reader->get_reviewed_by( $post_id, $review_mode );
-		$citations    = $this->reader->get_citations( $post_id );
-		$about_stubs  = $this->reader->get_about_peptides( $post_id );
+		$review_mode = $this->reader->get_review_mode( $post_id );
+		$reviewed_at = $this->reader->get_reviewed_at( $post_id );
+		$reviewed_by = $this->reader->get_reviewed_by( $post_id, $review_mode );
+		$citations   = $this->reader->get_citations( $post_id );
+		$about_stubs = $this->reader->get_about_peptides( $post_id );
 
 		foreach ( $graph as &$piece ) {
 			if ( ! is_array( $piece ) ) {
