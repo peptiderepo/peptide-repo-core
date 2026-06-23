@@ -63,6 +63,26 @@ v0.6.0 uses four focused classes (see ARCHITECTURE.md §#6). To add a new field 
 4. To add a new schema piece (not Drug), create a new `PR_Core_Jsonld_<Piece>` class in `frontend/` and inject it from `PR_Core_Jsonld::inject_graph_pieces()`.
 5. The `pr_core_jsonld_peptide` filter on the Drug node array is preserved for consumer plugins.
 
+
+## How To: Add Fields to the PRAB Article JSON-LD (contract v2+)
+
+The `_prab_*` meta contract is versioned (`_prab_schema_version`). The contract is frozen at v1
+until prcore and PRAB coordinate a version bump. To add new fields:
+
+1. Propose the new field in `convo/prcore/decisions/` (CTO ratifies; PRAB and prcore must agree).
+2. Bump `_prab_schema_version` to 2 in PRAB's meta write code — do NOT bump before prcore ships support.
+3. Add the new field to `PR_Core_Prab_Meta_Reader` (sanitize at read time, degrade gracefully).
+4. Add emission logic to `PR_Core_Jsonld_Article` — emit only when field is non-empty.
+5. Add unit tests for the new field in `tests/unit/JsonldArticleTest.php`.
+6. Bump `SUPPORTED_VERSION` in `PR_Core_Prab_Meta_Reader::SUPPORTED_VERSION` to 2.
+7. Update the contract decision doc and CHANGELOG.
+
+Key rules:
+- prcore **reads** `_prab_*` meta only. PRAB **writes** only. The namespace boundary is hard.
+- `uninstall.php` must NOT touch `_prab_*` keys — they belong to PRAB's namespace.
+- `quality_score` and similar audit fields must never be emitted (no schema.org mapping).
+- The `reviewedBy` Person guard is non-negotiable: Person only with human mode + valid user ID.
+
 ## Error Handling
 
 - Repository methods return `null` or `0` on failure, never throw.

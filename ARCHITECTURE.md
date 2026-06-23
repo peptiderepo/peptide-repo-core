@@ -215,14 +215,25 @@ Drug schema on single pages increases LLM citation rate. Filter hook allows cons
 - **FAQ emission:** `_pr_faq_items` post-meta (JSON array of `{question, answer}` objects). Node emitted only when items exist.
 - **Dosing omitted from schema:** YMYL constraint — no dosing data in JSON-LD.
 
-JSON-LD class tree (v0.6.0):
+JSON-LD class tree (v0.8.0):
 
 | Class | File | Responsibility |
 |---|---|---|
 | `PR_Core_Jsonld` | `frontend/class-pr-core-jsonld.php` | Orchestrator: registers hooks, Yoast vs. standalone routing |
 | `PR_Core_Jsonld_Drug` | `frontend/class-pr-core-jsonld-drug.php` | Builds Drug (+ MolecularEntity) schema node |
-| `PR_Core_Jsonld_Webpage` | `frontend/class-pr-core-jsonld-webpage.php` | MedicalWebPage retype + lastReviewed/reviewedBy enrichment |
+| `PR_Core_Jsonld_Webpage` | `frontend/class-pr-core-jsonld-webpage.php` | MedicalWebPage retype + lastReviewed/reviewedBy enrichment (peptide pages) |
 | `PR_Core_Jsonld_Faq` | `frontend/class-pr-core-jsonld-faq.php` | FAQPage node (emit-only-when-populated) |
+| `PR_Core_Jsonld_Article` | `frontend/class-pr-core-jsonld-article.php` | PRAB article emitter: MedicalWebPage retype + Article citation/about/reviewedBy enrichment |
+| `PR_Core_Prab_Meta_Reader` | `frontend/class-pr-core-prab-meta-reader.php` | Reads and sanitises _prab_* meta (contract v1 reader) |
+
+**PRAB article emission (v0.8.0, contract v1):**
+- Trigger: `_prab_schema_version=1` on a standard `post`.
+- Yoast path (priority 13, after peptide enrichment at 11+12): retypes page node to `MedicalWebPage`; enriches Yoast's existing Article piece with `citation[]`, `about[]` (Drug @id references), `lastReviewed`, honest `reviewedBy`.
+- No-Yoast fallback: standalone `@graph` (Article + MedicalWebPage) on `wp_head` priority 99.
+- **Honest reviewedBy:** Person only when `_prab_review_mode=human` + valid `_prab_reviewed_by` WP user ID. All other cases: Organization "Peptide Repo". Never a fabricated person.
+- **`about` linkage:** Drug stubs reference `{peptide_permalink}#drug` (stable @id from v0.6.0).
+- prcore reads `_prab_*` meta only; PRAutoBlogger writes only. uninstall.php unaffected.
+- All `_prab_*` meta treated as untrusted at read time.
 
 ### #7: PR Core owns the `peptide` CPT and `peptide_category` taxonomy (v0.2.0)
 Prior to v0.2.0, PR Core registered `pr_peptide` while Peptide Search AI registered `peptide` — both claimed the public rewrite slug `peptides`, and WP's rewrite resolver picked PR Core's empty CPT, 404'ing all 89 production peptide detail pages. v0.2.0 consolidates both registrations onto a single `peptide` CPT, owned by PR Core. PSA v4.5.0 drops its CPT/taxonomy registration; its meta boxes (`psa_peptide_data`, `psa_extended_data`), directory shortcode, KB article renderer, and search widget continue operating on the shared `peptide` CPT regardless of who registers it. Registration on both sides is guarded with `post_type_exists()` / `taxonomy_exists()` so deploy order is forgiving.

@@ -4,6 +4,52 @@ All notable changes to Peptide Repo Core are documented here.
 Format: [Semantic Versioning](https://semver.org/).
 
 
+## [0.8.0] — 2026-06-23
+
+### Added
+- **PRAutoBlogger article JSON-LD emitter** (ratified contract v1 — `convo/prcore/decisions/2026-06-11-jsonld-contract-v1.md`):
+  - `PR_Core_Jsonld_Article` (`frontend/class-pr-core-jsonld-article.php`, ~235 lines) — meta-triggered
+    emitter for `post` posts carrying `_prab_schema_version=1`. Hooks into Yoast's graph via
+    `wpseo_schema_webpage_type` (priority 10) and `wpseo_schema_graph` (priority 13). Retypes the
+    page node to `MedicalWebPage`; enriches the Yoast `Article` piece with `citation[]`,
+    `about[]` (Drug `@id` stubs), `lastReviewed`, and `reviewedBy`. Standalone `@graph` fallback
+    (Article + MedicalWebPage) when Yoast is absent. Posts without `_prab_schema_version` meta
+    are byte-unchanged.
+  - `PR_Core_Prab_Meta_Reader` (`frontend/class-pr-core-prab-meta-reader.php`, ~268 lines) — reads
+    and sanitises all contract-v1 `_prab_*` meta at read time (not trusting PRAB's write-time
+    sanitization). URLs validated (http/https only), DOIs matched against canonical pattern, JSON
+    arrays validated per-element, WP user ID resolved via `get_userdata()`. Malformed values
+    degrade gracefully (field skipped) — no page-render fatals.
+  - **Honest `reviewedBy`:** Person node emitted ONLY when `_prab_review_mode=human` AND
+    `_prab_reviewed_by` resolves to an existing WP user. All other cases (editorial-system mode,
+    missing/zero/nonexistent user ID) emit the Organization node ("Peptide Repo"). Never emits a
+    fabricated person — the core contract guarantee.
+  - **`about` Drug linkage:** `_prab_about_peptides` (JSON array of peptide post IDs) is resolved
+    to Drug stub arrays using the stable `{permalink}#drug` @id established in v0.6.0. Each ID
+    must resolve to a published `peptide` post; unresolvable IDs are skipped.
+  - **Citation nodes:** `ScholarlyArticle` when DOI present (DOI normalised to https://doi.org/
+    URI as `sameAs`), else `CreativeWork`. `quality_score` never emitted (no schema.org mapping
+    per contract v1).
+  - **No duplicate nodes:** integrates via Yoast mutation (priority 13, after PR_Core_Jsonld
+    priority-12 Drug/FAQ injection). Never adds new WebPage or Article pieces.
+  - Unit tests: `tests/unit/JsonldArticleTest.php` — 22 assertions covering is_triggered,
+    review_mode, reviewed_by (Person/Org decision tree), citation sanitization, about linkage,
+    retype, enrich, no-new-nodes, untriggered passthrough, editorial-system-never-person.
+
+### Changed
+- `class-pr-core.php`: boots `PR_Core_Jsonld_Article` alongside `PR_Core_Jsonld` in `init()`.
+- `tests/bootstrap.php`: enhanced `get_userdata()` stub to read from `$GLOBALS['pr_test_userdata']`;
+  added `WP_User` class stub; initialised `$GLOBALS['pr_test_userdata']` global.
+- `ARCHITECTURE.md`: JSON-LD class table updated with new classes; §2.7 PRAB article emission added.
+- `CONVENTIONS.md`: JSON-LD extension guide updated with PRAB-article hook pattern.
+
+### Technical
+- Meta keys `_prab_*` are owned by PRAutoBlogger namespace (PRAB registers/writes; prcore reads
+  only). `uninstall.php` unaffected — prcore never writes `_prab_*` meta, so no teardown needed.
+- Yoast hook order: `wpseo_schema_graph` priority 11 (peptide MedicalWebPage enrich) → priority 12
+  (Drug/FAQ inject) → priority 13 (PRAB Article enrich + page retype). Three priorities prevent
+  race conditions between the peptide and article enrichment paths.
+
 ## [0.7.1] - 2026-06-17
 
 ### Fixed
