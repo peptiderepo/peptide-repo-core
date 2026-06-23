@@ -19,7 +19,7 @@ declare(strict_types=1);
  * What: Registers all hooks, runs migrations, boots subsystems.
  * Who calls it: peptide-repo-core.php on plugins_loaded.
  * Dependencies: PR_Core_Migration_Runner, PR_Core_Peptide_CPT, PR_Core_Topic_Taxonomy,
- *              PR_Core_Admin, PR_Core_Disclaimer, PR_Core_Jsonld,
+ *              PR_Core_Admin, PR_Core_Disclaimer, PR_Core_Jsonld, PR_Core_Jsonld_Article,
  *              PR_Core_Rest_Controller, PR_Core_Related_Posts_Section.
  *
  * @see peptide-repo-core.php — Bootstrap that instantiates this class.
@@ -90,6 +90,9 @@ class PR_Core {
 
 		$jsonld = new PR_Core_Jsonld();
 		$jsonld->register_hooks();
+
+		$jsonld_article = new PR_Core_Jsonld_Article();
+		$jsonld_article->register_hooks();
 
 		// Related Articles section (frontend).
 		$related_posts = new PR_Core_Related_Posts_Section(

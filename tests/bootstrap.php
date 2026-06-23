@@ -61,6 +61,7 @@ $GLOBALS['pr_core_options']      = [];
 $GLOBALS['pr_core_cron_calls']   = [];
 $GLOBALS['pr_test_postmeta']     = [];
 $GLOBALS['pr_test_posts']        = [];
+$GLOBALS['pr_test_userdata']     = [];
 $GLOBALS['pr_test_updated_meta'] = [];
 $GLOBALS['pr_test_is_singular']  = false;
 $GLOBALS['pr_test_singular_type'] = '';
@@ -167,6 +168,11 @@ if ( ! function_exists( 'error_log' ) ) {
 if ( ! function_exists( 'is_email' ) ) {
 	function is_email( string $email ): bool {
 		return (bool) filter_var( $email, FILTER_VALIDATE_EMAIL );
+	}
+}
+if ( ! function_exists( 'wp_parse_url' ) ) {
+	function wp_parse_url( string $url, int $component = -1 ) {
+		return parse_url( $url, $component );
 	}
 }
 
@@ -325,7 +331,26 @@ if ( ! function_exists( 'get_post_modified_time' ) ) {
 }
 if ( ! function_exists( 'get_userdata' ) ) {
 	function get_userdata( int $id ) {
+		$data = $GLOBALS['pr_test_userdata'][ $id ] ?? null;
+		if ( null !== $data ) {
+			return $data instanceof WP_User ? $data : new WP_User( (array) $data );
+		}
 		return false;
+	}
+}
+
+if ( ! class_exists( 'WP_User' ) ) {
+	class WP_User {
+		public int    $ID           = 0;
+		public string $display_name = '';
+		public string $user_login   = '';
+		public string $user_email   = '';
+		/** @param array<string, mixed> $data */
+		public function __construct( array $data = [] ) {
+			foreach ( $data as $key => $value ) {
+				$this->$key = $value;
+			}
+		}
 	}
 }
 if ( ! function_exists( 'get_author_posts_url' ) ) {
