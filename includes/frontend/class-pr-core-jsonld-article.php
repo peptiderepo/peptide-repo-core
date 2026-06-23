@@ -210,6 +210,7 @@ class PR_Core_Jsonld_Article {
 			JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
 		);
 		if ( false !== $json ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode() is the canonical JSON escape; no further escaping needed.
 			printf(
 				'<script type="application/ld+json">%s</script>' . "\n",
 				$json

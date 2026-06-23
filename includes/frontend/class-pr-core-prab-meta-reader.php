@@ -10,15 +10,8 @@ declare(strict_types=1);
 /**
  * Reads and validates _prab_* post-meta written by PRAutoBlogger.
  *
- * What: Reads contract-v1 meta keys from a `post` and returns sanitised values.
- *       All meta is treated as untrusted — malformed values degrade gracefully
- *       (skipped/null) and never throw. Called by PR_Core_Jsonld_Article.
- *
- * Security: URLs validated (http/https only), DOIs matched against canonical
- * pattern, JSON arrays decoded per-element, user ID resolved via get_userdata().
- *
- * Who calls it: PR_Core_Jsonld_Article.
- * Dependencies: WordPress get_post_meta(), get_userdata(), get_post().
+ * All meta treated as untrusted: URLs validated (http/https), DOIs regex-checked,
+ * JSON arrays decoded per-element, user IDs resolved via get_userdata(). Never throws.
  *
  * @see frontend/class-pr-core-jsonld-article.php — Consumer.
  * @see convo/prcore/decisions/2026-06-11-jsonld-contract-v1.md — Meta contract.
@@ -26,32 +19,57 @@ declare(strict_types=1);
  * @package Peptide_Repo_Core
  */
 class PR_Core_Prab_Meta_Reader {
-
-	/** @var string Schema version meta key; value must equal 1 to trigger. */
+	/**
+	 * Schema version meta key; presence opts the post in, value must equal 1.
+	 *
+	 * @var string
+	 */
 	public const META_SCHEMA_VERSION = '_prab_schema_version';
 
-	/** @var string Citations meta key; JSON array of {url, title, doi?, quality_score?}. */
+	/**
+	 * Citations meta key; JSON array of {url, title, doi?, quality_score?}.
+	 *
+	 * @var string
+	 */
 	public const META_CITATIONS = '_prab_citations';
 
-	/** @var string About-peptides meta key; JSON array of peptide post IDs for schema `about`. */
+	/**
+	 * About-peptides meta key; JSON array of peptide post IDs for schema `about`.
+	 *
+	 * @var string
+	 */
 	public const META_ABOUT_PEPTIDES = '_prab_about_peptides';
 
-	/** @var string Review mode meta key; value is 'human' or 'editorial-system'. */
+	/**
+	 * Review mode meta key; value is 'human' or 'editorial-system'.
+	 *
+	 * @var string
+	 */
 	public const META_REVIEW_MODE = '_prab_review_mode';
 
-	/** @var string Reviewed-at meta key; ISO 8601 datetime of last review. */
+	/**
+	 * Reviewed-at meta key; ISO 8601 datetime of last review.
+	 *
+	 * @var string
+	 */
 	public const META_REVIEWED_AT = '_prab_reviewed_at';
 
-	/** @var string Reviewed-by meta key; WP user ID of the Review Queue approver. */
+	/**
+	 * Reviewed-by meta key; WP user ID of the Review Queue approver.
+	 *
+	 * @var string
+	 */
 	public const META_REVIEWED_BY = '_prab_reviewed_by';
 
-	/** @var int The only schema version this reader currently supports. */
+	/**
+	 * The only schema version this reader currently supports.
+	 *
+	 * @var int
+	 */
 	private const SUPPORTED_VERSION = 1;
 
 	/**
-	 * Per-request cache for is_triggered() results, keyed by post ID.
-	 *
-	 * Avoids triple get_post_meta reads when all three hooks fire for the same post.
+	 * Per-request cache for is_triggered(), keyed by post ID (avoids triple meta reads).
 	 *
 	 * @var array<int, bool>
 	 */
@@ -60,8 +78,8 @@ class PR_Core_Prab_Meta_Reader {
 	/**
 	 * Return true when this post carries a supported _prab_schema_version meta.
 	 *
-	 * Result is cached per post ID to avoid repeated get_post_meta reads within
-	 * one request (all three Yoast hooks call this for the same post).
+	 * Cached per post ID: all three Yoast hooks call this for the same post,
+	 * so caching avoids triple get_post_meta reads per request.
 	 *
 	 * @param int $post_id WordPress post ID.
 	 * @return bool
@@ -72,22 +90,24 @@ class PR_Core_Prab_Meta_Reader {
 		}
 		$raw = get_post_meta( $post_id, self::META_SCHEMA_VERSION, true );
 		if ( '' === $raw || false === $raw ) {
-			return $this->triggered_cache[ $post_id ] = false;
+			$this->triggered_cache[ $post_id ] = false;
+			return false;
 		}
 		$version = (int) $raw;
 		if ( self::SUPPORTED_VERSION === $version ) {
-			return $this->triggered_cache[ $post_id ] = true;
+			$this->triggered_cache[ $post_id ] = true;
+			return true;
 		}
 		error_log( sprintf( '[PR Core] Unsupported _prab_schema_version=%d on post %d. Supports v%d only. Emission suppressed.', $version, $post_id, self::SUPPORTED_VERSION ) );
-		return $this->triggered_cache[ $post_id ] = false;
+		$this->triggered_cache[ $post_id ] = false;
+		return false;
 	}
 
 	/**
 	 * Read and validate _prab_citations meta.
 	 *
-	 * Each entry must have a valid http/https `url` and a non-empty `title`.
-	 * Invalid entries are skipped. `quality_score` is never emitted (no schema.org
-	 * mapping — contract v1).
+	 * Each entry needs valid http/https `url` and non-empty `title`; others skipped.
+	 * `quality_score` never emitted — no schema.org mapping (contract v1).
 	 *
 	 * @param int $post_id WordPress post ID.
 	 * @return array<int, array{url: string, title: string, doi: string|null}> Validated.
@@ -119,9 +139,8 @@ class PR_Core_Prab_Meta_Reader {
 	/**
 	 * Read and validate _prab_about_peptides meta.
 	 *
-	 * Returns Drug stub arrays for schema `about`. Each peptide post ID must
-	 * resolve to a published `peptide` post; unresolvable IDs and posts whose
-	 * permalink is empty are skipped.
+	 * Returns Drug stubs for schema `about`. Each ID must resolve to a published
+	 * `peptide` post; unresolvable IDs and empty-permalink posts are skipped.
 	 *
 	 * @param int $post_id WordPress post ID.
 	 * @return array<int, array<string, string>> Drug stubs.
@@ -195,12 +214,8 @@ class PR_Core_Prab_Meta_Reader {
 	/**
 	 * Resolve the honest reviewedBy value for a PRAB article.
 	 *
-	 * Returns a Person node only when mode='human' AND _prab_reviewed_by resolves
-	 * to an existing WP user with a non-empty display_name. All other cases return
-	 * the Organization node. Never emits a fabricated Person — core contract.
-	 *
-	 * Person @id: {home_url}/#/schema/person/{user_id} (Yoast convention).
-	 * Org @id: {home_url}/#organization (references Yoast's publisher node).
+	 * Person only when mode='human', user resolves, and display_name non-empty.
+	 * All other cases → Organization. Never fabricated. Core contract guarantee.
 	 *
 	 * @param int    $post_id     WordPress post ID.
 	 * @param string $review_mode Result of get_review_mode() for this post.
