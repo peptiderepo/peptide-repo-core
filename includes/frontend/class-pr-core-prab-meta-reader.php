@@ -27,85 +27,70 @@ declare(strict_types=1);
  */
 class PR_Core_Prab_Meta_Reader {
 
-	/**
-	 * Schema version meta key; presence opts the post in, value must equal 1.
-	 *
-	 * @var string
-	 */
+	/** @var string Schema version meta key; value must equal 1 to trigger. */
 	public const META_SCHEMA_VERSION = '_prab_schema_version';
 
-	/**
-	 * Citations meta key; JSON array of {url, title, doi?, quality_score?} objects.
-	 *
-	 * @var string
-	 */
+	/** @var string Citations meta key; JSON array of {url, title, doi?, quality_score?}. */
 	public const META_CITATIONS = '_prab_citations';
 
-	/**
-	 * About-peptides meta key; JSON array of peptide post IDs (ints) for schema `about`.
-	 *
-	 * @var string
-	 */
+	/** @var string About-peptides meta key; JSON array of peptide post IDs for schema `about`. */
 	public const META_ABOUT_PEPTIDES = '_prab_about_peptides';
 
-	/**
-	 * Review mode meta key; value is 'human' or 'editorial-system'.
-	 *
-	 * @var string
-	 */
+	/** @var string Review mode meta key; value is 'human' or 'editorial-system'. */
 	public const META_REVIEW_MODE = '_prab_review_mode';
 
-	/**
-	 * Reviewed-at meta key; ISO 8601 datetime of last review.
-	 *
-	 * @var string
-	 */
+	/** @var string Reviewed-at meta key; ISO 8601 datetime of last review. */
 	public const META_REVIEWED_AT = '_prab_reviewed_at';
 
-	/**
-	 * Reviewed-by meta key; stores the WP user ID of the Review Queue approver.
-	 *
-	 * @var string
-	 */
+	/** @var string Reviewed-by meta key; WP user ID of the Review Queue approver. */
 	public const META_REVIEWED_BY = '_prab_reviewed_by';
 
-	/**
-	 * The only schema version this reader currently supports.
-	 *
-	 * @var int
-	 */
+	/** @var int The only schema version this reader currently supports. */
 	private const SUPPORTED_VERSION = 1;
+
+	/**
+	 * Per-request cache for is_triggered() results, keyed by post ID.
+	 *
+	 * Avoids triple get_post_meta reads when all three hooks fire for the same post.
+	 *
+	 * @var array<int, bool>
+	 */
+	private array $triggered_cache = array();
 
 	/**
 	 * Return true when this post carries a supported _prab_schema_version meta.
 	 *
-	 * Logs a notice on an unsupported-but-present version value.
+	 * Result is cached per post ID to avoid repeated get_post_meta reads within
+	 * one request (all three Yoast hooks call this for the same post).
 	 *
 	 * @param int $post_id WordPress post ID.
 	 * @return bool
 	 */
 	public function is_triggered( int $post_id ): bool {
+		if ( isset( $this->triggered_cache[ $post_id ] ) ) {
+			return $this->triggered_cache[ $post_id ];
+		}
 		$raw = get_post_meta( $post_id, self::META_SCHEMA_VERSION, true );
 		if ( '' === $raw || false === $raw ) {
-			return false;
+			return $this->triggered_cache[ $post_id ] = false;
 		}
 		$version = (int) $raw;
 		if ( self::SUPPORTED_VERSION === $version ) {
-			return true;
+			return $this->triggered_cache[ $post_id ] = true;
 		}
 		error_log( sprintf( '[PR Core] Unsupported _prab_schema_version=%d on post %d. Supports v%d only. Emission suppressed.', $version, $post_id, self::SUPPORTED_VERSION ) );
-		return false;
+		return $this->triggered_cache[ $post_id ] = false;
 	}
 
 	/**
 	 * Read and validate _prab_citations meta.
 	 *
 	 * Each entry must have a valid http/https `url` and a non-empty `title`.
-	 * Invalid entries are skipped individually. `quality_score` is never emitted
-	 * (no schema.org mapping — contract v1).
+	 * Invalid entries are skipped. `quality_score` is never emitted (no schema.org
+	 * mapping — contract v1).
 	 *
 	 * @param int $post_id WordPress post ID.
-	 * @return array<int, array{url: string, title: string, doi: string|null}> Validated citations.
+	 * @return array<int, array{url: string, title: string, doi: string|null}> Validated.
 	 */
 	public function get_citations( int $post_id ): array {
 		$decoded = $this->decode_json_meta( $post_id, self::META_CITATIONS );
@@ -135,7 +120,8 @@ class PR_Core_Prab_Meta_Reader {
 	 * Read and validate _prab_about_peptides meta.
 	 *
 	 * Returns Drug stub arrays for schema `about`. Each peptide post ID must
-	 * resolve to a published `peptide` post; unresolvable IDs are skipped.
+	 * resolve to a published `peptide` post; unresolvable IDs and posts whose
+	 * permalink is empty are skipped.
 	 *
 	 * @param int $post_id WordPress post ID.
 	 * @return array<int, array<string, string>> Drug stubs.
@@ -157,7 +143,10 @@ class PR_Core_Prab_Meta_Reader {
 				|| PR_Core_Peptide_CPT::POST_TYPE !== $post->post_type ) {
 				continue;
 			}
-			$link    = (string) get_permalink( $pid );
+			$link = (string) get_permalink( $pid );
+			if ( '' === $link ) {
+				continue;
+			}
 			$stubs[] = array(
 				'@type' => 'Drug',
 				'@id'   => $link . '#drug',
@@ -207,11 +196,11 @@ class PR_Core_Prab_Meta_Reader {
 	 * Resolve the honest reviewedBy value for a PRAB article.
 	 *
 	 * Returns a Person node only when mode='human' AND _prab_reviewed_by resolves
-	 * to an existing WP user. All other cases return the Organization node.
-	 * Never emits a fabricated Person — that is the core contract guarantee.
+	 * to an existing WP user with a non-empty display_name. All other cases return
+	 * the Organization node. Never emits a fabricated Person — core contract.
 	 *
 	 * Person @id: {home_url}/#/schema/person/{user_id} (Yoast convention).
-	 * Org @id: {home_url}/#organization (references Yoast's existing publisher node).
+	 * Org @id: {home_url}/#organization (references Yoast's publisher node).
 	 *
 	 * @param int    $post_id     WordPress post ID.
 	 * @param string $review_mode Result of get_review_mode() for this post.
@@ -222,13 +211,15 @@ class PR_Core_Prab_Meta_Reader {
 			$uid  = absint( get_post_meta( $post_id, self::META_REVIEWED_BY, true ) );
 			$user = $uid > 0 ? get_userdata( $uid ) : false;
 			if ( $user instanceof WP_User ) {
-				return array(
-					'@type' => 'Person',
-					'@id'   => home_url( '/#/schema/person/' . $uid ),
-					'name'  => sanitize_text_field( $user->display_name ),
-				);
+				$display = sanitize_text_field( $user->display_name );
+				if ( '' !== $display ) {
+					return array(
+						'@type' => 'Person',
+						'@id'   => home_url( '/#/schema/person/' . $uid ),
+						'name'  => $display,
+					);
+				}
 			}
-			// Log missing/unresolvable user and fall through to Org.
 			error_log( sprintf( '[PR Core] _prab_review_mode=human but reviewed_by user (ID=%d) unresolvable on post %d. Emitting Organization.', $uid, $post_id ) );
 		}
 		return array(

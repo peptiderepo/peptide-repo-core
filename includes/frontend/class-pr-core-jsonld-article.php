@@ -62,7 +62,7 @@ class PR_Core_Jsonld_Article {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_filter( 'wpseo_schema_webpage_type', array( $this, 'retype_article_page' ) );
+		add_filter( 'wpseo_schema_webpage_type', array( $this, 'retype_article_page' ), 10 );
 		add_filter( 'wpseo_schema_graph', array( $this, 'enrich_article_graph' ), 13, 2 );
 		add_action( 'wp_head', array( $this, 'emit_standalone_fallback' ), 99 );
 	}
@@ -151,7 +151,7 @@ class PR_Core_Jsonld_Article {
 	 *
 	 * Suppressed when Yoast is loaded. Emits Article + MedicalWebPage nodes
 	 * with Yoast-parity @id conventions so consumers see one shape regardless
-	 * of whether Yoast is present.
+	 * of whether Yoast is present. Skips posts whose permalink cannot be resolved.
 	 *
 	 * @return void
 	 */
@@ -167,7 +167,11 @@ class PR_Core_Jsonld_Article {
 			return;
 		}
 
-		$permalink   = (string) get_permalink( $post_id );
+		$permalink = (string) get_permalink( $post_id );
+		if ( '' === $permalink ) {
+			return;
+		}
+
 		$post        = get_post( $post_id );
 		$review_mode = $this->reader->get_review_mode( $post_id );
 		$reviewed_at = $this->reader->get_reviewed_at( $post_id );
@@ -198,16 +202,19 @@ class PR_Core_Jsonld_Article {
 			$article['about'] = $about_stubs;
 		}
 
-		printf(
-			'<script type="application/ld+json">%s</script>' . "\n",
-			wp_json_encode(
-				array(
-					'@context' => 'https://schema.org',
-					'@graph'   => array( $webpage, $article ),
-				),
-				JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
-			)
+		$json = wp_json_encode(
+			array(
+				'@context' => 'https://schema.org',
+				'@graph'   => array( $webpage, $article ),
+			),
+			JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
 		);
+		if ( false !== $json ) {
+			printf(
+				'<script type="application/ld+json">%s</script>' . "\n",
+				$json
+			);
+		}
 	}
 
 	// ── Private builders ─────────────────────────────────────────────────

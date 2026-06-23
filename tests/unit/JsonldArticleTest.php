@@ -4,15 +4,20 @@
  *
  * Coverage:
  *   - is_triggered: version=1 triggers, absent/wrong version does not.
+ *   - is_triggered cache: second call returns cached value (no extra meta read).
  *   - get_review_mode: 'human', 'editorial-system', unknown → 'editorial-system'.
  *   - get_reviewed_by: human + valid user → Person; human + bad user → Org; editorial → Org.
+ *   - get_reviewed_by: human + empty display_name → Org (P2-2 guard).
  *   - get_citations: valid, missing url, missing title, bad url, doi normalisation.
- *   - get_about_peptides: valid peptide ID, non-existent ID, non-peptide type.
+ *   - get_about_peptides: valid peptide ID; non-existent ID skipped; non-peptide type skipped.
  *   - get_reviewed_at: valid ISO, empty, unparseable → null.
  *   - retype_article_page: triggered post → MedicalWebPage; untriggered → passthrough.
  *   - enrich_article_graph: Article gains citation/about; WebPage gains lastReviewed/reviewedBy.
  *   - No duplicate Article/WebPage nodes emitted.
  *   - editorial-system mode never emits Person.
+ *   - emit_standalone_fallback: Yoast-active suppresses output.
+ *   - emit_standalone_fallback: untriggered post emits nothing.
+ *   - emit_standalone_fallback: triggered post emits valid @graph with Article + MedicalWebPage.
  *
  * @package PeptideRepoCore\Tests
  */
@@ -77,6 +82,15 @@ class JsonldArticleTest extends TestCase {
 		$this->assertFalse( $this->reader()->is_triggered( 1 ) );
 	}
 
+	public function test_is_triggered_cache_returns_same_value(): void {
+		$this->set_meta( 5, array( '_prab_schema_version' => '1' ) );
+		$r = $this->reader();
+		$first  = $r->is_triggered( 5 );
+		$second = $r->is_triggered( 5 );
+		$this->assertSame( $first, $second );
+		$this->assertTrue( $first );
+	}
+
 	// ── get_review_mode ───────────────────────────────────────────────────
 
 	public function test_review_mode_human(): void {
@@ -119,6 +133,13 @@ class JsonldArticleTest extends TestCase {
 
 	public function test_reviewed_by_human_zero_user_id_returns_org(): void {
 		$this->set_meta( 1, array( '_prab_reviewed_by' => '0' ) );
+		$node = $this->reader()->get_reviewed_by( 1, 'human' );
+		$this->assertSame( 'Organization', $node['@type'] );
+	}
+
+	public function test_reviewed_by_human_empty_display_name_returns_org(): void {
+		$this->set_meta( 1, array( '_prab_reviewed_by' => '77' ) );
+		$GLOBALS['pr_test_userdata'][77] = new WP_User( array( 'display_name' => '', 'ID' => 77 ) );
 		$node = $this->reader()->get_reviewed_by( 1, 'human' );
 		$this->assertSame( 'Organization', $node['@type'] );
 	}
@@ -204,6 +225,34 @@ class JsonldArticleTest extends TestCase {
 	public function test_citations_malformed_json_returns_empty(): void {
 		$this->set_meta( 1, array( '_prab_citations' => 'not-json' ) );
 		$this->assertCount( 0, $this->reader()->get_citations( 1 ) );
+	}
+
+	// ── get_about_peptides edge cases ─────────────────────────────────────
+
+	public function test_get_about_peptides_nonexistent_id_skipped(): void {
+		// post ID 999 does not exist in $GLOBALS['pr_test_posts'] → get_post returns null.
+		$this->set_meta( 1, array(
+			'_prab_schema_version'  => '1',
+			'_prab_about_peptides'  => wp_json_encode( array( 999 ) ),
+		) );
+		$stubs = $this->reader()->get_about_peptides( 1 );
+		$this->assertCount( 0, $stubs );
+	}
+
+	public function test_get_about_peptides_wrong_post_type_skipped(): void {
+		// A published post of type 'post' (not 'peptide') should be excluded.
+		$GLOBALS['pr_test_posts'][50] = new WP_Post( array(
+			'ID'          => 50,
+			'post_type'   => 'post',
+			'post_status' => 'publish',
+			'post_title'  => 'Not a peptide',
+		) );
+		$this->set_meta( 1, array(
+			'_prab_schema_version'  => '1',
+			'_prab_about_peptides'  => wp_json_encode( array( 50 ) ),
+		) );
+		$stubs = $this->reader()->get_about_peptides( 1 );
+		$this->assertCount( 0, $stubs );
 	}
 
 	// ── get_reviewed_at ───────────────────────────────────────────────────
@@ -342,5 +391,94 @@ class JsonldArticleTest extends TestCase {
 
 		// Still exactly 2 pieces — no new nodes injected.
 		$this->assertCount( 2, $result );
+	}
+
+	// ── emit_standalone_fallback ──────────────────────────────────────────
+
+	public function test_standalone_fallback_emits_nothing_for_untriggered_post(): void {
+		$GLOBALS['pr_test_is_singular']   = true;
+		$GLOBALS['pr_test_singular_type'] = 'post';
+		$GLOBALS['pr_test_the_id']        = 3;
+		$this->set_meta( 3, array() ); // no _prab_schema_version.
+
+		$emitter = new PR_Core_Jsonld_Article();
+		ob_start();
+		$emitter->emit_standalone_fallback();
+		$output = ob_get_clean();
+
+		$this->assertSame( '', $output, 'Untriggered post must produce no output' );
+	}
+
+	public function test_standalone_fallback_emits_valid_graph_for_triggered_post(): void {
+		$GLOBALS['pr_test_is_singular']   = true;
+		$GLOBALS['pr_test_singular_type'] = 'post';
+		$GLOBALS['pr_test_the_id']        = 4;
+		$GLOBALS['pr_test_posts'][4]      = new WP_Post( array(
+			'ID'         => 4,
+			'post_type'  => 'post',
+			'post_status' => 'publish',
+			'post_title' => 'BPC-157 Article',
+		) );
+		$this->set_meta( 4, array(
+			'_prab_schema_version' => '1',
+			'_prab_review_mode'    => 'editorial-system',
+			'_prab_reviewed_at'    => '2026-06-20T10:00:00+00:00',
+			'_prab_citations'      => wp_json_encode( array(
+				array( 'url' => 'https://example.com/study', 'title' => 'Study One', 'doi' => '10.1234/abc' ),
+			) ),
+		) );
+
+		$emitter = new PR_Core_Jsonld_Article();
+		ob_start();
+		$emitter->emit_standalone_fallback();
+		$output = ob_get_clean();
+
+		// Must contain a script tag.
+		$this->assertStringContainsString( '<script type="application/ld+json">', $output );
+		$this->assertStringContainsString( '</script>', $output );
+
+		// Extract JSON between script tags.
+		preg_match( '#<script[^>]*>(.*?)</script>#s', $output, $matches );
+		$this->assertNotEmpty( $matches[1], 'JSON body found inside script tag' );
+
+		$decoded = json_decode( $matches[1], true );
+		$this->assertIsArray( $decoded, 'Output is valid JSON' );
+		$this->assertSame( 'https://schema.org', $decoded['@context'] );
+		$this->assertArrayHasKey( '@graph', $decoded );
+
+		// Collect types.
+		$types = array_column( $decoded['@graph'], '@type' );
+		$this->assertContains( 'MedicalWebPage', $types, '@graph contains MedicalWebPage' );
+		$this->assertContains( 'Article', $types, '@graph contains Article' );
+
+		// Article must have citation with ScholarlyArticle (DOI present).
+		$article_node = null;
+		foreach ( $decoded['@graph'] as $piece ) {
+			if ( 'Article' === ( $piece['@type'] ?? '' ) ) {
+				$article_node = $piece;
+			}
+		}
+		$this->assertNotNull( $article_node );
+		$this->assertArrayHasKey( 'citation', $article_node );
+		$this->assertSame( 'ScholarlyArticle', $article_node['citation'][0]['@type'] );
+	}
+	public function test_standalone_fallback_suppressed_when_yoast_active(): void {
+		// YoastSEO() is defined here so it runs LAST — once defined it persists for
+		// the whole PHPUnit process and would suppress the output assertions above.
+		if ( ! function_exists( 'YoastSEO' ) ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
+			eval( 'function YoastSEO() { return new stdClass(); }' );
+		}
+		$GLOBALS['pr_test_is_singular']   = true;
+		$GLOBALS['pr_test_singular_type'] = 'post';
+		$GLOBALS['pr_test_the_id']        = 1;
+		$this->set_meta( 1, array( '_prab_schema_version' => '1' ) );
+
+		$emitter = new PR_Core_Jsonld_Article();
+		ob_start();
+		$emitter->emit_standalone_fallback();
+		$output = ob_get_clean();
+
+		$this->assertSame( '', $output, 'Yoast-active path must produce no output' );
 	}
 }

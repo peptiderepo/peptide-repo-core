@@ -113,3 +113,62 @@ Gutenberg block. Not surfaced in JSON-LD (dosing YMYL constraint).
 `PR_Core_Migration_Runner` — runs numbered migrations (0001–N) sequentially on every
 `plugins_loaded`. Compares `pr_core_schema_version` wp_option against
 `PR_CORE_TARGET_SCHEMA_VERSION` constant. All migrations are idempotent and re-runnable.
+
+## _prab_* meta namespace
+
+Post-meta keys written exclusively by PRAutoBlogger (PRAB) and read by prcore's
+`PR_Core_Prab_Meta_Reader` at render time. The namespace is `_prab_` (PRAutoBlogger
+private). Ownership split: **PRAB writes, prcore reads**. No other plugin reads or
+writes `_prab_*` meta. Contract v1 keys (frozen; additive evolution only, gated by
+`_prab_schema_version`):
+
+| Key | Type | Purpose |
+|---|---|---|
+| `_prab_schema_version` | int (1) | Opt-in trigger; presence + value = 1 enables JSON-LD emission |
+| `_prab_citations` | JSON array | `[{url, doi?, title, quality_score?}]` — validated sources |
+| `_prab_about_peptides` | JSON array | Peptide post IDs → Drug `@id` references in `about[]` |
+| `_prab_review_mode` | string | `human` \| `editorial-system` |
+| `_prab_reviewed_at` | string | ISO 8601 datetime → `lastReviewed` |
+| `_prab_reviewed_by` | int | WP user ID of Review Queue approver (required when mode=`human`) |
+
+All `_prab_*` values are treated as **untrusted at read time**: sanitized and
+validated by `PR_Core_Prab_Meta_Reader` before any schema.org output is produced.
+Malformed values degrade gracefully (skipped/null); no fatal path exists.
+Canonical contract: `convo/prcore/decisions/2026-06-11-jsonld-contract-v1.md`.
+
+## Meta-reader pattern
+
+`PR_Core_Prab_Meta_Reader` is the dedicated sanitizer class that isolates all
+`_prab_*` meta reading and validation from the emitter (`PR_Core_Jsonld_Article`).
+The pattern: **one sanitizer class per untrusted meta namespace**. The reader owns
+all `get_post_meta` calls for the namespace, validates every field, and returns
+typed clean values. The emitter (consumer) never calls `get_post_meta` directly.
+
+This keeps the emitter testable without the meta contract details and ensures that
+adding a new `_prab_*` field never touches the emission logic. Future `_prab_v2_*`
+fields would use a v2 reader that the emitter selects by version.
+
+## ScholarlyArticle
+
+A `schema.org/ScholarlyArticle` node emitted inside a citation array (`citation[]`)
+on the `Article` graph piece when a validated DOI is present in the PRAB citation
+record. Emitted with `url` (the citation URL), `name` (the citation title), and
+`sameAs` (the canonical `https://doi.org/` URI). When no DOI is available,
+`CreativeWork` is emitted instead. Per contract v1, `quality_score` is never
+emitted (no schema.org mapping).
+
+## Honest reviewedBy (integrity constraint)
+
+The `reviewedBy` field on the `MedicalWebPage` node emits a `schema.org/Person`
+node **only** when all three conditions hold simultaneously:
+1. `_prab_review_mode` = `human`
+2. `_prab_reviewed_by` resolves to a WP user ID > 0
+3. `get_userdata()` returns a valid `WP_User` instance with a non-empty
+   `display_name`
+
+Any other combination (missing mode, zero user ID, unresolvable user, or
+editorial-system mode) produces a `schema.org/Organization` node (Peptide Repo
+editorial). This is an **integrity constraint**, not a UI choice: emitting a
+fabricated Person would constitute misleading structured data. The constraint is
+enforced in `PR_Core_Prab_Meta_Reader::get_reviewed_by()` and covered by dedicated
+unit tests.
