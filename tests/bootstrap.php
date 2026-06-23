@@ -170,6 +170,11 @@ if ( ! function_exists( 'is_email' ) ) {
 		return (bool) filter_var( $email, FILTER_VALIDATE_EMAIL );
 	}
 }
+if ( ! function_exists( 'wp_parse_url' ) ) {
+	function wp_parse_url( string $url, int $component = -1 ) {
+		return parse_url( $url, $component );
+	}
+}
 
 // ── Option / cron stubs ───────────────────────────────────────────────.
 
