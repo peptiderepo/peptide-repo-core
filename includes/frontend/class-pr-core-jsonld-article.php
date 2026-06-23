@@ -39,7 +39,11 @@ declare(strict_types=1);
  */
 class PR_Core_Jsonld_Article {
 
-	/** @var PR_Core_Prab_Meta_Reader Meta reader instance. */
+	/**
+	 * Meta reader instance.
+	 *
+	 * @var PR_Core_Prab_Meta_Reader
+	 */
 	private PR_Core_Prab_Meta_Reader $reader;
 
 	/**

@@ -27,25 +27,53 @@ declare(strict_types=1);
  */
 class PR_Core_Prab_Meta_Reader {
 
-	/** @var string Presence = opt-in trigger; value must equal 1. */
+	/**
+	 * Schema version meta key; presence opts the post in, value must equal 1.
+	 *
+	 * @var string
+	 */
 	public const META_SCHEMA_VERSION = '_prab_schema_version';
 
-	/** @var string JSON array of {url, title, doi?, quality_score?} citation objects. */
+	/**
+	 * Citations meta key; JSON array of {url, title, doi?, quality_score?} objects.
+	 *
+	 * @var string
+	 */
 	public const META_CITATIONS = '_prab_citations';
 
-	/** @var string JSON array of peptide post IDs (ints) for `about` linkage. */
+	/**
+	 * About-peptides meta key; JSON array of peptide post IDs (ints) for schema `about`.
+	 *
+	 * @var string
+	 */
 	public const META_ABOUT_PEPTIDES = '_prab_about_peptides';
 
-	/** @var string Review mode: 'human' | 'editorial-system'. */
+	/**
+	 * Review mode meta key; value is 'human' or 'editorial-system'.
+	 *
+	 * @var string
+	 */
 	public const META_REVIEW_MODE = '_prab_review_mode';
 
-	/** @var string ISO 8601 datetime of last review. */
+	/**
+	 * Reviewed-at meta key; ISO 8601 datetime of last review.
+	 *
+	 * @var string
+	 */
 	public const META_REVIEWED_AT = '_prab_reviewed_at';
 
-	/** @var string WP user ID of the Review Queue approver. */
+	/**
+	 * Reviewed-by meta key; stores the WP user ID of the Review Queue approver.
+	 *
+	 * @var string
+	 */
 	public const META_REVIEWED_BY = '_prab_reviewed_by';
 
-	/** @var int The only schema version this reader supports. */
+	/**
+	 * The only schema version this reader currently supports.
+	 *
+	 * @var int
+	 */
 	private const SUPPORTED_VERSION = 1;
 
 	/**
@@ -240,7 +268,7 @@ class PR_Core_Prab_Meta_Reader {
 		if ( '' === $url || ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
 			return '';
 		}
-		$scheme = (string) parse_url( $url, PHP_URL_SCHEME );
+		$scheme = (string) wp_parse_url( $url, PHP_URL_SCHEME );
 		return in_array( $scheme, array( 'http', 'https' ), true ) ? $url : '';
 	}
 
